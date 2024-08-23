@@ -1,3 +1,4 @@
+ARG GUI_VERSION=dev
 FROM node:18-alpine AS base
 
 # Install dependencies only when needed
@@ -29,6 +30,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN npm run build
 
+RUN echo ${GUI_VERSION} > /app/gui-version.txt
+
 # Production image, copy all the files and run next
 FROM base AS runner
 WORKDIR /app
@@ -46,8 +49,7 @@ COPY --from=builder /app/public ./public
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-COPY gui-version.txt ./
+COPY --from=builder /app/gui-version.txt ./
 
 USER nextjs
 
