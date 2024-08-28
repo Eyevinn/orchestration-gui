@@ -127,3 +127,25 @@ export async function getSourceThumbnail(
   }
   throw await response.json();
 }
+
+export async function deleteSrtSource(ingestUuid: string, sourceId: number) {
+  const response = await fetch(
+    new URL(
+      AGILE_BASE_API_PATH + `/ingests/${ingestUuid}/sources/${sourceId}`,
+      process.env.AGILE_URL
+    ),
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: getAuthorizationHeader()
+      },
+      next: {
+        revalidate: 0
+      }
+    }
+  );
+  if (response.ok) {
+    return response.status;
+  }
+  throw await response.text();
+}

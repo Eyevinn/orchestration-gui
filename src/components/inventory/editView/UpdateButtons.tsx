@@ -4,8 +4,15 @@ import { EditViewContext } from '../EditViewContext';
 import { useTranslate } from '../../../i18n/useTranslate';
 import styles from './animation.module.scss';
 import { Loader } from '../../loader/Loader';
+import { IconTrash } from '@tabler/icons-react';
 
-export default function UpdateButtons({ close }: { close: () => void }) {
+export default function UpdateButtons({
+  close,
+  deleteInventorySource
+}: {
+  close: () => void;
+  deleteInventorySource: () => void;
+}) {
   const t = useTranslate();
   const {
     saved: [saved],
@@ -22,6 +29,14 @@ export default function UpdateButtons({ close }: { close: () => void }) {
       </div>
 
       <div className="flex">
+        <Button
+          state="warning"
+          className="mr-5 relative flex"
+          type="submit"
+          onClick={deleteInventorySource}
+        >
+          <IconTrash className="text-p" />
+        </Button>
         <Button state="warning" onClick={close}>
           {t('close')}
         </Button>

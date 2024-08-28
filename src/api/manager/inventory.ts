@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
 import { Numbers } from '../../interfaces/Source';
+import { Log } from '../logger';
 
 interface IResponse {
   audio_stream?: {
@@ -19,4 +20,15 @@ export async function getAudioMapping(id: ObjectId): Promise<IResponse> {
     .catch(() => {
       throw `Could not find audio mapping for source: ${id.toString()}`;
     })) as IResponse;
+}
+
+export async function deleteInventorySourceItem(id: string): Promise<void> {
+  const db = await getDatabase();
+  // Information sent to db:
+  console.log('DB', { _id: { $eq: new ObjectId(id) } });
+
+  await db
+    .collection('inventory')
+    .deleteOne({ _id: { $eq: new ObjectId(id) } });
+  Log().info('Deleted source', id);
 }
