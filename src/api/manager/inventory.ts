@@ -24,11 +24,15 @@ export async function getAudioMapping(id: ObjectId): Promise<IResponse> {
 
 export async function deleteInventorySourceItem(id: string): Promise<void> {
   const db = await getDatabase();
-  // Information sent to db:
-  console.log('DB', { _id: { $eq: new ObjectId(id) } });
 
-  await db
+  const document = await db
     .collection('inventory')
-    .deleteOne({ _id: { $eq: new ObjectId(id) } });
+    .findOne({ _id: new ObjectId(id) });
+  console.log('DB dokument', document);
+  if (!document) {
+    console.log('Document not found');
+  }
+
+  await db.collection('inventory').deleteOne({ _id: new ObjectId(id) });
   Log().info('Deleted source', id);
 }
