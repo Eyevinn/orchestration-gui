@@ -78,7 +78,8 @@ export async function runSyncInventory() {
 
     const databaseStatus = inventorySource.status;
     const apiStatus = apiSource.status;
-    const isStatusGoneAndSetToPurge = databaseStatus === 'purge' && apiStatus === 'gone';
+    const isStatusGoneAndSetToPurge =
+      databaseStatus === 'purge' && apiStatus === 'gone';
 
     // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
     return {
