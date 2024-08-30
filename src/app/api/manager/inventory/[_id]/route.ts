@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
-import { deleteInventorySourceItem } from '../../../../../api/manager/inventory';
+import { putDeleteFlagOnInventorySourceItem } from '../../../../../api/manager/inventory';
 
-export async function DELETE(
+export async function PUT(
   request: NextRequest,
   { params }: { params: Params }
 ): Promise<NextResponse> {
@@ -14,10 +14,20 @@ export async function DELETE(
   }
 
   try {
-    await deleteInventorySourceItem(params._id);
-    return new NextResponse(null, {
-      status: 200
-    });
+    const response = await putDeleteFlagOnInventorySourceItem(params._id);
+    if (response.acknowledged && response.modifiedCount === 0) {
+      return new NextResponse(`Did not match requirements`, {
+        status: 204
+      });
+    } else if (response.acknowledged) {
+      return new NextResponse(null, {
+        status: 200
+      });
+    } else {
+      return new NextResponse(`Could not update database-status`, {
+        status: 500
+      });
+    }
   } catch (error) {
     return new NextResponse(
       `Error occurred while posting to DB! Error: ${error}`,

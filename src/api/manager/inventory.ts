@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, UpdateResult } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
 import { Numbers } from '../../interfaces/Source';
 import { Log } from '../logger';
@@ -22,17 +22,20 @@ export async function getAudioMapping(id: ObjectId): Promise<IResponse> {
     })) as IResponse;
 }
 
-export async function deleteInventorySourceItem(id: string): Promise<void> {
+export async function putDeleteFlagOnInventorySourceItem(
+  id: string
+): Promise<UpdateResult<Document>> {
   const db = await getDatabase();
+  const objectId = new ObjectId(id);
 
-  const document = await db
+  // Not possible to delete from API so this adds a purge-flag
+  // to the source
+  const result = await db
     .collection('inventory')
-    .findOne({ _id: new ObjectId(id) });
-  console.log('DB dokument', document);
-  if (!document) {
-    console.log('Document not found');
-  }
+    .updateOne({ _id: objectId, status: 'gone' }, { $set: { status: 'purge' } })
+    .catch((error) => {
+      Log().info(`Was not able to set source-id for ${id} to purge: ${error} `);
+    });
 
-  await db.collection('inventory').deleteOne({ _id: new ObjectId(id) });
-  Log().info('Deleted source', id);
+  return result as UpdateResult<Document>;
 }
