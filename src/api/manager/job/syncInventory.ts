@@ -42,7 +42,8 @@ async function getSourcesFromAPI() {
             audio_stream: {
               number_of_channels: source?.audio_stream?.number_of_channels,
               sample_rate: source?.audio_stream?.sample_rate
-            }
+            },
+          createdAt: new Date()
           } satisfies SourceWithoutLastConnected)
       );
     }
@@ -57,8 +58,8 @@ async function getSourcesFromAPI() {
  */
 export async function runSyncInventory() {
   const db = await getDatabase();
-  const dbInventory = await db.collection<Source>('inventory').find().toArray();
   const apiSources = await getSourcesFromAPI();
+  const dbInventory = await db.collection<Source>('inventory').find().toArray();
 
   // Update status of all sources in the inventory to the status found in API.
   // If a source is not found in the API, it is marked as gone.
@@ -74,10 +75,22 @@ export async function runSyncInventory() {
       // If source was not found in response from API, always mark it as gone
       return { ...inventorySource, status: 'gone' } satisfies WithId<Source>;
     }
-    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status and set the lastConnected to the current date
+    const statusUpdateCheck = () => {
+      const databaseStatus = inventorySource.status;
+      const apiStatus = apiSource.status;
+      if (apiStatus === 'new') {
+        return apiStatus;
+      } else if (databaseStatus === 'purge' && apiStatus === 'gone') {
+        return databaseStatus;
+      } else {
+        return apiStatus;
+      }
+    };
+
+    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
     return {
       ...inventorySource,
-      status: apiSource.status,
+      status: statusUpdateCheck(),
       lastConnected:
         apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
     } satisfies WithId<Source>;
