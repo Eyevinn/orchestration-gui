@@ -623,13 +623,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
           />
         </div>
       </HeaderNavigation>
-      <div className="flex max-h-full min-h-[100%] flex-row">
+      <div className="flex h-[95%] flex-row">
         <div
           className={`overflow-hidden transition-[min-width] w-0 min-w-0 ${
             inventoryVisible ? 'min-w-[35%] ml-2 mt-2 max-h-[89vh]' : ''
           }`}
         >
-          <div className={`p-3 w-full bg-container rounded break-all h-full`}>
+          <div className={`p-3 w-full bg-container rounded break-all h-[98%]`}>
             <div className="flex justify-end mb-2">
               <button className="flex justify-end mb-2">
                 <IconX
@@ -648,7 +648,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               </FilterProvider>
             </div>
             <ul
-              className={`flex flex-col border-t border-gray-600 overflow-scroll h-full ${
+              className={`flex flex-col border-t border-gray-600 overflow-scroll h-[91%] ${
                 !inventoryVisible && 'hidden'
               } ${styles.no_scrollbar}`}
             >
