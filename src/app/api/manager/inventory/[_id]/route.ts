@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
-import { putDeleteFlagOnInventorySourceItem } from '../../../../../api/manager/inventory';
+import { purgeInventorySourceItem } from '../../../../../api/manager/inventory';
 
 export async function PUT(
   request: NextRequest,
@@ -14,7 +14,7 @@ export async function PUT(
   }
 
   try {
-    const response = await putDeleteFlagOnInventorySourceItem(params._id);
+    const response = await purgeInventorySourceItem(params._id);
     if (response.acknowledged && response.modifiedCount === 0) {
       return new NextResponse(`Did not match requirements`, {
         status: 204

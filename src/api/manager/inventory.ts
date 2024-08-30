@@ -22,7 +22,7 @@ export async function getAudioMapping(id: ObjectId): Promise<IResponse> {
     })) as IResponse;
 }
 
-export async function putDeleteFlagOnInventorySourceItem(
+export async function purgeInventorySourceItem(
   id: string
 ): Promise<UpdateResult<Document>> {
   const db = await getDatabase();
