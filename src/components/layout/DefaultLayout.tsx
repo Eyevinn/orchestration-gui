@@ -7,7 +7,7 @@ export default function DefaultLayout({
 }) {
   return (
     <div className="flex h-screen justify-between w-full flex-col">
-      <div className="flex flex-row rounded p-2 w-full mb-8">
+      <div className="flex flex-row rounded p-2 w-full mb-8 h-full">
         <div className="p-3 m-2 grow rounded">{children}</div>
       </div>
 

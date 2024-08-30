@@ -92,7 +92,7 @@ export default function Inventory() {
         </div>
 
         {currentSource ? (
-          <div className={`p-3 ml-2 mt-2 bg-container rounded h-1/2 min-w-max`}>
+          <div className={`p-3 ml-2 mt-2 bg-container rounded h-[60%] min-w-max`}>
             <EditView
               source={currentSource}
               updateSource={(source) => setUpdatedSource(source)}
