@@ -7,16 +7,20 @@ import SourceListItem from '../../components/sourceListItem/SourceListItem';
 import { SourceWithId } from '../../interfaces/Source';
 import EditView from './editView/EditView';
 import FilterContext from './FilterContext';
+import { useDeleteSource } from '../../hooks/sources/useDeleteSource';
 import styles from './Inventory.module.scss';
 
 export default function Inventory() {
+  const [itemToDelete, setItemToDelete] = useState<SourceWithId | null>(null);
+  const [loading, deleteComplete] = useDeleteSource(itemToDelete);
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
   >();
-  const [sources] = useSources(updatedSource);
+  const [sources] = useSources(deleteComplete, updatedSource);
   const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
   const [filteredSources, setFilteredSources] =
     useState<Map<string, SourceWithId>>(sources);
+
   const inventoryVisible = true;
 
   useEffect(() => {
@@ -24,6 +28,13 @@ export default function Inventory() {
       setCurrentSource(updatedSource);
     }
   }, [updatedSource]);
+
+  useEffect(() => {
+    if (deleteComplete) {
+      setItemToDelete(null);
+      setCurrentSource(null);
+    }
+  }, [deleteComplete]);
 
   const editSource = (source: SourceWithId) => {
     setCurrentSource(() => source);
@@ -35,23 +46,25 @@ export default function Inventory() {
     return Array.from(
       filteredSources.size > 0 ? filteredSources.values() : sources.values()
     ).map((source, index) => {
-      return (
-        <SourceListItem
-          edit
-          key={`${source.ingest_source_name}-${index}`}
-          source={source}
-          disabled={false}
-          action={(source) => {
-            editSource(source);
-          }}
-        />
-      );
+      if (source.status !== 'purge') {
+        return (
+          <SourceListItem
+            edit
+            key={`${source.ingest_source_name}-${index}`}
+            source={source}
+            disabled={false}
+            action={(source) => {
+              editSource(source);
+            }}
+          />
+        );
+      }
     });
   }
 
   return (
     <FilterContext sources={sources}>
-      <div className="flex max-h-full min-h-[100%] flex-row">
+      <div className="flex h-[93%] flex-row">
         <div
           className={
             inventoryVisible
@@ -71,9 +84,9 @@ export default function Inventory() {
               />
             </div>
             <ul
-              className={`flex flex-col border-t border-gray-600 overflow-scroll h-full ${styles.no_scrollbar}`}
+              className={`flex flex-col border-t border-gray-600 overflow-scroll h-[95%] ${styles.no_scrollbar}`}
             >
-              {getSourcesToDisplay(filteredSources)}
+              {loading ? '' : getSourcesToDisplay(filteredSources)}
             </ul>
           </div>
         </div>
@@ -84,6 +97,7 @@ export default function Inventory() {
               source={currentSource}
               updateSource={(source) => setUpdatedSource(source)}
               close={() => setCurrentSource(null)}
+              deleteInventorySource={(source) => setItemToDelete(source)}
             />
           </div>
         ) : null}

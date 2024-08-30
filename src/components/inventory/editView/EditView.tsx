@@ -1,40 +1,26 @@
 import Image from 'next/image';
 import { getSourceThumbnail } from '../../../utils/source';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import EditViewContext from '../EditViewContext';
 import GeneralSettings from './GeneralSettings';
 import { SourceWithId } from '../../../interfaces/Source';
 import UpdateButtons from './UpdateButtons';
 import AudioChannels from './AudioChannels/AudioChannels';
 import { IconExclamationCircle } from '@tabler/icons-react';
-import { useDeleteSource } from '../../../hooks/sources/useDeleteSource';
 
 export default function EditView({
   source,
   updateSource,
-  close
+  close,
+  deleteInventorySource
 }: {
   source: SourceWithId;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
+  deleteInventorySource: (source: SourceWithId) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<SourceWithId | null>(null);
   const src = useMemo(() => getSourceThumbnail(source), [source]);
-  const [loading, deleteComplete] = useDeleteSource(itemToDelete);
-
-  const deleteInventorySource = async () => {
-    console.log('delete: ', source);
-    setItemToDelete(source);
-  };
-
-  useEffect(() => {
-    if (deleteComplete) {
-      console.log('RESET - delete is done: ', deleteComplete);
-      setItemToDelete(null);
-      close();
-    }
-  }, [close, deleteComplete]);
 
   return (
     <EditViewContext source={source} updateSource={updateSource}>
@@ -66,10 +52,10 @@ export default function EditView({
       <div className="flex-auto">
         <AudioChannels source={source} />
       </div>
-
       <UpdateButtons
         close={close}
-        deleteInventorySource={() => deleteInventorySource()}
+        deleteInventorySource={deleteInventorySource}
+        source={source}
       />
     </EditViewContext>
   );
