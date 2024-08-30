@@ -11,8 +11,7 @@ import { useDeleteSource } from '../../hooks/sources/useDeleteSource';
 import styles from './Inventory.module.scss';
 
 export default function Inventory() {
-  const [itemToDelete, setItemToDelete] = useState<SourceWithId | null>(null);
-  const [loading, deleteComplete] = useDeleteSource(itemToDelete);
+  const [deleteSource, deleteComplete] = useDeleteSource();
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
   >();
@@ -31,7 +30,6 @@ export default function Inventory() {
 
   useEffect(() => {
     if (deleteComplete) {
-      setItemToDelete(null);
       setCurrentSource(null);
     }
   }, [deleteComplete]);
@@ -86,18 +84,20 @@ export default function Inventory() {
             <ul
               className={`flex flex-col border-t border-gray-600 overflow-scroll h-[95%] ${styles.no_scrollbar}`}
             >
-              {loading ? '' : getSourcesToDisplay(filteredSources)}
+              {getSourcesToDisplay(filteredSources)}
             </ul>
           </div>
         </div>
 
         {currentSource ? (
-          <div className={`p-3 ml-2 mt-2 bg-container rounded h-[60%] min-w-max`}>
+          <div
+            className={`p-3 ml-2 mt-2 bg-container rounded h-[60%] min-w-max`}
+          >
             <EditView
               source={currentSource}
               updateSource={(source) => setUpdatedSource(source)}
               close={() => setCurrentSource(null)}
-              deleteInventorySource={(source) => setItemToDelete(source)}
+              deleteInventorySource={(source) => deleteSource(source)}
             />
           </div>
         ) : null}
