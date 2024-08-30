@@ -75,17 +75,10 @@ export async function runSyncInventory() {
       // If source was not found in response from API, always mark it as gone
       return { ...inventorySource, status: 'gone' } satisfies WithId<Source>;
     }
-    const statusUpdateCheck = () => {
-      const databaseStatus = inventorySource.status;
-      const apiStatus = apiSource.status;
-      if (apiStatus === 'new') {
-        return apiStatus;
-      } else if (databaseStatus === 'purge' && apiStatus === 'gone') {
-        return databaseStatus;
-      } else {
-        return apiStatus;
-      }
-    };
+
+    const databaseStatus = inventorySource.status;
+    const apiStatus = apiSource.status;
+    const isStatusGoneAndSetToPurge = databaseStatus === 'purge' && apiStatus === 'gone';
 
     // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
     return {
