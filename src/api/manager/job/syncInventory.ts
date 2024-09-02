@@ -61,18 +61,21 @@ export async function runSyncInventory() {
   const apiSources = await getSourcesFromAPI();
   const dbInventory = await db.collection<Source>('inventory').find().toArray();
 
-  const statusUpdateCheck = (inventorySource: WithId<Source>, apiSource: Source) => {
+  const statusUpdateCheck = (
+    inventorySource: WithId<Source>,
+    apiSource: Source
+  ) => {
     const databaseStatus = inventorySource.status;
     const apiStatus = apiSource.status;
     let currentTime = new Date().getTime();
     let createdAtTime = new Date(inventorySource.createdAt).getTime();
     let monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
     let expiryTime = createdAtTime + monthInMilliseconds;
-  
+
     if (databaseStatus === 'purge' && apiStatus === 'gone') {
       return databaseStatus;
     } else if (apiStatus === 'gone' && currentTime > expiryTime) {
-        return 'purge';
+      return 'purge';
     } else {
       return apiStatus;
     }
