@@ -67,10 +67,10 @@ export async function runSyncInventory() {
   ) => {
     const databaseStatus = inventorySource.status;
     const apiStatus = apiSource.status;
-    let currentTime = new Date().getTime();
-    let createdAtTime = new Date(inventorySource.createdAt).getTime();
-    let monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
-    let expiryTime = createdAtTime + monthInMilliseconds;
+    const currentTime = new Date().getTime();
+    const createdAtTime = new Date(inventorySource.createdAt).getTime();
+    const monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
+    const expiryTime = createdAtTime + monthInMilliseconds;
 
     if (databaseStatus === 'purge' && apiStatus === 'gone') {
       return databaseStatus;
