@@ -34,6 +34,6 @@ export function useSources(
     }
     sources.set(updatedSource._id.toString(), updatedSource);
     setSources(new Map<string, SourceWithId>(sources));
-  }, [updatedSource, deleteComplete, sources]);
+  }, [updatedSource, deleteComplete]);
   return [sources, loading];
 }
