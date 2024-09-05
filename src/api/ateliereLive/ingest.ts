@@ -128,8 +128,8 @@ export async function getSourceThumbnail(
 export async function deleteSrtSource(ingestUuid: string, sourceId: number) {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/ingests/${ingestUuid}/sources/${sourceId}`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/ingests/${ingestUuid}/sources/${sourceId}`,
+      process.env.LIVE_URL
     ),
     {
       method: 'DELETE',
