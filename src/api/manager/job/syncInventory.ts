@@ -57,8 +57,29 @@ async function getSourcesFromAPI() {
  */
 export async function runSyncInventory() {
   const db = await getDatabase();
-  const dbInventory = await db.collection<Source>('inventory').find().toArray();
   const apiSources = await getSourcesFromAPI();
+  const dbInventory = await db.collection<Source>('inventory').find().toArray();
+
+  const statusUpdateCheck = (
+    inventorySource: WithId<Source>,
+    apiSource: SourceWithoutLastConnected,
+    lastConnected: Date
+  ) => {
+    const databaseStatus = inventorySource.status;
+    const apiStatus = apiSource.status;
+    const currentTime = new Date().getTime();
+    const lastConnectedTime = new Date(lastConnected).getTime();
+    const monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
+    const expiryTime = lastConnectedTime + monthInMilliseconds;
+
+    if (databaseStatus === 'purge' && apiStatus === 'gone') {
+      return databaseStatus;
+    } else if (apiStatus === 'gone' && currentTime > expiryTime) {
+      return 'purge';
+    } else {
+      return apiStatus;
+    }
+  };
 
   // Update status of all sources in the inventory to the status found in API.
   // If a source is not found in the API, it is marked as gone.
@@ -73,12 +94,14 @@ export async function runSyncInventory() {
       // If source was not found in response from API, always mark it as gone
       return { ...inventorySource, status: 'gone' } satisfies WithId<Source>;
     }
-    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status and set the lastConnected to the current date
+    const lastConnected =
+      apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected;
+
+    // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
     return {
       ...inventorySource,
-      status: apiSource.status,
-      lastConnected:
-        apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
+      status: statusUpdateCheck(inventorySource, apiSource, lastConnected),
+      lastConnected: lastConnected
     } satisfies WithId<Source>;
   });
 

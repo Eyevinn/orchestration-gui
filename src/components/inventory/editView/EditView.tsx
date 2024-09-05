@@ -11,14 +11,17 @@ import { IconExclamationCircle } from '@tabler/icons-react';
 export default function EditView({
   source,
   updateSource,
-  close
+  close,
+  removeInventorySource
 }: {
   source: SourceWithId;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
+  removeInventorySource: (source: SourceWithId) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const src = useMemo(() => getSourceThumbnail(source), [source]);
+
   return (
     <EditViewContext source={source} updateSource={updateSource}>
       <div className="flex flex-row">
@@ -49,8 +52,11 @@ export default function EditView({
       <div className="flex-auto">
         <AudioChannels source={source} />
       </div>
-
-      <UpdateButtons close={close} />
+      <UpdateButtons
+        close={close}
+        removeInventorySource={removeInventorySource}
+        source={source}
+      />
     </EditViewContext>
   );
 }
