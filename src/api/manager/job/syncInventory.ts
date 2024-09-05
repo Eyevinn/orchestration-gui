@@ -42,8 +42,7 @@ async function getSourcesFromAPI() {
             audio_stream: {
               number_of_channels: source?.audio_stream?.number_of_channels,
               sample_rate: source?.audio_stream?.sample_rate
-            },
-            createdAt: new Date()
+            }
           } satisfies SourceWithoutLastConnected)
       );
     }
@@ -63,14 +62,15 @@ export async function runSyncInventory() {
 
   const statusUpdateCheck = (
     inventorySource: WithId<Source>,
-    apiSource: SourceWithoutLastConnected
+    apiSource: SourceWithoutLastConnected,
+    lastConnected: Date
   ) => {
     const databaseStatus = inventorySource.status;
     const apiStatus = apiSource.status;
     const currentTime = new Date().getTime();
-    const createdAtTime = new Date(inventorySource.createdAt).getTime();
+    const lastConnectedTime = new Date(lastConnected).getTime();
     const monthInMilliseconds = 30 * 24 * 60 * 60 * 1000;
-    const expiryTime = createdAtTime + monthInMilliseconds;
+    const expiryTime = lastConnectedTime + monthInMilliseconds;
 
     if (databaseStatus === 'purge' && apiStatus === 'gone') {
       return databaseStatus;
@@ -87,21 +87,21 @@ export async function runSyncInventory() {
     const apiSource = apiSources.find((source) => {
       return (
         source.ingest_name === inventorySource.ingest_name &&
-        source.ingest_source_name === inventorySource.ingest_source_name &&
-        source.ingest_type === inventorySource.type
+        source.ingest_source_name === inventorySource.ingest_source_name
       );
     });
     if (!apiSource) {
       // If source was not found in response from API, always mark it as gone
       return { ...inventorySource, status: 'gone' } satisfies WithId<Source>;
     }
+    const lastConnected =
+      apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected;
 
     // Keep all old fields from the inventory source (name, tags, id, audio_stream etc), but update the status
     return {
       ...inventorySource,
-      status: statusUpdateCheck(inventorySource, apiSource),
-      lastConnected:
-        apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
+      status: statusUpdateCheck(inventorySource, apiSource, lastConnected),
+      lastConnected: lastConnected
     } satisfies WithId<Source>;
   });
 
