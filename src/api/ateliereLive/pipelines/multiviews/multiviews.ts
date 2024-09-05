@@ -131,7 +131,7 @@ export async function createMultiviewForPipeline(
       const response = await fetch(
         new URL(
           LIVE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews`,
-          process.env.AGILE_URL
+          process.env.LIVE_URL
         ),
         {
           method: 'POST',
