@@ -9,11 +9,11 @@ import { IconTrash } from '@tabler/icons-react';
 
 export default function UpdateButtons({
   close,
-  deleteInventorySource,
+  removeInventorySource,
   source
 }: {
   close: () => void;
-  deleteInventorySource: (source: SourceWithId) => void;
+  removeInventorySource: (source: SourceWithId) => void;
   source: SourceWithId;
 }) {
   const t = useTranslate();
@@ -37,7 +37,7 @@ export default function UpdateButtons({
           state="warning"
           disabled={source.status !== 'gone'}
           className="mr-5 relative flex"
-          onClick={() => deleteInventorySource(source)}
+          onClick={() => removeInventorySource(source)}
         >
           <IconTrash className="text-p" />
         </Button>

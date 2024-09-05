@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { useSources } from '../../hooks/sources/useSources';
+import { useSetSourceToPerge } from '../../hooks/sources/useSetSourceToPerge';
 import FilterOptions from '../../components/filter/FilterOptions';
 import SourceListItem from '../../components/sourceListItem/SourceListItem';
 import { SourceWithId } from '../../interfaces/Source';
 import EditView from './editView/EditView';
 import FilterContext from './FilterContext';
-import { useDeleteSource } from '../../hooks/sources/useDeleteSource';
 import styles from './Inventory.module.scss';
 
 export default function Inventory() {
-  const [deleteSource, deleteComplete] = useDeleteSource();
+  const [removeInventorySource, reloadList] = useSetSourceToPerge();
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
   >();
-  const [sources] = useSources(deleteComplete, updatedSource);
+  const [sources] = useSources(reloadList, updatedSource);
   const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
   const [filteredSources, setFilteredSources] =
     useState<Map<string, SourceWithId>>(sources);
@@ -29,10 +29,10 @@ export default function Inventory() {
   }, [updatedSource]);
 
   useEffect(() => {
-    if (deleteComplete) {
+    if (reloadList) {
       setCurrentSource(null);
     }
-  }, [deleteComplete]);
+  }, [reloadList]);
 
   const editSource = (source: SourceWithId) => {
     setCurrentSource(() => source);
@@ -97,7 +97,7 @@ export default function Inventory() {
               source={currentSource}
               updateSource={(source) => setUpdatedSource(source)}
               close={() => setCurrentSource(null)}
-              deleteInventorySource={(source) => deleteSource(source)}
+              removeInventorySource={(source) => removeInventorySource(source)}
             />
           </div>
         ) : null}

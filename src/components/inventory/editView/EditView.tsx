@@ -12,12 +12,12 @@ export default function EditView({
   source,
   updateSource,
   close,
-  deleteInventorySource
+  removeInventorySource
 }: {
   source: SourceWithId;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
-  deleteInventorySource: (source: SourceWithId) => void;
+  removeInventorySource: (source: SourceWithId) => void;
 }) {
   const [loaded, setLoaded] = useState(false);
   const src = useMemo(() => getSourceThumbnail(source), [source]);
@@ -54,7 +54,7 @@ export default function EditView({
       </div>
       <UpdateButtons
         close={close}
-        deleteInventorySource={deleteInventorySource}
+        removeInventorySource={removeInventorySource}
         source={source}
       />
     </EditViewContext>

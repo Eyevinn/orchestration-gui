@@ -34,7 +34,7 @@ export async function purgeInventorySourceItem(
     .collection('inventory')
     .updateOne({ _id: objectId, status: 'gone' }, { $set: { status: 'purge' } })
     .catch((error) => {
-      Log().info(`Was not able to set source-id for ${id} to purge: ${error} `);
+      throw `Was not able to set source-id for ${id} to purge: ${error}`;
     });
 
   return result as UpdateResult<Document>;
