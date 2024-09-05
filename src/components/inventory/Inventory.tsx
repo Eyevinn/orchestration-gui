@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useSources } from '../../hooks/sources/useSources';
-import { useSetSourceToPerge } from '../../hooks/sources/useSetSourceToPerge';
+import { useSetSourceToPurge } from '../../hooks/sources/useSetSourceToPurge';
 import FilterOptions from '../../components/filter/FilterOptions';
 import SourceListItem from '../../components/sourceListItem/SourceListItem';
 import { SourceWithId } from '../../interfaces/Source';
@@ -11,7 +11,7 @@ import FilterContext from './FilterContext';
 import styles from './Inventory.module.scss';
 
 export default function Inventory() {
-  const [removeInventorySource, reloadList] = useSetSourceToPerge();
+  const [removeInventorySource, reloadList] = useSetSourceToPurge();
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
   >();

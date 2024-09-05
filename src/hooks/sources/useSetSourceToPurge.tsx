@@ -3,7 +3,7 @@ import { SourceWithId } from '../../interfaces/Source';
 import { CallbackHook } from '../types';
 import { Log } from '../../api/logger';
 
-export function useSetSourceToPerge(): CallbackHook<
+export function useSetSourceToPurge(): CallbackHook<
   (source: SourceWithId) => void
 > {
   const [reloadList, setReloadList] = useState(false);
