@@ -43,7 +43,7 @@ async function getSourcesFromAPI() {
               number_of_channels: source?.audio_stream?.number_of_channels,
               sample_rate: source?.audio_stream?.sample_rate
             },
-          createdAt: new Date()
+            createdAt: new Date()
           } satisfies SourceWithoutLastConnected)
       );
     }
@@ -63,7 +63,7 @@ export async function runSyncInventory() {
 
   const statusUpdateCheck = (
     inventorySource: WithId<Source>,
-    apiSource: Source
+    apiSource: SourceWithoutLastConnected
   ) => {
     const databaseStatus = inventorySource.status;
     const apiStatus = apiSource.status;
@@ -101,7 +101,7 @@ export async function runSyncInventory() {
       ...inventorySource,
       status: statusUpdateCheck(inventorySource, apiSource),
       lastConnected:
-      apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
+        apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected
     } satisfies WithId<Source>;
   });
 
