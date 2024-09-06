@@ -24,7 +24,7 @@ export default function EditView({
       <div className="flex flex-row">
         {source.status === 'gone' ? (
           <div className="w-96 h-96 flex justify-center items-center p-5">
-            <IconExclamationCircle className="text-error w-full h-full" />
+            <IconExclamationCircle className="text-error w-full h-full fill-white" />
           </div>
         ) : (
           <Image
