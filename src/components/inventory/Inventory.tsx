@@ -41,9 +41,7 @@ export default function Inventory() {
   function getSourcesToDisplay(
     filteredSources: Map<string, SourceWithId>
   ): React.ReactNode {
-    return Array.from(
-      filteredSources.size >= 0 ? filteredSources.values() : sources.values()
-    ).map((source, index) => {
+    return Array.from(filteredSources.values()).map((source, index) => {
       if (source.status !== 'purge') {
         return (
           <SourceListItem

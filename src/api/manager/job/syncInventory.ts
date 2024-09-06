@@ -7,8 +7,7 @@ import { WithId } from 'mongodb';
 
 type SourceWithoutLastConnected = Omit<Source, 'lastConnected'>;
 
-// TODO: getSourcesFromAPI should return ResourcesSourceResponse and changed to our model later
-async function getSourcesFromAPI() {
+async function getSourcesFromAPI(): Promise<SourceWithoutLastConnected[]> {
   const ingests = await getIngests();
   const resolvedIngests = (
     await Promise.allSettled(ingests.map((ingest) => getIngest(ingest.uuid)))

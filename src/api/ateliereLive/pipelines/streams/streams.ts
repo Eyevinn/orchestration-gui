@@ -252,8 +252,6 @@ export async function createStream(
             streams: sourceToPipelineStreams
           }
         };
-        // TODO Check if this can be cleaned out. This is an old code and dont know the purpose of it, therefor I dont want to remove it yet.
-        // return sourceToPipelineStreams;
       }
       const updatedViewsForSource = viewsForSource.map((v) => {
         return { ...v, label: source.name };

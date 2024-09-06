@@ -38,9 +38,6 @@ export async function createMultiviewForPipeline(
   productionSettings: ProductionSettings,
   sourceRefs: SourceReference[]
 ): Promise<ResourcesPipelineMultiviewResponse[]> {
-  // TODO Check if this can be cleaned out. This is an old code and dont know the purpose of it, therefor I dont want to remove it yet.
-  // const multiviewPresets = await getMultiviewPresets();
-
   const pipeline = productionSettings.pipelines.find((p) =>
     p.multiviews ? p.multiviews?.length > 0 : undefined
   );
