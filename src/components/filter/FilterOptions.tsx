@@ -30,8 +30,6 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
     Map<string, SourceWithId>
   >(new Map<string, SourceWithId>());
 
-  useEffect(() => {}, [showMediaSourceGeneratorType]);
-
   useEffect(() => {
     const tempSet = new Map<string, SourceWithId>(sources);
 
