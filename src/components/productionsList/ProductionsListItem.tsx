@@ -144,7 +144,10 @@ export function ProductionsListItem({
       </Link>
       <div className="flex space-x-4">
         {production.isActive && (
-          <MonitoringButton id={production._id.toString()} />
+          <MonitoringButton
+            id={production._id.toString()}
+            isLocked={isLocked}
+          />
         )}
         {isConfigured(production) && (
           <div

@@ -8,6 +8,7 @@ import ImageComponent from '../../image/ImageComponent';
 
 export default function EditView({
   source,
+  isLocked,
   updateSource,
   close,
   removeInventorySource,
