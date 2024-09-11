@@ -109,6 +109,7 @@ export async function getSourceThumbnail(
       process.env.AGILE_URL
     ),
     {
+      next: { tags: ['image'] },
       method: 'POST',
       body: JSON.stringify({
         encoder: 'auto',
@@ -117,7 +118,8 @@ export async function getSourceThumbnail(
         width
       }),
       headers: {
-        authorization: getAuthorizationHeader()
+        authorization: getAuthorizationHeader(),
+        cache: 'no-store'
       }
     }
   );

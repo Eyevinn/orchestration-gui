@@ -1,24 +1,29 @@
 'use client';
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
+import milliseconds from 'date-fns/milliseconds';
 
 interface IContext {
   locations: string[];
   types: string[];
   sources: Map<string, SourceWithId>;
+  refetchIndex: number;
 }
 
 export const FilterContext = createContext<IContext>({
   locations: [],
   types: [],
-  sources: new Map<string, SourceWithId>()
+  sources: new Map<string, SourceWithId>(),
+  refetchIndex: 0
 });
 
 export default function Context({
   sources,
+  refetchIndex,
   children
 }: {
   sources: Map<string, SourceWithId>;
+  refetchIndex: number;
   children: ReactNode;
 }) {
   const [locations, setLocations] = useState<string[]>([]);
@@ -44,7 +49,8 @@ export default function Context({
       value={{
         locations,
         types,
-        sources
+        sources,
+        refetchIndex
       }}
     >
       {children}

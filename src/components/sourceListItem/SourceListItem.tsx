@@ -61,9 +61,6 @@ function SourceListItem({
         disabled ? 'bg-unclickable-bg' : 'hover:bg-zinc-700'
       }`}
     >
-      {/* {source.status !== 'gone' && source.type === 'camera' && (
-        <PreviewThumbnail src={getSourceThumbnail(source)} />
-      )} */}
       <div className="flex">
         <div className="flex flex-row flex-1 items-center space-x-4 p-3 sm:pb-4 ">
           <SourceListItemThumbnail source={source} />

@@ -8,6 +8,7 @@ import { SourceWithId } from '../../interfaces/Source';
 import EditView from './editView/EditView';
 import FilterContext from './FilterContext';
 import styles from './Inventory.module.scss';
+import { IconRefresh } from '@tabler/icons-react';
 
 export default function Inventory() {
   const [updatedSource, setUpdatedSource] = useState<
@@ -17,6 +18,7 @@ export default function Inventory() {
   const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
   const [filteredSources, setFilteredSources] =
     useState<Map<string, SourceWithId>>(sources);
+  const [refetchIndex, setRefetchIndex] = useState<number>(0);
   const inventoryVisible = true;
 
   useEffect(() => {
@@ -49,8 +51,12 @@ export default function Inventory() {
     });
   }
 
+  const refetchImages = () => {
+    setRefetchIndex(refetchIndex + 1);
+  };
+
   return (
-    <FilterContext sources={sources}>
+    <FilterContext sources={sources} refetchIndex={refetchIndex}>
       <div className="flex max-h-full min-h-[100%] flex-row">
         <div
           className={
@@ -63,11 +69,15 @@ export default function Inventory() {
           }
         >
           <div className="p-3 bg-container rounded break-all h-full">
-            <div className="mb-1">
+            <div className="flex justify-between mb-1">
               <FilterOptions
                 onFilteredSources={(filtered: Map<string, SourceWithId>) =>
                   setFilteredSources(new Map<string, SourceWithId>(filtered))
                 }
+              />
+              <IconRefresh
+                className="ml-2 text-white w-auto h-10 w-10 hover:cursor-pointer"
+                onClick={refetchImages}
               />
             </div>
             <ul
