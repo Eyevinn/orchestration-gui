@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
 import videoSettings from '../../utils/videoSettings';
 import { getHertz } from '../../utils/stream';
@@ -25,23 +25,37 @@ function SourceListItem({
   actionText
 }: SourceListItemProps) {
   const t = useTranslate();
+  const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [outputRows, setOutputRows] = useState<
     { id: string; value: string }[][]
   >([]);
+
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const { video_stream: videoStream, audio_stream: audioStream } = source;
   const { width, height, frame_rate: frameRate } = videoStream || {};
   const { sample_rate: sampleRate, number_of_channels: numberOfChannels = 0 } =
     audioStream || {};
-  const channelsInArray: number[] = useMemo(() => {
-    const numberArray = [];
-    for (let i = 1; i <= numberOfChannels; i++) {
-      numberArray.push(i);
-    }
-    return numberArray;
-  }, [numberOfChannels]);
+
+  useEffect(() => {
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
+
+  const onMouseEnter = useCallback(() => {
+    timeoutRef.current = setTimeout(() => setPreviewVisible(true), 1000);
+  }, []);
+
+  const onMouseLeave = useCallback(() => {
+    setPreviewVisible(false);
+    clearTimeout(timeoutRef.current);
+  }, []);
 
   const style = { textWrap: 'wrap' } as React.CSSProperties;
+
+  const channelsInArray: number[] = [];
+  for (let i = 1; i <= numberOfChannels; i++) {
+    channelsInArray.push(i);
+  }
 
   useEffect(() => {
     const audioMapping = source?.audio_stream.audio_mapping;
@@ -53,7 +67,7 @@ function SourceListItem({
           : []
       );
     }
-  }, [source.audio_stream.audio_mapping, channelsInArray]);
+  }, [source.audio_stream.audio_mapping]);
 
   return (
     <li
@@ -145,7 +159,6 @@ function SourceListItem({
                     disabled ? 'text-unclickable-text' : 'text-brand'
                   } text-xs`}
                 >
-                  {/* {edit ? t('inventory_list.edit') : t('inventory_list.add')} */}
                   {actionText}
                 </div>
                 <Icons
