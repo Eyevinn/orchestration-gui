@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useSources } from '../../hooks/sources/useSources';
+import { useSetSourceToPurge } from '../../hooks/sources/useSetSourceToPurge';
 import { SourceWithId } from '../../interfaces/Source';
 import EditView from './editView/EditView';
 import SourceList from '../sourceList/SourceList';
 import { useTranslate } from '../../i18n/useTranslate';
 
 export default function Inventory() {
+  const [removeInventorySource, reloadList] = useSetSourceToPurge();
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
   >();
-  const [sources] = useSources(updatedSource);
+  const [sources] = useSources(reloadList, updatedSource);
   const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
   const t = useTranslate();
 
@@ -21,10 +23,15 @@ export default function Inventory() {
     }
   }, [updatedSource]);
 
+  useEffect(() => {
+    if (reloadList) {
+      setCurrentSource(null);
+    }
+  }, [reloadList]);
+
   const editSource = (source: SourceWithId) => {
     setCurrentSource(source);
   };
-
   return (
     <div className="flex ">
       <SourceList

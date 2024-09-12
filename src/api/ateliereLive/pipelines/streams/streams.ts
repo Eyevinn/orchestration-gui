@@ -1,5 +1,5 @@
-import { ResourcesUUIDResponse } from '../../../../../types/agile-live';
-import { AGILE_BASE_API_PATH } from '../../../../constants';
+import { ResourcesUUIDResponse } from '../../../../../types/ateliere-live';
+import { LIVE_BASE_API_PATH } from '../../../../constants';
 import {
   AddSourceResult,
   SourceToPipelineStream,
@@ -29,8 +29,8 @@ export async function getPipelineStreams(
 ): Promise<ResourcesUUIDResponse[]> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${pipelineUuid}/streams`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${pipelineUuid}/streams`,
+      process.env.LIVE_URL
     ),
     {
       method: 'GET',
@@ -252,8 +252,6 @@ export async function createStream(
             streams: sourceToPipelineStreams
           }
         };
-        // TODO Check if this can be cleaned out. This is an old code and dont know the purpose of it, therefor I dont want to remove it yet.
-        // return sourceToPipelineStreams;
       }
       const updatedViewsForSource = viewsForSource.map((v) => {
         return { ...v, label: source.name };
@@ -333,8 +331,8 @@ export async function createStream(
 export async function deleteStream(streamUuid: string) {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/streams/${streamUuid}`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/streams/${streamUuid}`,
+      process.env.LIVE_URL
     ),
     {
       method: 'DELETE',

@@ -9,11 +9,13 @@ import ImageComponent from '../../image/ImageComponent';
 export default function EditView({
   source,
   updateSource,
-  close
+  close,
+  removeInventorySource
 }: {
   source: SourceWithId;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
+  removeInventorySource: (source: SourceWithId) => void;
 }) {
   return (
     <EditViewContext source={source} updateSource={updateSource}>
@@ -27,8 +29,11 @@ export default function EditView({
       <div className="flex-auto">
         <AudioChannels source={source} />
       </div>
-
-      <UpdateButtons close={close} />
+      <UpdateButtons
+        close={close}
+        removeInventorySource={removeInventorySource}
+        source={source}
+      />
     </EditViewContext>
   );
 }

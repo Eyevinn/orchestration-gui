@@ -1,23 +1,23 @@
 import {
   ResourcesPipelineMultiviewResponse,
   ResourcesView
-} from '../../../../../types/agile-live';
+} from '../../../../../types/ateliere-live';
 import { SourceReference } from '../../../../interfaces/Source';
 import { getAuthorizationHeader } from '../../utils/authheader';
 import { createMultiview } from '../../utils/multiview';
 import { getSourcesByIds } from '../../../manager/sources';
 import { Log } from '../../../logger';
 import { ProductionSettings } from '../../../../interfaces/production';
-import { AGILE_BASE_API_PATH } from '../../../../constants';
 import { MultiviewSettings } from '../../../../interfaces/multiview';
+import { LIVE_BASE_API_PATH } from '../../../../constants';
 
 export async function getMultiviewsForPipeline(
   pipelineUUID: string
 ): Promise<ResourcesPipelineMultiviewResponse[]> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews?expand=true`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews?expand=true`,
+      process.env.LIVE_URL
     ),
     {
       headers: {
@@ -38,9 +38,6 @@ export async function createMultiviewForPipeline(
   productionSettings: ProductionSettings,
   sourceRefs: SourceReference[]
 ): Promise<ResourcesPipelineMultiviewResponse[]> {
-  // TODO Check if this can be cleaned out. This is an old code and dont know the purpose of it, therefor I dont want to remove it yet.
-  // const multiviewPresets = await getMultiviewPresets();
-
   const pipeline = productionSettings.pipelines.find((p) =>
     p.multiviews ? p.multiviews?.length > 0 : undefined
   );
@@ -130,8 +127,8 @@ export async function createMultiviewForPipeline(
       }
       const response = await fetch(
         new URL(
-          AGILE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews`,
-          process.env.AGILE_URL
+          LIVE_BASE_API_PATH + `/pipelines/${pipelineUUID}/multiviews`,
+          process.env.LIVE_URL
         ),
         {
           method: 'POST',
@@ -161,9 +158,9 @@ export async function deleteMultiviewFromPipeline(
 ): Promise<void> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH +
+      LIVE_BASE_API_PATH +
         `/pipelines/${pipelineUUID}/multiviews/${multiviewId}`,
-      process.env.AGILE_URL
+      process.env.LIVE_URL
     ),
     {
       method: 'DELETE',
@@ -204,9 +201,9 @@ export async function updateMultiviewForPipeline(
   );
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH +
+      LIVE_BASE_API_PATH +
         `/pipelines/${pipelineUUID}/multiviews/${multiviewId}`,
-      process.env.AGILE_URL
+      process.env.LIVE_URL
     ),
     {
       method: 'PUT',

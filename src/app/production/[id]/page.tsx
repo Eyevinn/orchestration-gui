@@ -78,7 +78,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const getMultiviewPreset = useGetMultiviewPreset();
   const [updateMultiviewViews] = useMultiviews();
 
-  //FROM AGILE API
+  //FROM LIVE API
   const [pipelines, loadingPipelines, , refreshPipelines] = usePipelines();
   const [controlPanels, loadingControlPanels, , refreshControlPanels] =
     useControlPanels();
@@ -640,7 +640,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           />
         </div>
       </HeaderNavigation>
-      <div className="flex max-h-full min-h-[100%] flex-row">
+      <div className="flex h-[95%] flex-row">
         <div
           className={`overflow-hidden transition-[min-width] w-0 min-w-0 ${
             inventoryVisible ? 'min-w-[35%] ml-2 mt-2 max-h-[89vh]' : ''

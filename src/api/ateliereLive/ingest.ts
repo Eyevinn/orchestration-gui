@@ -2,8 +2,8 @@ import {
   ResourcesCompactIngestResponse,
   ResourcesIngestResponse,
   ResourcesThumbnailResponse
-} from '../../../types/agile-live';
-import { AGILE_BASE_API_PATH } from '../../constants';
+} from '../../../types/ateliere-live';
+import { LIVE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
 
 // TODO: create proper cache...
@@ -58,10 +58,7 @@ export async function getSourceIdFromSourceName(
 
 export async function getIngests(): Promise<ResourcesCompactIngestResponse[]> {
   const response = await fetch(
-    new URL(
-      AGILE_BASE_API_PATH + `/ingests?expand=true`,
-      process.env.AGILE_URL
-    ),
+    new URL(LIVE_BASE_API_PATH + `/ingests?expand=true`, process.env.LIVE_URL),
     {
       headers: {
         authorization: getAuthorizationHeader()
@@ -82,8 +79,8 @@ export async function getIngest(
 ): Promise<ResourcesIngestResponse> {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH + `/ingests/${uuid}?expand=true`,
-      process.env.AGILE_URL
+      LIVE_BASE_API_PATH + `/ingests/${uuid}?expand=true`,
+      process.env.LIVE_URL
     ),
     {
       headers: {
@@ -104,9 +101,9 @@ export async function getSourceThumbnail(
 ) {
   const response = await fetch(
     new URL(
-      AGILE_BASE_API_PATH +
+      LIVE_BASE_API_PATH +
         `/ingests/${ingestUuid}/sources/${sourceId}/thumbnail`,
-      process.env.AGILE_URL
+      process.env.LIVE_URL
     ),
     {
       next: { tags: ['image'] },
@@ -128,4 +125,26 @@ export async function getSourceThumbnail(
     return json.data;
   }
   throw await response.json();
+}
+
+export async function deleteSrtSource(ingestUuid: string, sourceId: number) {
+  const response = await fetch(
+    new URL(
+      LIVE_BASE_API_PATH + `/ingests/${ingestUuid}/sources/${sourceId}`,
+      process.env.LIVE_URL
+    ),
+    {
+      method: 'DELETE',
+      headers: {
+        authorization: getAuthorizationHeader()
+      },
+      next: {
+        revalidate: 0
+      }
+    }
+  );
+  if (response.ok) {
+    return response.status;
+  }
+  throw await response.text();
 }

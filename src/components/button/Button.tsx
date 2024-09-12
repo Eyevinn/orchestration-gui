@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react';
 import { twMerge } from 'tailwind-merge';
 type ButtonProps = {
-  type?: 'submit';
+  type?: 'submit' | 'button';
   className?: string;
   onClick?: () => void;
   disabled?: boolean;
