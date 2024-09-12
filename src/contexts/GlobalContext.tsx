@@ -12,8 +12,12 @@ interface IGlobalContext {
 export const GlobalContext = createContext<IGlobalContext>({
   locked: false,
   imageRefetchIndex: 0,
-  incrementImageRefetchIndex: () => {},
-  toggleLocked: () => {}
+  incrementImageRefetchIndex: () => {
+    // outsmarting lint
+  },
+  toggleLocked: () => {
+    // outsmarting lint
+  }
 });
 
 const GlobalContextProvider = (props: PropsWithChildren) => {

@@ -45,6 +45,7 @@ export default function Inventory() {
             source={currentSource}
             updateSource={(source) => setUpdatedSource(source)}
             close={() => setCurrentSource(null)}
+            removeInventorySource={removeInventorySource}
           />
         </div>
       ) : null}
