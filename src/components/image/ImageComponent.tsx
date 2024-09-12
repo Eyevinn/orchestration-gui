@@ -7,9 +7,9 @@ import {
   useState
 } from 'react';
 import Image from 'next/image';
-import { FilterContext } from '../inventory/FilterContext';
 import { IconExclamationCircle } from '@tabler/icons-react';
 import { Loader } from '../loader/Loader';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 interface ImageComponentProps extends PropsWithChildren {
   src: string;
@@ -18,7 +18,7 @@ interface ImageComponentProps extends PropsWithChildren {
 
 const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   const { src, alt = 'Image', children } = props;
-  const { refetchIndex } = useContext(FilterContext);
+  const { imageRefetchIndex } = useContext(GlobalContext);
   const [imgSrc, setImgSrc] = useState<string>();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -26,20 +26,21 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
   const refetchImage = () => {
-    setImgSrc(`${src}?refetch=${refetchIndex}}`);
-  };
-
-  useEffect(() => {
-    refetchImage();
-  }, [src]);
-
-  useEffect(() => {
-    refetchImage();
+    setImgSrc(`${src}?refetch=${imageRefetchIndex}}`);
     setError(undefined);
     setLoading(true);
     clearTimeout(timeout.current);
     timeout.current = setTimeout(() => setLoading(false), 500);
-  }, [refetchIndex]);
+  };
+
+  useEffect(() => {
+    refetchImage();
+  }, [imageRefetchIndex]);
+
+  useEffect(() => {
+    setError(undefined);
+    setImgSrc(`${src}?refetch=${imageRefetchIndex}}`);
+  }, [src]);
 
   useEffect(() => {
     return () => {
@@ -48,7 +49,7 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   }, []);
 
   return (
-    <div className="relative z-50 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
+    <div className="relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
       {((!imgSrc || error) && (
         <IconExclamationCircle className="text-error fill-white w-full h-full" />
       )) || (

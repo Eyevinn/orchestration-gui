@@ -13,8 +13,8 @@ import { SourceListItemThumbnail } from './SourceListItemThumbnail';
 
 type SourceListItemProps = {
   source: SourceWithId;
-  action: (source: SourceWithId) => void;
-  edit?: boolean;
+  action?: (source: SourceWithId) => void;
+  actionText?: string;
   disabled: unknown;
 };
 
@@ -22,7 +22,7 @@ function SourceListItem({
   source,
   action,
   disabled,
-  edit = false
+  actionText
 }: SourceListItemProps) {
   const t = useTranslate();
   const [outputRows, setOutputRows] = useState<
@@ -138,14 +138,15 @@ function SourceListItem({
                     ? 'text-unclickable-text'
                     : 'text-brand hover:bg-zinc-500'
                 } bg-zinc-600`}
-                onClick={() => (disabled ? '' : action(source))}
+                onClick={() => (disabled || !action ? '' : action(source))}
               >
                 <div
                   className={`flex items-center overflow-hidden mr-6 ${
                     disabled ? 'text-unclickable-text' : 'text-brand'
                   } text-xs`}
                 >
-                  {edit ? t('inventory_list.edit') : t('inventory_list.add')}
+                  {/* {edit ? t('inventory_list.edit') : t('inventory_list.add')} */}
+                  {actionText}
                 </div>
                 <Icons
                   name="IconArrowRight"
