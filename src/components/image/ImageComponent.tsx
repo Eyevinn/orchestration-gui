@@ -25,12 +25,16 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   const [error, setError] = useState<SyntheticEvent<HTMLImageElement, Event>>();
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
+  const refetchImage = () => {
+    setImgSrc(`${src}?refetch=${refetchIndex}}`);
+  };
+
   useEffect(() => {
-    setImgSrc(src);
+    refetchImage();
   }, [src]);
 
   useEffect(() => {
-    setImgSrc(`${src}?refetch=${refetchIndex}}`);
+    refetchImage();
     setError(undefined);
     setLoading(true);
     clearTimeout(timeout.current);
