@@ -119,10 +119,6 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
         shouldDelete = true;
       }
 
-      if (onlyShowActiveSources && source.status === 'gone') {
-        shouldDelete = true;
-      }
-
       if (shouldDelete) {
         tempSet.delete(source._id.toString());
       }
