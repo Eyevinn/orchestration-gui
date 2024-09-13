@@ -30,7 +30,7 @@ export default function HeaderNavigation({
             className="text-white mr-1"
             onClick={incrementImageRefetchIndex}
           />
-          Refresh Images
+          {t('refresh_images')}
         </button>
       </div>
       {children}
