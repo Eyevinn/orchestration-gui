@@ -611,6 +611,10 @@ export const sv = {
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
     no_multiview_found: 'Hittade ingen multiview',
+    select_multiview_layout: 'Komposition',
+    configure_layout: 'Justera komposition',
+    create_layout: 'Skapa komposition',
+    update_layout: 'Uppdatera komposition',
     select_multiview_preset: 'Förinställningar',
     no_port_selected: 'Unik port krävs'
   },
