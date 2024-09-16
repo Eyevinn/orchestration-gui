@@ -93,7 +93,6 @@ function FilterOptions({ onFilteredSources }: FilterOptionsProps) {
       }
     }
   };
-
   const filterSources = (tempSet: Map<string, SourceWithId>) => {
     const isFilteringByType =
       showNdiType || showBmdType || showSrtType || showMediaSourceGeneratorType;

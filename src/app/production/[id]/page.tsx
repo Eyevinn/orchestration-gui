@@ -770,7 +770,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       });
                     }
                   }}
-                  isLocked={isLocked}
                 />
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal
@@ -870,7 +869,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             <div className="flex justify-end p-3">
               <MonitoringButton
                 id={productionSetup?._id.toString()}
-                isLocked={isLocked}
+                locked={locked}
               />
             </div>
           )}

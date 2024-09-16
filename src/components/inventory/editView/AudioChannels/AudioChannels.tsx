@@ -227,7 +227,7 @@ export default function AudioChannels({ source, locked }: IAudioChannels) {
             outputRows={outputRows}
             rowIndex={rowIndex}
             max={max}
-            isLocked={isLocked}
+            locked={locked}
             updateRows={updateRows}
             locked={locked}
           />
