@@ -12,15 +12,13 @@ export default function SourceCards({
   locked,
   updateProduction,
   onSourceUpdate,
-  onSourceRemoval,
-  isLocked
+  onSourceRemoval
 }: {
   productionSetup: Production;
   locked: boolean;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
-  isLocked: boolean;
 }) {
   const [items, moveItem] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);

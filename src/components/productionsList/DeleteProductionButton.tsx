@@ -6,6 +6,8 @@ import { useCallback, useState } from 'react';
 import { Loader } from '../loader/Loader';
 import { useRouter } from 'next/navigation';
 import { DeleteModal } from '../modal/DeleteModal';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type DeleteProductionButtonProps = {
   id: string;
