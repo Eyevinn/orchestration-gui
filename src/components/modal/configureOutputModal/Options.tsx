@@ -5,11 +5,25 @@ interface IOPtions {
   options: optionTypes[];
   value: string;
   update: (value: string) => void;
+  columnStyle?: boolean;
 }
 
-export default function Options({ label, options, value, update }: IOPtions) {
+export default function Options({
+  label,
+  options,
+  value,
+  update,
+  columnStyle
+}: IOPtions) {
   return (
-    <div className="flex mb-5 justify-between w-full px-2">
+    <div
+      className="flex mb-5 justify-between px-2 w-full"
+      style={
+        columnStyle
+          ? { flexDirection: 'column', alignItems: 'center' }
+          : { flexDirection: 'row' }
+      }
+    >
       <label className="flex items-center">{label}</label>
       <select
         onChange={(e) => {
