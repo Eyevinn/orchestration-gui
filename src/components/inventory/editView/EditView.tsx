@@ -21,8 +21,6 @@ export default function EditView({
   removeInventorySource: (source: SourceWithId) => void;
   locked: boolean;
 }) {
-  console.log('LOCKED THREE: ', locked);
-
   return (
     <EditViewContext source={source} updateSource={updateSource}>
       <div className="flex flex-row mb-10 h-[22rem]">
