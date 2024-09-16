@@ -21,8 +21,6 @@ import { refresh } from '../../utils/refresh';
 import { StopModal } from '../modal/StopModal';
 import { useState } from 'react';
 import { StartModal } from '../modal/StartModal';
-import { useContext } from 'react';
-import { GlobalContext } from '../../contexts/GlobalContext';
 
 type ProductionListItemProps = {
   production: Production;
