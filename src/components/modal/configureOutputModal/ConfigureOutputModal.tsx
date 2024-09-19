@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import MultiviewSettingsConfig from './MultiviewSettings';
 import PipelineSettingsConfig from './PipelineSettings';
-import MultiviewLayoutSettings from './MultiviewLayoutSettings';
+import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { Production } from '../../../interfaces/production';
 import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';

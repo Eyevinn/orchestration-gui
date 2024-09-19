@@ -1,12 +1,12 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MultiviewPreset } from '../interfaces/preset';
-import { SourceReference } from '../interfaces/Source';
 import { MultiviewViewsWithId } from './useSetupMultiviewLayout';
+import { TList } from './useCreateInputArray';
 
 export function useConfigureMultiviewLayout(
   preset: MultiviewPreset | null,
   defaultLabel: string | undefined,
-  source: SourceReference | undefined,
+  source: TList | undefined,
   id: number | undefined,
   configMode: string,
   name: string | null
