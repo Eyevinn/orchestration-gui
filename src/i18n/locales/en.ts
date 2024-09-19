@@ -610,7 +610,11 @@ export const en = {
     configure_layout: 'Configure layout',
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
+    no_updated_layout: 'No layout updated',
+    muliview_view: 'Input',
+    select_option: 'Select',
     select_multiview_preset: 'Preset',
+    new_preset_name: 'My layout',
     no_multiview_selected: 'No multiview selected',
     no_multiview_found: 'No multiview found',
     no_port_selected: 'Unique port needed'

@@ -615,6 +615,10 @@ export const sv = {
     configure_layout: 'Justera komposition',
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
+    no_updated_layout: 'Ingen uppdaterad komposition',
+    new_preset_name: 'Min komposition',
+    muliview_view: 'Ingång',
+    select_option: 'Välj',
     select_multiview_preset: 'Förinställningar',
     no_port_selected: 'Unik port krävs'
   },

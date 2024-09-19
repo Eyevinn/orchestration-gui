@@ -2,18 +2,48 @@ import { useEffect, useState } from 'react';
 import { useMultiviewPresets } from '../../../hooks/multiviewPreset';
 import Options from './Options';
 import { MultiviewPreset } from '../../../interfaces/preset';
-import toast from 'react-hot-toast';
 import { useTranslate } from '../../../i18n/useTranslate';
+import {
+  MultiviewViewsWithId,
+  useSetupMultiviewLayout
+} from '../../../hooks/useSetupMultiviewLayout';
+import { Production } from '../../../interfaces/production';
+import { useConfigureMultiviewLayout } from '../../../hooks/useConfigureMultiviewLayout';
+import { SourceReference } from '../../../interfaces/Source';
+import Input from './Input';
+
+type ChangeLayout = {
+  defaultLabel?: string;
+  source?: SourceReference;
+  id: number;
+};
 
 export default function MultiviewLayoutSettings({
-  configMode
+  // configMode sets the mode of the configuration to create or edit, not implemented yet
+  configMode,
+  production,
+  setNewMultiviewPreset
 }: {
   configMode: string;
+  production: Production | undefined;
+  setNewMultiviewPreset: (preset: MultiviewPreset | null) => void;
 }) {
-  const [selectedMultiviewPreset, setSelectedMultiviewPreset] = useState<
-    MultiviewPreset | undefined
-  >();
+  const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
+    useState<MultiviewPreset | null>(null);
+  const [changedLayout, setChangedLayout] = useState<ChangeLayout | null>(null);
+  const [newPresetName, setNewPresetName] = useState<string | null>(null);
   const [multiviewPresets, loading] = useMultiviewPresets();
+  const { multiviewPresetLayout } = useSetupMultiviewLayout(
+    selectedMultiviewPreset
+  );
+  const { multiviewLayout } = useConfigureMultiviewLayout(
+    selectedMultiviewPreset,
+    changedLayout?.defaultLabel,
+    changedLayout?.source,
+    changedLayout?.id,
+    configMode,
+    newPresetName
+  );
   const t = useTranslate();
 
   const multiviewPresetNames = multiviewPresets?.map((preset) => preset.name)
@@ -21,65 +51,99 @@ export default function MultiviewLayoutSettings({
     : [];
 
   useEffect(() => {
-    // if (multiview) {
-    //   setSelectedMultiviewPreset(multiview);
-    //   return;
-    // }
+    setNewPresetName(null);
+  }, [configMode]);
+
+  useEffect(() => {
     if (multiviewPresets && multiviewPresets[0]) {
-      console.log(multiviewPresets);
       setSelectedMultiviewPreset(multiviewPresets[0]);
     }
   }, [multiviewPresets]);
 
-  const handlePresetUpdate = (name: string) => {
-    const selected = multiviewPresets?.find((m) => m.name === name);
-    if (!selected) {
-      toast.error(t('preset.no_multiview_found'));
-      return;
+  useEffect(() => {
+    if (multiviewLayout) {
+      setSelectedMultiviewPreset(multiviewLayout);
+      setNewMultiviewPreset(multiviewLayout);
+    } else {
+      setSelectedMultiviewPreset(null);
+      setNewMultiviewPreset(null);
     }
-    setSelectedMultiviewPreset(selected);
+  }, [multiviewLayout]);
+
+  const handlePresetUpdate = (name: string) => {
+    const presetLayout = multiviewPresets?.find(
+      (singlePreset) => singlePreset.name === name
+    );
+    setNewPresetName(name);
+    if (presetLayout) {
+      setSelectedMultiviewPreset(presetLayout);
+    }
   };
 
-  const handleChange = (key: string, value: string) => {
-    console.log('onChange: ', key, value);
+  const handleChange = (id: number | undefined, value: string) => {
+    if (production && id && multiviewPresets) {
+      // Remove 2 from id to remove id for Preview- and Program-view
+      // Add 1 to index to get the correct input_slot
+      const idFirstInputView = id - 2 + 1;
+      const defaultLabel = multiviewPresets[0].layout.views.find(
+        (item) => item.input_slot === idFirstInputView
+      )?.label;
+      production.sources.map((source) => {
+        if (value === '') {
+          setChangedLayout({ defaultLabel, id });
+        }
+        if (source.label === value) {
+          setChangedLayout({ source, id });
+        }
+      });
+    }
   };
 
   const renderPresetModel = () => {
-    if (selectedMultiviewPreset) {
-      const presetHeight =
-        selectedMultiviewPreset.layout.output_height / 40 + 0.5;
-      const presetWidth =
-        selectedMultiviewPreset.layout.output_width / 40 + 0.5;
-
+    if (multiviewPresetLayout) {
       return (
         <div
           className={`border-4 border-p/50 relative p-2 m-2`}
-          style={{ width: `${presetWidth}rem`, height: `${presetHeight}rem` }}
+          style={{
+            width: `${multiviewPresetLayout.layout.output_width}rem`,
+            height: `${multiviewPresetLayout.layout.output_height}rem`
+          }}
         >
-          {selectedMultiviewPreset.layout.views.map((singleView) => {
-            return (
-              <div
-                key={singleView.x + singleView.y}
-                className="flex items-center justify-center border-[1px] border-p/50 absolute w-full"
-                style={{
-                  width: `${singleView.width / 40}rem`,
-                  height: `${singleView.height / 40}rem`,
-                  top: `${singleView.y / 40}rem`,
-                  left: `${singleView.x / 40}rem`
-                }}
-              >
-                <Options
-                  label={t('preset.video_format')}
-                  options={selectedMultiviewPreset.layout.views.map(
-                    (singleView) => singleView.label
+          {multiviewPresetLayout.layout.views.map(
+            (singleView: MultiviewViewsWithId) => {
+              const { x, y, width, height, label, id } = singleView;
+              const previewView = singleView.input_slot === 1002;
+              const programView = singleView.input_slot === 1001;
+
+              return (
+                <div
+                  key={x + y}
+                  className="flex items-center justify-center border-[1px] border-p/50 absolute w-full"
+                  style={{
+                    width: `${width}rem`,
+                    height: `${height}rem`,
+                    top: `${y}rem`,
+                    left: `${x}rem`
+                  }}
+                >
+                  {production && (previewView || programView) && (
+                    <p className="flex items-center">{label}</p>
                   )}
-                  value={'string'}
-                  update={(value) => handleChange('videoFormat', value)}
-                  columnStyle
-                />
-              </div>
-            );
-          })}
+                  {production && !previewView && !programView && (
+                    <Options
+                      label={label}
+                      options={production.sources.map(
+                        (singleSource) => singleSource.label
+                      )}
+                      value={label ? label : ''}
+                      update={(value) => handleChange(id, value)}
+                      columnStyle
+                    />
+                  )}
+                </div>
+              );
+            }
+          )}
         </div>
       );
     }
@@ -88,12 +152,18 @@ export default function MultiviewLayoutSettings({
   return (
     <div className="flex flex-col w-full h-full">
       {renderPresetModel()}
-      <div>
+      <div className="flex flex-col w-[50%] h-full">
         <Options
-          label={t('preset.select_multiview_layout')}
+          label={t('preset.select_multiview_preset')}
           options={multiviewPresetNames}
           value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
           update={(value) => handlePresetUpdate(value)}
+        />
+        <Input
+          label={t('name')}
+          value={newPresetName ? newPresetName : ''}
+          update={(value) => handlePresetUpdate(value)}
+          placeholder={t('preset.new_preset_name')}
         />
       </div>
     </div>

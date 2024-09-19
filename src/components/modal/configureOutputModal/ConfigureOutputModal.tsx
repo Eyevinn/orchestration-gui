@@ -1,4 +1,4 @@
-import { Preset } from '../../../interfaces/preset';
+import { MultiviewPreset, Preset } from '../../../interfaces/preset';
 import { ProgramOutput, PipelineSettings } from '../../../interfaces/pipeline';
 import { Modal } from '../Modal';
 import Decision from './Decision';
@@ -11,6 +11,8 @@ import MultiviewSettingsConfig from './MultiviewSettings';
 import PipelineSettingsConfig from './PipelineSettings';
 import MultiviewLayoutSettings from './MultiviewLayoutSettings';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { Production } from '../../../interfaces/production';
+import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';
 
 export interface OutputStream {
   name: string;
@@ -30,13 +32,15 @@ type ConfigureOutputModalProps = {
   preset: Preset;
   onClose: () => void;
   updatePreset: (preset: Preset) => void;
+  production: Production | undefined;
 };
 
 export function ConfigureOutputModal({
   open,
   preset,
   onClose,
-  updatePreset
+  updatePreset,
+  production
 }: ConfigureOutputModalProps) {
   const defaultState = (pipelines: PipelineSettings[]) => {
     const streamsPerPipe = pipelines.map((pipe, i) => {
@@ -71,7 +75,10 @@ export function ConfigureOutputModal({
   const [portDuplicateIndexes, setPortDuplicateIndexes] = useState<number[]>(
     []
   );
-  const [modalOpen, setModalOpen] = useState<string | null>(null);
+  const [layoutModalOpen, setLayoutModalOpen] = useState<string | null>(null);
+  const [newMultiviewPreset, setNewMultiviewPreset] =
+    useState<MultiviewPreset | null>(null);
+  const addNewPreset = usePutMultiviewPreset();
   const t = useTranslate();
 
   useEffect(() => {
@@ -89,7 +96,7 @@ export function ConfigureOutputModal({
   }, [preset]);
 
   const clearInputs = () => {
-    setModalOpen(null);
+    setLayoutModalOpen(null);
     setMultiviews(preset.pipelines[0].multiviews || []);
     setOutputStreams(defaultState(preset.pipelines));
     onClose();
@@ -131,6 +138,19 @@ export function ConfigureOutputModal({
 
     updatePreset(presetToUpdate);
     onClose();
+  };
+
+  const onUpdateLayoutPreset = () => {
+    if (!newMultiviewPreset) {
+      toast.error(t('preset.no_updated_layout'));
+      return;
+    }
+    addNewPreset(newMultiviewPreset);
+    setLayoutModalOpen(null);
+  };
+
+  const closeLayoutModal = () => {
+    setLayoutModalOpen(null);
   };
 
   const streamsToProgramOutputs = (
@@ -267,7 +287,7 @@ export function ConfigureOutputModal({
 
   return (
     <Modal open={open} outsideClick={() => clearInputs()}>
-      {!modalOpen && (
+      {!layoutModalOpen && (
         <div className="flex gap-3">
           {preset.pipelines.map((pipeline, i) => {
             return (
@@ -294,7 +314,9 @@ export function ConfigureOutputModal({
                   <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
-                      openConfigModal={(input: string) => setModalOpen(input)}
+                      openConfigModal={(input: string) =>
+                        setLayoutModalOpen(input)
+                      }
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
                       handleUpdateMultiview={(input) =>
@@ -340,8 +362,19 @@ export function ConfigureOutputModal({
             })}
         </div>
       )}
-      {!!modalOpen && <MultiviewLayoutSettings configMode={modalOpen} />}
-      <Decision onClose={() => clearInputs()} onSave={onSave} />
+      {!!layoutModalOpen && (
+        <MultiviewLayoutSettings
+          configMode={layoutModalOpen}
+          production={production}
+          setNewMultiviewPreset={(newLayout) =>
+            setNewMultiviewPreset(newLayout)
+          }
+        />
+      )}
+      <Decision
+        onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
+        onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
+      />
     </Modal>
   );
 }
