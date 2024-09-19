@@ -12,12 +12,14 @@ type ConfigureOutputButtonProps = {
   preset?: Preset;
   disabled?: boolean;
   updatePreset: (preset: Preset) => void;
+  production: Production | undefined;
 };
 
 export function ConfigureOutputButton({
   preset,
   updatePreset,
-  disabled
+  disabled,
+  production
 }: ConfigureOutputButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(
@@ -59,6 +61,7 @@ export function ConfigureOutputButton({
           preset={preset}
           onClose={toggleConfigModal}
           updatePreset={updatePreset}
+          production={production}
         />
       )}
     </>

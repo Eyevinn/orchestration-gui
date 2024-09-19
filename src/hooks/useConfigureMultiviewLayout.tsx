@@ -1,38 +1,36 @@
 import { useEffect, useState } from 'react';
-import { MultiviewPreset } from '../interfaces/preset';
-import { MultiviewViewsWithId } from './useSetupMultiviewLayout';
-import { TList } from './useCreateInputArray';
+import { MultiviewPreset, TMultiviewLayout } from '../interfaces/preset';
+import { MultiviewViews, TListSource } from '../interfaces/multiview';
 
 export function useConfigureMultiviewLayout(
+  productionId: string | undefined,
   preset: MultiviewPreset | null,
   defaultLabel: string | undefined,
-  source: TList | undefined,
-  viewId: number | undefined,
-  configMode: string,
+  source: TListSource | undefined,
+  viewId: string | undefined,
   name: string | null
 ) {
-  const [updatedPreset, setUpdatedPreset] = useState<MultiviewPreset | null>();
+  const [updatedPreset, setUpdatedPreset] = useState<TMultiviewLayout | null>(
+    null
+  );
 
   useEffect(() => {
-    setUpdatedPreset(null);
-  }, [configMode]);
-
-  useEffect(() => {
-    if (preset && (defaultLabel || source)) {
-      const arr: MultiviewViewsWithId[] = [];
-      (preset.layout.views as MultiviewViewsWithId[]).map((item, index) => {
-        if (index === viewId) {
+    if (productionId && preset && (defaultLabel || source)) {
+      const arr: MultiviewViews[] = [];
+      preset.layout.views.map((item, index) => {
+        if (index.toString() === viewId) {
           if (source) {
             arr.push({
               ...item,
               input_slot: source.input_slot,
-              label: source.label
+              label: source.label,
+              id: source.id
             });
           }
           if (defaultLabel) {
             arr.push({
               ...item,
-              input_slot: viewId,
+              input_slot: parseInt(viewId, 10),
               label: defaultLabel
             });
           }
@@ -44,22 +42,15 @@ export function useConfigureMultiviewLayout(
       });
       return setUpdatedPreset({
         ...preset,
+        productionId,
+        name: name ? name : preset.name,
         layout: {
           ...preset.layout,
           views: arr
         }
       });
     }
-  }, [source?.input_slot, source?.label, defaultLabel]);
-
-  useEffect(() => {
-    if (preset && name && name !== preset.name) {
-      return setUpdatedPreset({
-        ...preset,
-        name
-      });
-    }
-  }, [name]);
+  }, [defaultLabel, name, source, viewId]);
 
   return { multiviewLayout: updatedPreset };
 }

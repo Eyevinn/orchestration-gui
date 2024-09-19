@@ -1,4 +1,4 @@
-import { Preset } from '../../../interfaces/preset';
+import { MultiviewPreset, Preset } from '../../../interfaces/preset';
 import { Modal } from '../Modal';
 import Decision from './Decision';
 import PipelineOutputConfig, { PipelineTypes } from './PipelineOutputConfig';
@@ -6,12 +6,17 @@ import { useState } from 'react';
 import { PipelineOutput, PipelineSettings } from '../../../interfaces/pipeline';
 import { usePipelines } from '../../../hooks/pipelines';
 import cloneDeep from 'lodash.clonedeep';
+import MultiviewLayoutSettings from './MultiviewLayoutSettings';
+import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { Production } from '../../../interfaces/production';
+import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';
 
 type ConfigureOutputModalProps = {
   open: boolean;
   preset: Preset;
   onClose: () => void;
   updatePreset: (preset: Preset) => void;
+  production: Production | undefined;
 };
 
 export interface OutputStream {
@@ -33,7 +38,8 @@ export function ConfigureOutputModal({
   open,
   preset,
   onClose,
-  updatePreset
+  updatePreset,
+  production
 }: ConfigureOutputModalProps) {
   const [pipelines, setPipelines] = useState<PipelineSettings[]>(
     preset.pipelines || []
@@ -43,6 +49,15 @@ export function ConfigureOutputModal({
     useState<number>(DEFAULT_PORT_MUMBER);
 
   const [pipes] = usePipelines();
+  const [layoutModalOpen, setLayoutModalOpen] = useState<string | null>(null);
+  const [newMultiviewPreset, setNewMultiviewPreset] =
+    useState<MultiviewPreset | null>(null);
+  const addNewPreset = usePutMultiviewPreset();
+
+  const clearInputs = () => {
+    setLayoutModalOpen(null);
+    onClose();
+  };
 
   const onSave = () => {
     const locations = pipelines
@@ -67,18 +82,111 @@ export function ConfigureOutputModal({
     onClose();
   };
 
-  const updatePipelineOutputFunc = (
-    pipeline: PipelineSettings,
-    outputs: PipelineOutput[]
+  const streamsToProgramOutputs = (
+    pipelineIndex: number,
+    outputStreams?: OutputStream[]
   ) => {
-    setCurrentError('');
-    const pipelineIndex = pipelines.findIndex(
-      (p) => p.pipeline_name === pipeline.pipeline_name
+    if (!outputStreams) return [];
+    return outputStreams.map((stream) => ({
+      ...preset.pipelines[pipelineIndex].program_output[0],
+      port: stream.port,
+      [stream.srtMode === 'listener' ? 'local_ip' : 'remote_ip']: stream.ip,
+      srt_mode: stream.srtMode,
+      video_bit_depth: stream.videoBit,
+      video_format: stream.videoFormat,
+      video_kilobit_rate: stream.videoKiloBit,
+      srt_passphrase: stream.srtPassphrase
+    })) satisfies ProgramOutput[];
+  };
+
+  const addStream = (stream: OutputStream) => {
+    const streams = outputstreams.filter(
+      (o) => o.pipelineIndex === stream.pipelineIndex
     );
-    if (pipelineIndex >= 0) {
-      const newPipelines = cloneDeep(pipelines);
-      newPipelines.splice(pipelineIndex, 1, { ...pipeline, outputs: outputs });
-      setPipelines(newPipelines);
+    if (streams.length > 4) return;
+    setOutputStreams([
+      ...outputstreams,
+      {
+        ...stream,
+        name: `${t('preset.stream_name')} ${streams.length + 1}`,
+        port: streams[streams.length - 1].port + 1
+      }
+    ]);
+  };
+
+  const updateStream = (updatedStream: OutputStream) => {
+    setOutputStreams(
+      [
+        ...outputstreams.filter((o) => o.id !== updatedStream.id),
+        updatedStream
+      ].sort((a, b) => a.name.localeCompare(b.name))
+    );
+  };
+
+  const updateStreams = (updatedStreams: OutputStream[]) => {
+    const streams = outputstreams.filter(
+      (o) => !updatedStreams.some((u) => u.id === o.id)
+    );
+    setOutputStreams(
+      [...streams, ...updatedStreams].sort((a, b) =>
+        a.name.localeCompare(b.name)
+      )
+    );
+  };
+
+  const setNames = (outputstreams: OutputStream[], index: number) => {
+    const streamsForPipe = outputstreams.filter(
+      (o) => o.pipelineIndex === index
+    );
+    const rest = outputstreams.filter((o) => o.pipelineIndex !== index);
+    return [
+      ...streamsForPipe.map((s, i) => ({ ...s, name: `Stream ${i + 1}` })),
+      ...rest
+    ];
+  };
+
+  const deleteStream = (id: string, index: number) => {
+    setOutputStreams(
+      setNames(
+        outputstreams.filter((o) => o.id !== id),
+        index
+      )
+    );
+  };
+
+  const findDuplicateValues = (mvs: MultiviewSettings[]) => {
+    const ports = mvs.map(
+      (item: MultiviewSettings) =>
+        item.output.local_ip + ':' + item.output.local_port.toString()
+    );
+    const duplicateIndices: number[] = [];
+    const seenPorts = new Set();
+
+    ports.forEach((port, index) => {
+      if (seenPorts.has(port)) {
+        duplicateIndices.push(index);
+        // Also include the first occurrence if it's not already included
+        const firstIndex = ports.indexOf(port);
+        if (!duplicateIndices.includes(firstIndex)) {
+          duplicateIndices.push(firstIndex);
+        }
+      } else {
+        seenPorts.add(port);
+      }
+    });
+
+    return duplicateIndices;
+  };
+
+  const runDuplicateCheck = (mvs: MultiviewSettings[]) => {
+    const hasDuplicates = findDuplicateValues(mvs);
+
+    if (hasDuplicates.length > 0) {
+      setPortDuplicateIndexes(hasDuplicates);
+    }
+
+    if (hasDuplicates.length === 0) {
+      setPortDuplicateIndexes([]);
     }
   };
 
@@ -116,7 +224,10 @@ export function ConfigureOutputModal({
           })}
         </div>
         <div className="text-button-delete text-center">{currentError}</div>
-        <Decision onClose={() => onClose()} onSave={onSave} />
+        <Decision
+        onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
+        onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
+      />
       </div>
     </Modal>
   );
