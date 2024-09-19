@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { PipelineOutput, PipelineSettings } from '../../../interfaces/pipeline';
 import { usePipelines } from '../../../hooks/pipelines';
 import cloneDeep from 'lodash.clonedeep';
-import MultiviewLayoutSettings from './MultiviewLayoutSettings';
+import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { Production } from '../../../interfaces/production';
 import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';

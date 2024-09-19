@@ -4,45 +4,46 @@ import Options from '../Options';
 import { MultiviewPreset } from '../../../../interfaces/preset';
 import { useTranslate } from '../../../../i18n/useTranslate';
 import { useSetupMultiviewLayout } from '../../../../hooks/useSetupMultiviewLayout';
+import { useMultiviewLayouts } from '../../../../hooks/multiviewLayout';
 import { Production } from '../../../../interfaces/production';
 import { useConfigureMultiviewLayout } from '../../../../hooks/useConfigureMultiviewLayout';
 import Input from '../Input';
+import { TMultiviewLayout } from '../../../../interfaces/preset';
+import { useCreateInputArray } from '../../../../hooks/useCreateInputArray';
 import MultiviewLayout from './MultiviewLayout';
-import {
-  TList,
-  useCreateInputArray
-} from '../../../../hooks/useCreateInputArray';
+import { TListSource } from '../../../../interfaces/multiview';
 
 type ChangeLayout = {
   defaultLabel?: string;
-  source?: TList;
-  viewId: number;
+  source?: TListSource;
+  viewId: string;
 };
 
 export default function MultiviewLayoutSettings({
-  // TODO configMode sets the mode of the configuration to create or edit, not implemented yet
-  configMode,
   production,
+  selectedMultiviewLayout,
   setNewMultiviewPreset
 }: {
-  configMode: string;
   production: Production | undefined;
-  setNewMultiviewPreset: (preset: MultiviewPreset | null) => void;
+  selectedMultiviewLayout: TMultiviewLayout | undefined;
+  setNewMultiviewPreset: (preset: TMultiviewLayout | null) => void;
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
   const [changedLayout, setChangedLayout] = useState<ChangeLayout | null>(null);
   const [newPresetName, setNewPresetName] = useState<string | null>(null);
-  const [multiviewPresets, loading] = useMultiviewPresets();
+  const [layoutToChange, setLayoutToChange] = useState<string>('');
+  const [multiviewLayouts] = useMultiviewLayouts();
+  const [multiviewPresets] = useMultiviewPresets();
   const { multiviewPresetLayout } = useSetupMultiviewLayout(
     selectedMultiviewPreset
   );
   const { multiviewLayout } = useConfigureMultiviewLayout(
+    production?._id,
     selectedMultiviewPreset,
     changedLayout?.defaultLabel,
     changedLayout?.source,
     changedLayout?.viewId,
-    configMode,
     newPresetName
   );
   const { inputList } = useCreateInputArray(production);
@@ -52,15 +53,20 @@ export default function MultiviewLayoutSettings({
     ? multiviewPresets?.map((preset) => preset.name)
     : [];
 
+  // This useEffect is used to set the drawn layout of the multiviewer on start,
+  // if this fails then the modal will be empty
   useEffect(() => {
-    setNewPresetName(null);
-  }, [configMode]);
-
-  useEffect(() => {
-    if (multiviewPresets && multiviewPresets[0]) {
+    if (selectedMultiviewLayout) {
+      setLayoutToChange(selectedMultiviewLayout.name);
+      setSelectedMultiviewPreset(selectedMultiviewLayout);
+    } else if (multiviewPresets && multiviewPresets[0]) {
       setSelectedMultiviewPreset(multiviewPresets[0]);
     }
-  }, [multiviewPresets]);
+  }, [multiviewPresets, selectedMultiviewLayout]);
+
+  const layoutNameAlreadyExist = multiviewLayouts?.find(
+    (singlePreset) => singlePreset.name === multiviewLayout?.name
+  )?.name;
 
   useEffect(() => {
     if (multiviewLayout) {
@@ -76,18 +82,19 @@ export default function MultiviewLayoutSettings({
     const presetLayout = multiviewPresets?.find(
       (singlePreset) => singlePreset.name === name
     );
+    setLayoutToChange('');
     setNewPresetName(name);
     if (presetLayout) {
       setSelectedMultiviewPreset(presetLayout);
     }
   };
 
-  const handleChange = (viewId: number, value: string) => {
-    if (inputList && multiviewPresets) {
+  const handleChange = (viewId: string, value: string) => {
+    if (inputList && multiviewLayouts) {
       // Remove 2 from id to remove id for Preview- and Program-view
       // Add 1 to index to get the correct input_slot
-      const idFirstInputView = viewId - 2 + 1;
-      const defaultLabel = multiviewPresets[0].layout.views.find(
+      const idFirstInputView = parseInt(viewId, 10) - 2 + 1;
+      const defaultLabel = multiviewLayouts[0].layout.views.find(
         (item) => item.input_slot === idFirstInputView
       )?.label;
       inputList.map((source) => {
@@ -101,15 +108,17 @@ export default function MultiviewLayoutSettings({
     }
   };
 
+  if (!selectedMultiviewPreset) {
+    return <></>;
+  }
+
   return (
     <div className="flex flex-col w-full h-full">
       {multiviewPresetLayout && (
         <MultiviewLayout
           multiviewPresetLayout={multiviewPresetLayout}
           inputList={inputList}
-          handleChange={(viewId: number, value: string) =>
-            handleChange(viewId, value)
-          }
+          handleChange={handleChange}
         />
       )}
       <div className="flex flex-col w-[50%] h-full">
@@ -119,14 +128,19 @@ export default function MultiviewLayoutSettings({
             label: singleItem
           }))}
           value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
-          update={(value) => handlePresetUpdate(value)}
+          update={handlePresetUpdate}
         />
         <Input
           label={t('name')}
-          value={newPresetName ? newPresetName : ''}
-          update={(value) => handlePresetUpdate(value)}
+          value={newPresetName ? newPresetName : layoutToChange}
+          update={handlePresetUpdate}
           placeholder={t('preset.new_preset_name')}
         />
+        {layoutNameAlreadyExist && (
+          <p className="text-right mr-2 text-button-delete font-bold">
+            {t('preset.layout_already_exist', { layoutNameAlreadyExist })}
+          </p>
+        )}
       </div>
     </div>
   );
