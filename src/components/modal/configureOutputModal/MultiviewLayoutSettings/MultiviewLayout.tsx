@@ -10,7 +10,7 @@ export default function MultiviewLayout({
 }: {
   multiviewPresetLayout: MultiviewPreset;
   inputList: TList[] | undefined;
-  handleChange: (id: number | undefined, value: string) => void;
+  handleChange: (id: number, value: string) => void;
 }) {
   return (
     <div
@@ -20,7 +20,7 @@ export default function MultiviewLayout({
         height: `${multiviewPresetLayout.layout.output_height}rem`
       }}
     >
-      {multiviewPresetLayout.layout.views.map(
+      {(multiviewPresetLayout.layout.views as MultiviewViewsWithId[]).map(
         (singleView: MultiviewViewsWithId) => {
           const { x, y, width, height, label, id } = singleView;
           const previewView = singleView.input_slot === 1002;

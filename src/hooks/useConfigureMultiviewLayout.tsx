@@ -20,7 +20,7 @@ export function useConfigureMultiviewLayout(
   useEffect(() => {
     if (preset && id && (defaultLabel || source)) {
       const arr: MultiviewViewsWithId[] = [];
-      preset.layout.views.map((item, index) => {
+      (preset.layout.views as MultiviewViewsWithId[]).map((item, index) => {
         if (index === id) {
           if (source) {
             arr.push({
