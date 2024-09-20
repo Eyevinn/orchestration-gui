@@ -317,6 +317,7 @@ export function ConfigureOutputModal({
                       openConfigModal={(input: string) =>
                         setLayoutModalOpen(input)
                       }
+                      newMultiviewPreset={newMultiviewPreset}
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
                       handleUpdateMultiview={(input) =>

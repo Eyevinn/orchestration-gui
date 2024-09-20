@@ -14,6 +14,7 @@ type MultiviewSettingsProps = {
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
   portDuplicateError: boolean;
   openConfigModal: (input: string) => void;
+  newMultiviewPreset: MultiviewPreset | null;
 };
 
 export default function MultiviewSettingsConfig({
@@ -21,7 +22,8 @@ export default function MultiviewSettingsConfig({
   multiview,
   handleUpdateMultiview,
   portDuplicateError,
-  openConfigModal
+  openConfigModal,
+  newMultiviewPreset
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewPresets, loading] = useMultiviewPresets();
@@ -36,6 +38,10 @@ export default function MultiviewSettingsConfig({
   // };
 
   useEffect(() => {
+    if (newMultiviewPreset && lastItem) {
+      setSelectedMultiviewPreset(newMultiviewPreset);
+      return;
+    }
     if (multiview) {
       setSelectedMultiviewPreset(multiview);
       return;
@@ -43,7 +49,7 @@ export default function MultiviewSettingsConfig({
     if (multiviewPresets && multiviewPresets[0]) {
       setSelectedMultiviewPreset(multiviewPresets[0]);
     }
-  }, [multiviewPresets, multiview]);
+  }, [multiviewPresets, multiview, newMultiviewPreset]);
 
   if (!multiview) {
     if (!multiviewPresets || multiviewPresets.length === 0) {
