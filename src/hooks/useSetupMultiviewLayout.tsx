@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { MultiviewPreset } from '../interfaces/preset';
 import { MultiviewViews } from '../interfaces/multiview';
 
-export type MultiviewViewsWithId = MultiviewViews & { id?: number };
+export type MultiviewViewsWithId = MultiviewViews & { id: number };
 
 export function useSetupMultiviewLayout(preset: MultiviewPreset | null) {
   const [multiviewPreset, setMultiviewPreset] = useState<MultiviewPreset>();
