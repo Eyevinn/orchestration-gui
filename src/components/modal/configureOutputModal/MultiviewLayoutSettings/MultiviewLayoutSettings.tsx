@@ -86,7 +86,7 @@ export default function MultiviewLayoutSettings({
     if (inputList && multiviewPresets) {
       // Remove 2 from id to remove id for Preview- and Program-view
       // Add 1 to index to get the correct input_slot
-      const idFirstInputView  = viewId - 2 + 1;
+      const idFirstInputView = viewId - 2 + 1;
       const defaultLabel = multiviewPresets[0].layout.views.find(
         (item) => item.input_slot === idFirstInputView
       )?.label;
