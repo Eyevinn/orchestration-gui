@@ -272,6 +272,7 @@ export function ConfigureOutputModal({
                   <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
+                      productionId={production?._id}
                       openConfigModal={(input: string) =>
                         setLayoutModalOpen(input)
                       }
