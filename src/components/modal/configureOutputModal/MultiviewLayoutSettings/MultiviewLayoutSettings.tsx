@@ -16,11 +16,11 @@ import {
 type ChangeLayout = {
   defaultLabel?: string;
   source?: TList;
-  id: number;
+  viewId: number;
 };
 
 export default function MultiviewLayoutSettings({
-  // configMode sets the mode of the configuration to create or edit, not implemented yet
+  // TODO configMode sets the mode of the configuration to create or edit, not implemented yet
   configMode,
   production,
   setNewMultiviewPreset
@@ -41,7 +41,7 @@ export default function MultiviewLayoutSettings({
     selectedMultiviewPreset,
     changedLayout?.defaultLabel,
     changedLayout?.source,
-    changedLayout?.id,
+    changedLayout?.viewId,
     configMode,
     newPresetName
   );
@@ -82,20 +82,20 @@ export default function MultiviewLayoutSettings({
     }
   };
 
-  const handleChange = (id: number | undefined, value: string) => {
-    if (inputList && id && multiviewPresets) {
+  const handleChange = (viewId: number, value: string) => {
+    if (inputList && multiviewPresets) {
       // Remove 2 from id to remove id for Preview- and Program-view
       // Add 1 to index to get the correct input_slot
-      const idFirstInputView = id - 2 + 1;
+      const idFirstInputView  = viewId - 2 + 1;
       const defaultLabel = multiviewPresets[0].layout.views.find(
         (item) => item.input_slot === idFirstInputView
       )?.label;
       inputList.map((source) => {
         if (value === '') {
-          setChangedLayout({ defaultLabel, id });
+          setChangedLayout({ defaultLabel, viewId });
         }
-        if (source.label === value) {
-          setChangedLayout({ source, id });
+        if (source.id === value) {
+          setChangedLayout({ source, viewId });
         }
       });
     }
@@ -107,15 +107,17 @@ export default function MultiviewLayoutSettings({
         <MultiviewLayout
           multiviewPresetLayout={multiviewPresetLayout}
           inputList={inputList}
-          handleChange={(id: number | undefined, value: string) =>
-            handleChange(id, value)
+          handleChange={(viewId: number, value: string) =>
+            handleChange(viewId, value)
           }
         />
       )}
       <div className="flex flex-col w-[50%] h-full">
         <Options
           label={t('preset.select_multiview_preset')}
-          options={multiviewPresetNames}
+          options={multiviewPresetNames.map((singleItem) => ({
+            label: singleItem
+          }))}
           value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
           update={(value) => handlePresetUpdate(value)}
         />

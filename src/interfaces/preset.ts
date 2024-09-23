@@ -20,6 +20,7 @@ export interface PresetReference {
 
 export interface MultiviewPreset {
   _id?: ObjectId;
+  production_id?: ObjectId;
   name: string;
   layout: MultiviewLayout;
   output: MultiviewOutputSettings;

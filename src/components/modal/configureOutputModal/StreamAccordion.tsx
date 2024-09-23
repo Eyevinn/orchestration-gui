@@ -58,7 +58,7 @@ export default function StreamAccordion({
         <div className="bg-container rounded text-p">
           <Options
             label={t('preset.mode')}
-            options={['listener', 'caller']}
+            options={[{ label: 'listener' }, { label: 'caller' }]}
             value={stream.srtMode}
             update={(value) => update('srtMode', value, stream.id)}
           />

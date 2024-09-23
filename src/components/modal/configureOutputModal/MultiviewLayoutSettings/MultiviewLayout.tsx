@@ -23,8 +23,8 @@ export default function MultiviewLayout({
       {(multiviewPresetLayout.layout.views as MultiviewViewsWithId[]).map(
         (singleView: MultiviewViewsWithId) => {
           const { x, y, width, height, label, id } = singleView;
-          const previewView = singleView.input_slot === 1002;
-          const programView = singleView.input_slot === 1001;
+          const previewView = singleView.input_slot === 1002 && y === 0;
+          const programView = singleView.input_slot === 1001 && y === 0;
 
           return (
             <div
@@ -43,7 +43,10 @@ export default function MultiviewLayout({
               {inputList && !previewView && !programView && (
                 <Options
                   label={label}
-                  options={inputList.map((singleSource) => singleSource.label)}
+                  options={inputList.map((singleSource) => ({
+                    id: singleSource.id,
+                    label: singleSource.label
+                  }))}
                   value={label ? label : ''}
                   update={(value) => handleChange(id, value)}
                   columnStyle

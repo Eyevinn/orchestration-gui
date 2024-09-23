@@ -90,14 +90,14 @@ export default function PipelineSettings({
       <div className="flex flex-col gap-3">
         <Options
           label={t('preset.video_format')}
-          options={['AVC', 'HEVC']}
+          options={[{ label: 'AVC' }, { label: 'HEVC' }]}
           value={streams[0].videoFormat}
           update={(value) =>
             handleUpdateStream('videoFormat', value, streams[0].id)
           }
         />
         <Options
-          options={['8', '10']}
+          options={[{ label: '8' }, { label: '10' }]}
           label={t('preset.video_bit_depth')}
           value={streams[0].videoBit.toString()}
           update={(value) =>

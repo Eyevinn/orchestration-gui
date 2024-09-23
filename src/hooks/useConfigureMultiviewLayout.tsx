@@ -7,7 +7,7 @@ export function useConfigureMultiviewLayout(
   preset: MultiviewPreset | null,
   defaultLabel: string | undefined,
   source: TList | undefined,
-  id: number | undefined,
+  viewId: number | undefined,
   configMode: string,
   name: string | null
 ) {
@@ -18,10 +18,10 @@ export function useConfigureMultiviewLayout(
   }, [configMode]);
 
   useEffect(() => {
-    if (preset && id && (defaultLabel || source)) {
+    if (preset && (defaultLabel || source)) {
       const arr: MultiviewViewsWithId[] = [];
       (preset.layout.views as MultiviewViewsWithId[]).map((item, index) => {
-        if (index === id) {
+        if (index === viewId) {
           if (source) {
             arr.push({
               ...item,
@@ -32,7 +32,7 @@ export function useConfigureMultiviewLayout(
           if (defaultLabel) {
             arr.push({
               ...item,
-              input_slot: id,
+              input_slot: viewId,
               label: defaultLabel
             });
           }
@@ -53,10 +53,10 @@ export function useConfigureMultiviewLayout(
   }, [source?.input_slot, source?.label, defaultLabel]);
 
   useEffect(() => {
-    if (preset) {
+    if (preset && name && name !== preset.name) {
       return setUpdatedPreset({
         ...preset,
-        name: name ? name : preset.name
+        name: name
       });
     }
   }, [name]);
