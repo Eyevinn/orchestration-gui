@@ -17,7 +17,7 @@ export function useCreateInputArray(production: Production | undefined) {
       const list: TList[] = [];
       production.sources.map((source) =>
         list.push({
-          id: source._id,
+          id: source._id ? source._id : '',
           input_slot: source.input_slot,
           label: source.label
         })
