@@ -15,6 +15,7 @@ interface SourceListProps {
   isDisabledFunc?: (source: SourceWithId) => boolean;
   action?: (source: SourceWithId) => void;
   actionText?: string;
+  locked: boolean;
 }
 
 const SourceList: React.FC<SourceListProps> = (props) => {
@@ -44,6 +45,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
           source={source}
           disabled={isDisabledFunc?.(source)}
           action={action}
+          locked={locked}
         />
       );
     });
