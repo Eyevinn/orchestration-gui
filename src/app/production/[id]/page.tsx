@@ -36,7 +36,7 @@ import { AddSourceModal } from '../../../components/modal/AddSourceModal';
 import { RemoveSourceModal } from '../../../components/modal/RemoveSourceModal';
 import { useDeleteStream, useCreateStream } from '../../../hooks/streams';
 import { MonitoringButton } from '../../../components/button/MonitoringButton';
-import { useGetMultiviewPreset } from '../../../hooks/multiviewPreset';
+import { useGetMultiviewLayout } from '../../../hooks/multiviewLayout';
 import { useMultiviews } from '../../../hooks/multiviews';
 import SourceList from '../../../components/sourceList/SourceList';
 import { LockButton } from '../../../components/lockButton/LockButton';
@@ -52,6 +52,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   //SOURCES
   const [sources] = useSources();
+  // TODO: Is this useEffect needed, filteredSources isn't used anymore?
   const [filteredSources, setFilteredSources] = useState(
     new Map<string, SourceWithId>()
   );
@@ -80,8 +81,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     productionSetup?.sources.map((prod) => prod._id) || [];
 
   //MULTIVIEWS
-  //TODO: move useGetMultiviewPreset into useMultiviews (refactor)
-  const getMultiviewPreset = useGetMultiviewPreset();
+  const getMultiviewLayout = useGetMultiviewLayout();
   const [updateMultiviewViews] = useMultiviews();
 
   //FROM LIVE API
@@ -242,6 +242,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     refreshProduction();
   }, []);
 
+  // TODO: Is this useEffect needed, filteredSources isn't used anymore?
   useEffect(() => {
     if (productionSetup) {
       const hasMissingSource = productionSetup?.sources.find(
@@ -350,7 +351,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       toast.error(t('production.missing_multiview'));
       return;
     }
-    const defaultMultiview = await getMultiviewPreset(
+    const defaultMultiview = await getMultiviewLayout(
       preset?.default_multiview_reference
     );
     setSelectedPreset(preset);

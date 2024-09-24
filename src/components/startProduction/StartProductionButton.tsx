@@ -16,7 +16,7 @@ import { StopModal } from '../modal/StopModal';
 import { usePutProduction } from '../../hooks/productions';
 import toast from 'react-hot-toast';
 import { useDeleteMonitoring } from '../../hooks/monitoring';
-import { useMultiviewPresets } from '../../hooks/multiviewPreset';
+import { useMultiviewLayouts } from '../../hooks/multiviewLayout';
 
 type StartProductionButtonProps = {
   production: Production | undefined;
@@ -41,7 +41,7 @@ export function StartProductionButton({
   const [deleteMonitoring] = useDeleteMonitoring();
   const [modalOpen, setModalOpen] = useState(false);
   const [stopModalOpen, setStopModalOpen] = useState(false);
-  const [multiviewPresets] = useMultiviewPresets();
+  const [multiviewLayouts] = useMultiviewLayouts();
 
   const onClick = () => {
     if (!production) return;
@@ -86,7 +86,7 @@ export function StartProductionButton({
     }
     let productionToStart: Production;
     if (!production.production_settings.pipelines[0].multiviews) {
-      if (!multiviewPresets || multiviewPresets.length === 0) {
+      if (!multiviewLayouts || multiviewLayouts.length === 0) {
         toast.error(t('start_production_status.unexpected'));
         return;
       }
@@ -106,7 +106,7 @@ export function StartProductionButton({
             ),
             {
               ...pipelineToUpdateMultiview,
-              multiviews: [{ ...multiviewPresets[0], for_pipeline_idx: 0 }]
+              multiviews: [{ ...multiviewLayouts[0], for_pipeline_idx: 0 }]
             }
           ]
         }

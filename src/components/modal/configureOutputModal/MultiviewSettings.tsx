@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useMultiviewPresets } from '../../../hooks/multiviewPreset';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { MultiviewPreset } from '../../../interfaces/preset';
@@ -7,6 +6,7 @@ import Input from './Input';
 import Options from './Options';
 import toast from 'react-hot-toast';
 import { IconSettings } from '@tabler/icons-react';
+import { useMultiviewLayouts } from '../../../hooks/multiviewLayout';
 
 type MultiviewSettingsProps = {
   lastItem: boolean;
@@ -28,7 +28,7 @@ export default function MultiviewSettingsConfig({
   productionId
 }: MultiviewSettingsProps) {
   const t = useTranslate();
-  const [multiviewPresets, loading] = useMultiviewPresets();
+  const [multiviewLayouts, loading] = useMultiviewLayouts();
   const [avaliableMultiviewPresets, setAvaliableMultiviewPresets] = useState<
     MultiviewPreset[] | undefined
   >();
@@ -43,18 +43,18 @@ export default function MultiviewSettingsConfig({
   // };
 
   useEffect(() => {
-    if (multiviewPresets) {
-      const globalPresets = multiviewPresets.filter((preset) => {
+    if (multiviewLayouts) {
+      const globalPresets = multiviewLayouts.filter((preset) => {
         !preset.production_id;
       });
 
-      const productionPresets = multiviewPresets.filter((preset) => {
+      const productionPresets = multiviewLayouts.filter((preset) => {
         preset.production_id?.toString() === productionId;
       });
 
       setAvaliableMultiviewPresets([...globalPresets, ...productionPresets]);
     }
-  }, [multiviewPresets, productionId]);
+  }, [multiviewLayouts, productionId]);
 
   useEffect(() => {
     if (newMultiviewPreset && lastItem) {
@@ -71,17 +71,17 @@ export default function MultiviewSettingsConfig({
   }, [avaliableMultiviewPresets, multiview, newMultiviewPreset]);
 
   if (!multiview) {
-    if (!multiviewPresets || multiviewPresets.length === 0) {
+    if (!multiviewLayouts || multiviewLayouts.length === 0) {
       return null;
     }
     handleUpdateMultiview({
-      ...multiviewPresets[0],
+      ...multiviewLayouts[0],
       for_pipeline_idx: 0
     });
   }
 
   const handleSetSelectedMultiviewPreset = (name: string) => {
-    const selected = multiviewPresets?.find((m) => m.name === name);
+    const selected = multiviewLayouts?.find((m) => m.name === name);
     if (!selected) {
       toast.error(t('preset.no_multiview_found'));
       return;
@@ -171,8 +171,8 @@ export default function MultiviewSettingsConfig({
       handleUpdateMultiview(updatedMultiview);
     }
   };
-  const multiviewPresetNames = multiviewPresets?.map((preset) => preset.name)
-    ? multiviewPresets?.map((preset) => preset.name)
+  const multiviewPresetNames = multiviewLayouts?.map((preset) => preset.name)
+    ? multiviewLayouts?.map((preset) => preset.name)
     : [];
 
   const multiviewOrPreset = multiview ? multiview : selectedMultiviewPreset;

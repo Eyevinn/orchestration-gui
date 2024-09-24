@@ -1,5 +1,6 @@
 import { Preset, PresetWithId } from '../interfaces/preset';
 import { ObjectId } from 'mongodb';
+
 export function useGetPresets() {
   return async (): Promise<PresetWithId[]> => {
     const response = await fetch(`/api/manager/presets`, {

@@ -102,7 +102,7 @@ export async function migratePresets(db: Db) {
 
 export async function migrateMultiviewPresets(db: Db) {
   const multiviewPresets = await db
-    .collection<MultiviewPreset>('multiviews')
+    .collection<MultiviewPreset>('multiview-presets')
     .find({})
     .toArray();
   for (const preset of multiviewPresets) {
@@ -114,13 +114,15 @@ export async function migrateMultiviewPresets(db: Db) {
         `Upgrading multiview preset '${migratedPreset.name}' with new SRT output settings`
       );
       const { _id, ...rest } = migratedPreset;
-      await db.collection<MultiviewPreset>('multiviews').findOneAndReplace(
-        { _id: new ObjectId(_id) },
-        {
-          ...rest
-        },
-        { returnDocument: 'after' }
-      );
+      await db
+        .collection<MultiviewPreset>('multiview-presets')
+        .findOneAndReplace(
+          { _id: new ObjectId(_id) },
+          {
+            ...rest
+          },
+          { returnDocument: 'after' }
+        );
     }
   }
 }

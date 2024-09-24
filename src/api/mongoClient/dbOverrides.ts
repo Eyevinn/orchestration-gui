@@ -100,7 +100,7 @@ async function overrideMultiviewPreset(
       break;
   }
   const { _id, ...rest } = multiviewPreset;
-  await db.collection<MultiviewPreset>('multiviews').findOneAndReplace(
+  await db.collection<MultiviewPreset>('multiview-presets').findOneAndReplace(
     { _id: new ObjectId(_id) },
     {
       ...rest
@@ -131,7 +131,7 @@ export async function applyPresetOverrides(db: Db, overrideString: string) {
       }
     } else if (override.type === 'multiview') {
       const multiviewPreset = await db
-        .collection<MultiviewPreset>('multiviews')
+        .collection<MultiviewPreset>('multiview-presets')
         .findOne({ name: override.name });
       if (multiviewPreset) {
         await overrideMultiviewPreset(db, multiviewPreset, override);

@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { MultiviewPreset } from '../interfaces/preset';
 import { DataHook } from './types';
 import { WithId } from 'mongodb';
-import { API_SECRET_KEY } from '../utils/constants';
+// TODO Add this when possibility to update and add mv-presets are added
+// import { API_SECRET_KEY } from '../utils/constants';
 
 export function useGetMultiviewPresets() {
   return async (): Promise<MultiviewPreset[]> => {
-    const response = await fetch(`/api/manager/multiviews`, {
+    const response = await fetch(`/api/manager/multiview-preset`, {
       method: 'GET',
       // TODO: Implement api key
       headers: [['x-api-key', `Bearer apisecretkey`]]
@@ -20,7 +21,7 @@ export function useGetMultiviewPresets() {
 
 export function useGetMultiviewPreset() {
   return async (id: string): Promise<WithId<MultiviewPreset>> => {
-    const response = await fetch(`/api/manager/multiviews/${id}`, {
+    const response = await fetch(`/api/manager/multiview-presets/${id}`, {
       method: 'GET',
       // TODO: Implement api key
       headers: [['x-api-key', `Bearer apisecretkey`]]
@@ -40,7 +41,7 @@ export function useMultiviewPresets(): DataHook<MultiviewPreset[]> {
 
   useEffect(() => {
     setLoading(true);
-    fetch('/api/manager/multiviews', {
+    fetch('/api/manager/multiview-presets', {
       method: 'GET',
       // TODO: Implement api key
       headers: [['x-api-key', `Bearer apisecretkey`]]
@@ -56,16 +57,17 @@ export function useMultiviewPresets(): DataHook<MultiviewPreset[]> {
   return [multiviewPresets, loading, undefined];
 }
 
-export function usePutMultiviewPreset() {
-  return async (newMultiviewPreset: MultiviewPreset): Promise<void> => {
-    const response = await fetch('/api/manager/presets', {
-      method: 'PUT',
-      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
-      body: JSON.stringify(newMultiviewPreset)
-    });
-    if (response.ok) {
-      return;
-    }
-    throw await response.text();
-  };
-}
+// TODO Add this when possibility to update and add mv-presets are added
+// export function usePutMultiviewPreset() {
+//   return async (newMultiviewPreset: MultiviewPreset): Promise<void> => {
+//     const response = await fetch('/api/manager/presets', {
+//       method: 'PUT',
+//       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
+//       body: JSON.stringify(newMultiviewPreset)
+//     });
+//     if (response.ok) {
+//       return;
+//     }
+//     throw await response.text();
+//   };
+// }

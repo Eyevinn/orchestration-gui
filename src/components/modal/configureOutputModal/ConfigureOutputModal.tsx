@@ -12,7 +12,7 @@ import MultiviewSettingsConfig from './MultiviewSettings';
 import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { Production } from '../../../interfaces/production';
-import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';
+import { usePutMultiviewLayout } from '../../../hooks/multiviewLayout';
 
 type ConfigureOutputModalProps = {
   open: boolean;
@@ -56,7 +56,7 @@ export function ConfigureOutputModal({
   const [layoutModalOpen, setLayoutModalOpen] = useState<string | null>(null);
   const [newMultiviewPreset, setNewMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
-  const addNewPreset = usePutMultiviewPreset();
+  const addNewPreset = usePutMultiviewLayout();
   
 
   const clearInputs = () => {

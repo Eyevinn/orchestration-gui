@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { getMultiviewPreset } from '../../../../../api/manager/presets';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
 import { MultiviewViews } from '../../../../../interfaces/multiview';
+import { getMultiviewLayout } from '../../../../../api/manager/multiviews';
+
+type PutMultiviewRequest = {
+  pipelineId: string;
+  multiviews: MultiviewViews[];
+};
 
 export async function GET(
   request: NextRequest,
@@ -15,17 +20,14 @@ export async function GET(
     });
   }
   try {
-    return NextResponse.json(await getMultiviewPreset(params.id));
+    return NextResponse.json(await getMultiviewLayout(params.id));
   } catch (e) {
     return new NextResponse(JSON.stringify(e), {
       status: 500
     });
   }
 }
-type PutMultiviewRequest = {
-  pipelineId: string;
-  multiviews: MultiviewViews[];
-};
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: Params }

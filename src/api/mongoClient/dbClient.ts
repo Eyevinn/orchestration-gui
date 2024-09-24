@@ -47,11 +47,17 @@ async function bootstrapDbCollections(db: Db) {
       await migratePresets(db);
     }
 
-    const multiviews = await db.collection('multiviews').countDocuments();
+    const multiviews = await db
+      .collection('multiview-presets')
+      .countDocuments();
     if (multiviews === 0) {
       Log().info('Bootstrapping database with default multiview');
 
-      await db.collection('multiviews').insertMany(defaultMultiview);
+      await db.collection('multiview-presets').insertMany(defaultMultiview);
+      await db.collection('multiviews').insertOne({
+        ...defaultMultiview[0],
+        name: 'Default - ' + defaultMultiview[0].name
+      });
     } else {
       await migrateMultiviewPresets(db);
     }
