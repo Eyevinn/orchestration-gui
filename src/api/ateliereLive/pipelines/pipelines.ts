@@ -92,7 +92,8 @@ export async function getPipelines(): Promise<
         name: pipeline.name,
         uuid: pipeline.uuid,
         outputs: pipeline.outputs,
-        streams: pipeline.streams
+        streams: pipeline.streams,
+        feedback_streams: pipeline.feedback_streams
       };
     });
   }

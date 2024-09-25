@@ -1,13 +1,13 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MultiviewPreset } from '../interfaces/preset';
-import { SourceReference } from '../interfaces/Source';
 import { MultiviewViewsWithId } from './useSetupMultiviewLayout';
+import { TList } from './useCreateInputArray';
 
 export function useConfigureMultiviewLayout(
   preset: MultiviewPreset | null,
   defaultLabel: string | undefined,
-  source: SourceReference | undefined,
-  id: number | undefined,
+  source: TList | undefined,
+  viewId: number | undefined,
   configMode: string,
   name: string | null
 ) {
@@ -18,10 +18,10 @@ export function useConfigureMultiviewLayout(
   }, [configMode]);
 
   useEffect(() => {
-    if (preset && id && (defaultLabel || source)) {
+    if (preset && (defaultLabel || source)) {
       const arr: MultiviewViewsWithId[] = [];
-      preset.layout.views.map((item, index) => {
-        if (index === id) {
+      (preset.layout.views as MultiviewViewsWithId[]).map((item, index) => {
+        if (index === viewId) {
           if (source) {
             arr.push({
               ...item,
@@ -32,7 +32,7 @@ export function useConfigureMultiviewLayout(
           if (defaultLabel) {
             arr.push({
               ...item,
-              input_slot: id,
+              input_slot: viewId,
               label: defaultLabel
             });
           }
@@ -53,10 +53,10 @@ export function useConfigureMultiviewLayout(
   }, [source?.input_slot, source?.label, defaultLabel]);
 
   useEffect(() => {
-    if (preset) {
+    if (preset && name && name !== preset.name) {
       return setUpdatedPreset({
         ...preset,
-        name: name ? name : preset.name
+        name
       });
     }
   }, [name]);

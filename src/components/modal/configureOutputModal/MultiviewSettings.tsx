@@ -14,6 +14,8 @@ type MultiviewSettingsProps = {
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
   portDuplicateError: boolean;
   openConfigModal: (input: string) => void;
+  newMultiviewPreset: MultiviewPreset | null;
+  productionId: string | undefined;
 };
 
 export default function MultiviewSettingsConfig({
@@ -21,10 +23,15 @@ export default function MultiviewSettingsConfig({
   multiview,
   handleUpdateMultiview,
   portDuplicateError,
-  openConfigModal
+  openConfigModal,
+  newMultiviewPreset,
+  productionId
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewPresets, loading] = useMultiviewPresets();
+  const [avaliableMultiviewPresets, setAvaliableMultiviewPresets] = useState<
+    MultiviewPreset[] | undefined
+  >();
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] = useState<
     MultiviewPreset | undefined
   >(multiview);
@@ -36,14 +43,32 @@ export default function MultiviewSettingsConfig({
   // };
 
   useEffect(() => {
+    if (multiviewPresets) {
+      const globalPresets = multiviewPresets.filter((preset) => {
+        !preset.production_id;
+      });
+
+      const productionPresets = multiviewPresets.filter((preset) => {
+        preset.production_id?.toString() === productionId;
+      });
+
+      setAvaliableMultiviewPresets([...globalPresets, ...productionPresets]);
+    }
+  }, [multiviewPresets, productionId]);
+
+  useEffect(() => {
+    if (newMultiviewPreset && lastItem) {
+      setSelectedMultiviewPreset(newMultiviewPreset);
+      return;
+    }
     if (multiview) {
       setSelectedMultiviewPreset(multiview);
       return;
     }
-    if (multiviewPresets && multiviewPresets[0]) {
-      setSelectedMultiviewPreset(multiviewPresets[0]);
+    if (avaliableMultiviewPresets && avaliableMultiviewPresets[0]) {
+      setSelectedMultiviewPreset(avaliableMultiviewPresets[0]);
     }
-  }, [multiviewPresets, multiview]);
+  }, [avaliableMultiviewPresets, multiview, newMultiviewPreset]);
 
   if (!multiview) {
     if (!multiviewPresets || multiviewPresets.length === 0) {
@@ -160,7 +185,9 @@ export default function MultiviewSettingsConfig({
       <div className="relative">
         <Options
           label={t('preset.select_multiview_layout')}
-          options={multiviewPresetNames}
+          options={multiviewPresetNames.map((singleItem) => ({
+            label: singleItem
+          }))}
           value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
           update={(value) => handleSetSelectedMultiviewPreset(value)}
         />
@@ -205,7 +232,7 @@ export default function MultiviewSettingsConfig({
       <div className="flex flex-col gap-3">
         <Options
           label={t('preset.video_format')}
-          options={['AVC', 'HEVC']}
+          options={[{ label: 'AVC' }, { label: 'HEVC' }]}
           value={
             multiviewOrPreset?.output.video_format
               ? multiviewOrPreset?.output.video_format
@@ -225,7 +252,7 @@ export default function MultiviewSettingsConfig({
         />
         <Options
           label={t('preset.mode')}
-          options={['listener', 'caller']}
+          options={[{ label: 'listener' }, { label: 'caller' }]}
           value={
             multiviewOrPreset?.output.srt_mode
               ? multiviewOrPreset?.output.srt_mode

@@ -1,6 +1,6 @@
 import { useTranslate } from '../../../i18n/useTranslate';
 
-type optionTypes = string;
+type optionTypes = { id?: string; label: string };
 
 interface IOptions {
   label: string;
@@ -37,8 +37,11 @@ export default function Options({
       >
         {columnStyle && <option value={''}>{t('preset.select_option')}</option>}
         {options.map((value, i) => (
-          <option value={value} key={value + i}>
-            {value}
+          <option
+            value={value.id ? value.id : value.label}
+            key={value.id ? value.id.toString() : value.label + i}
+          >
+            {value.label}
           </option>
         ))}
       </select>

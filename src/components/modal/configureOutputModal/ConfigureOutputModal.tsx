@@ -9,10 +9,10 @@ import toast from 'react-hot-toast';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import MultiviewSettingsConfig from './MultiviewSettings';
 import PipelineSettingsConfig from './PipelineSettings';
-import MultiviewLayoutSettings from './MultiviewLayoutSettings';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { Production } from '../../../interfaces/production';
 import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';
+import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 
 export interface OutputStream {
   name: string;
@@ -314,9 +314,11 @@ export function ConfigureOutputModal({
                   <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
+                      productionId={production?._id}
                       openConfigModal={(input: string) =>
                         setLayoutModalOpen(input)
                       }
+                      newMultiviewPreset={newMultiviewPreset}
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
                       handleUpdateMultiview={(input) =>
