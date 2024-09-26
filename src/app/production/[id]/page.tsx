@@ -240,12 +240,15 @@ export default function ProductionConfiguration({ params }: PageProps) {
   }, []);
 
   useEffect(() => {
-    if (productionSetup && sources) {
+    if (productionSetup) {
       const hasMissingSource = productionSetup?.sources.find(
-        (productionSource) =>
-          !Array.from(sources.values()).find(
-            (source) => source._id.toString() === productionSource._id
-          )
+        (productionSource) => {
+          if ((productionSource.type !== 'html' || 'mediaplayer') && sources) {
+            !Array.from(sources.values()).find(
+              (source) => source._id.toString() === productionSource._id
+            );
+          }
+        }
       );
       if (hasMissingSource) {
         toast.error(t('error.missing_sources_in_db'));
