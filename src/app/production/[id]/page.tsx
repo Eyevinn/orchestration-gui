@@ -243,7 +243,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
     if (productionSetup) {
       const hasMissingSource = productionSetup?.sources.find(
         (productionSource) => {
-          if ((productionSource.type !== 'html' || 'mediaplayer') && sources) {
+          if (
+            !['html', 'mediaplayer'].includes(productionSource.type) &&
+            sources
+          ) {
             !Array.from(sources.values()).find(
               (source) => source._id.toString() === productionSource._id
             );
