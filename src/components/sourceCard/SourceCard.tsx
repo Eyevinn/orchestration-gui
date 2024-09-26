@@ -120,6 +120,7 @@ export default function SourceCard({
       )}
       {(source || sourceRef) && (
         <button
+          disabled={locked}
           className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg z-20"
           onClick={() => {
             if (source) {
