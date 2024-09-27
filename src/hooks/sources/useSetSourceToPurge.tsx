@@ -8,7 +8,7 @@ export function useSetSourceToPurge(): CallbackHook<
 > {
   const [reloadList, setReloadList] = useState(false);
 
-  const removeInventorySource = (source: SourceWithId) => {
+  const purgeInventorySource = (source: SourceWithId) => {
     if (source && source.status === 'gone') {
       setReloadList(false);
 
@@ -40,5 +40,5 @@ export function useSetSourceToPurge(): CallbackHook<
       setReloadList(false);
     }
   };
-  return [removeInventorySource, reloadList];
+  return [purgeInventorySource, reloadList];
 }

@@ -10,7 +10,7 @@ import { useTranslate } from '../../i18n/useTranslate';
 import { useRemoveInventorySourceItem } from '../../hooks/sources/useRemoveInventorySource';
 
 export default function Inventory({ locked }: { locked: boolean }) {
-  const [removeInventorySource, reloadList] = useSetSourceToPurge();
+  const [purgeInventorySource, reloadList] = useSetSourceToPurge();
   const [removeInventorySourceItem, reloadInventoryList] =
     useRemoveInventorySourceItem();
   const [updatedSource, setUpdatedSource] = useState<
@@ -53,7 +53,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
             source={currentSource}
             updateSource={(source) => setUpdatedSource(source)}
             close={() => setCurrentSource(null)}
-            removeInventorySource={removeInventorySource}
+            purgeInventorySource={purgeInventorySource}
             removeInventorySourceItem={removeInventorySourceItem}
           />
         </div>

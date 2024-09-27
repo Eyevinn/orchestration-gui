@@ -10,7 +10,7 @@ import { useDeleteSrtSource } from '../../../hooks/sources/useDeleteSource';
 
 type UpdateButtonsProps = {
   source: SourceWithId;
-  removeInventorySource: (source: SourceWithId) => void;
+  purgeInventorySource: (source: SourceWithId) => void;
   removeInventorySourceItem: (id: string) => Promise<Response | undefined>;
   close: () => void;
   locked: boolean;
@@ -19,7 +19,7 @@ type UpdateButtonsProps = {
 export default function UpdateButtons({
   source,
   close,
-  removeInventorySource,
+  purgeInventorySource,
   removeInventorySourceItem,
   locked
 }: UpdateButtonsProps) {
@@ -37,7 +37,7 @@ export default function UpdateButtons({
       deleteSrtSource(source.ingest_name, source.ingest_source_name);
       removeInventorySourceItem(source._id.toString());
     } else {
-      removeInventorySource(source);
+      purgeInventorySource(source);
     }
   };
 
