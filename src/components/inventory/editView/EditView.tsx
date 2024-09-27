@@ -11,12 +11,14 @@ export default function EditView({
   updateSource,
   close,
   removeInventorySource,
+  removeInventorySourceItem,
   locked
 }: {
   source: SourceWithId;
   updateSource: (source: SourceWithId) => void;
   close: () => void;
   removeInventorySource: (source: SourceWithId) => void;
+  removeInventorySourceItem: (id: string) => Promise<Response | undefined>;
   locked: boolean;
 }) {
   return (
@@ -35,6 +37,7 @@ export default function EditView({
         source={source}
         close={close}
         removeInventorySource={removeInventorySource}
+        removeInventorySourceItem={removeInventorySourceItem}
         locked={locked}
       />
     </EditViewContext>

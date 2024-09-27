@@ -9,7 +9,7 @@ export const SourceListItemThumbnail = (props: SourceThumbnailProps) => {
   const { source } = props;
 
   const getIcon = (source: Source) => {
-    const isGone = source.status === 'gone';
+    const isGone = source.status === 'gone' || source.status === 'purge';
     const className = isGone ? 'text-error' : 'text-brand';
 
     const types = {

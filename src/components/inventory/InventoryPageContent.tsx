@@ -12,7 +12,7 @@ export const InventoryPageContent = () => {
 
   return (
     <>
-      <HeaderNavigation>
+      <HeaderNavigation isInventoryManagement={true} locked={locked}>
         <div className="flex justify-center items-center w-full">
           <div className="flex space-x-8">
             <h1 className="m-2 text-4xl text-p text-center">

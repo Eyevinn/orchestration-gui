@@ -52,8 +52,9 @@ async function getSourcesFromAPI(): Promise<SourceWithoutLastConnected[]> {
 /**
  * Syncs the inventory with the ingests in Ateliere Live.
  * - Adds new sources to the inventory with the status 'new'
- * - Updates the status of sources depending on wheter or not they are still present in the ingests
+ * - Updates the status of sources depending on whether or not they are still present in the ingests
  */
+
 export async function runSyncInventory() {
   const db = await getDatabase();
   const apiSources = await getSourcesFromAPI();

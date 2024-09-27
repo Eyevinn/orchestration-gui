@@ -5,6 +5,7 @@ import {
 } from '../../../types/ateliere-live';
 import { LIVE_BASE_API_PATH } from '../../constants';
 import { getAuthorizationHeader } from './utils/authheader';
+import { SrtSource } from '../../interfaces/Source';
 
 // TODO: create proper cache...
 const INGEST_UUID_CACHE: Map<string, string> = new Map();
@@ -147,4 +148,30 @@ export async function deleteSrtSource(ingestUuid: string, sourceId: number) {
     return response.status;
   }
   throw await response.text();
+}
+
+export async function createSrtSource(
+  ingestUuid: string,
+  srtPayload: SrtSource
+) {
+  const response = await fetch(
+    new URL(
+      LIVE_BASE_API_PATH + `/ingests/${ingestUuid}/sources`,
+      process.env.LIVE_URL
+    ),
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        srt_source: srtPayload
+      }),
+      headers: {
+        authorization: getAuthorizationHeader()
+      }
+    }
+  );
+  if (response.ok) {
+    return response.json();
+  }
+  const errorText = await response.text();
+  throw new Error(errorText);
 }

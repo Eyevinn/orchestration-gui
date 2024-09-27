@@ -39,3 +39,11 @@ export async function purgeInventorySourceItem(
 
   return result as UpdateResult<Document>;
 }
+
+// Used for SRT sources which unlike other sources can de deleted from the API
+export async function removeInventorySource(id: string) {
+  const db = await getDatabase();
+  const objectId = new ObjectId(id);
+
+  return await db.collection('inventory').deleteOne({ _id: objectId });
+}

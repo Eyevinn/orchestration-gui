@@ -2,6 +2,7 @@ import { ObjectId, WithId } from 'mongodb';
 export type SourceType = 'camera' | 'graphics' | 'microphone';
 export type SourceStatus = 'ready' | 'new' | 'gone' | 'purge';
 export type Type = 'ingest_source' | 'html' | 'mediaplayer';
+export type SrtMode = 'caller' | 'listener';
 export type VideoStream = {
   height?: number;
   width?: number;
@@ -81,3 +82,14 @@ export type AddSourceResult =
       success: false;
       steps: AddSourceStep[];
     };
+
+export interface SrtSource {
+  latency_ms?: number;
+  local_ip?: string;
+  local_port?: number;
+  mode: SrtMode;
+  name: string;
+  passphrase?: string;
+  remote_ip?: string;
+  remote_port?: number;
+}
