@@ -36,7 +36,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
     filteredSources: Map<string, SourceWithId>
   ): React.ReactNode {
     return Array.from(
-      filteredSources.size > 0 ? filteredSources.values() : sources.values()
+      filteredSources.size >= 0 ? filteredSources.values() : sources.values()
     ).map((source, index) => {
       return (
         <SourceListItem
