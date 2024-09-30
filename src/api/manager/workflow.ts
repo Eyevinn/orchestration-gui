@@ -111,7 +111,7 @@ async function connectIngestSources(
         throw `No available ports for ingest '${source.ingest_name}'`;
       }
 
-      const availablePort = availablePorts.values().next().value;
+      const availablePort = availablePorts.values().next().value || 0;
       Log().info(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
