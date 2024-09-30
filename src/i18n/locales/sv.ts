@@ -76,7 +76,8 @@ export const sv = {
     missing_multiview: 'Saknar referens till en multiview i valt preset',
     source: 'Källa',
     add: 'Lägg till',
-    add_other_source_type: 'Lägg till annan källtyp'
+    add_other_source_type: 'Lägg till annan källtyp',
+    configure_outputs: 'Konfigurera Outputs'
   },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',

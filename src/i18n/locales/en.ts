@@ -74,7 +74,8 @@ export const en = {
     missing_multiview: 'Missing multiview reference in selected preset',
     source: 'Source',
     add: 'Add',
-    add_other_source_type: 'Add other source type'
+    add_other_source_type: 'Add other source type',
+    configure_outputs: 'Configure Outputs'
   },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',

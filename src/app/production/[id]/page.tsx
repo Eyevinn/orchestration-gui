@@ -45,6 +45,7 @@ import { Select } from '../../../components/select/Select';
 import { useAddSource } from '../../../hooks/sources/useAddSource';
 import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import { useWebsocket } from '../../../hooks/useWebsocket';
+import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -156,12 +157,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
   const setSelectedPipelineName = (
     pipelineIndex: number,
-    pipelineName?: string
+    pipelineName?: string,
+    id?: string
   ) => {
     setProductionSetup((prevState) => {
       const updatedPipelines = prevState?.production_settings.pipelines;
       if (!updatedPipelines) return;
       updatedPipelines[pipelineIndex].pipeline_name = pipelineName;
+      updatedPipelines[pipelineIndex].pipeline_id = id;
       putProduction(prevState._id, {
         ...prevState,
         production_settings: {
@@ -631,6 +634,15 @@ export default function ProductionConfiguration({ params }: PageProps) {
     setDeleteSourceStatus(undefined);
   };
 
+  const hasSelectedPipelines = () => {
+    if (!productionSetup?.production_settings?.pipelines?.length) return false;
+    let allPipesHaveName = true;
+    productionSetup.production_settings.pipelines.forEach((p) => {
+      if (!p.pipeline_name) allPipesHaveName = false;
+    });
+    return allPipesHaveName;
+  };
+
   return (
     <>
       <HeaderNavigation>
@@ -672,6 +684,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
               })}
           </PresetDropdown>
           <ConfigureOutputButton
+            disabled={
+              productionSetup?.isActive || locked || !hasSelectedPipelines()
+            }
+            preset={selectedPreset}
+            updatePreset={updatePreset}
+          />
+          <ConfigureMultiviewButton
             disabled={productionSetup?.isActive || locked}
             preset={selectedPreset}
             updatePreset={updatePreset}
@@ -817,6 +836,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       label={pipeline.pipeline_readable_name}
                       options={pipelines?.map((pipeline) => ({
                         option: pipeline.name,
+                        id: pipeline.uuid,
                         available: pipeline.streams.length === 0
                       }))}
                       pipelineIndex={i}

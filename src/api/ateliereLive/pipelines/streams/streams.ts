@@ -101,6 +101,8 @@ export async function createStream(
       }
 
       const availablePort = availablePorts.values().next().value;
+      if (!availablePort)
+        throw `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name} cannot be undefined`;
       Log().info(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
