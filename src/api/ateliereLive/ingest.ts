@@ -154,7 +154,6 @@ export async function createSrtSource(
   ingestUuid: string,
   srtPayload: SrtSource
 ) {
-
   const payload = {
     srt_source: {
       ...srtPayload,
