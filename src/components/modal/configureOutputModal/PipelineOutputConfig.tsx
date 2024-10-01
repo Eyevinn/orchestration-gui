@@ -168,7 +168,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
     });
   };
 
-  const preventCharachters = (evt: KeyboardEvent) => {
+  const preventCharacters = (evt: KeyboardEvent) => {
     ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault();
   };
 
