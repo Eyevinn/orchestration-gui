@@ -318,7 +318,6 @@ export async function stopProduction(
     (p) => p.pipeline_id
   );
 
-  const controlPanelWS = await createControlPanelWebSocket();
   const htmlSources = production.sources.filter(
     (source) => source.type === 'html'
   );
@@ -326,15 +325,42 @@ export async function stopProduction(
     (source) => source.type === 'mediaplayer'
   );
 
-  for (const source of htmlSources) {
-    controlPanelWS.closeHtml(source.input_slot);
-  }
+  if (htmlSources.length > 0 || mediaPlayerSources.length > 0) {
+    let controlPanelWS;
+    try {
+      controlPanelWS = await createControlPanelWebSocket();
 
-  for (const source of mediaPlayerSources) {
-    controlPanelWS.closeMediaplayer(source.input_slot);
-  }
+      for (const source of htmlSources) {
+        controlPanelWS.closeHtml(source.input_slot);
+      }
 
-  controlPanelWS.close();
+      for (const source of mediaPlayerSources) {
+        controlPanelWS.closeMediaplayer(source.input_slot);
+      }
+    } catch (error) {
+      Log().error(
+        'Failed to create WebSocket or perform operations during stopProduction'
+      );
+      Log().error(error);
+      return {
+        ok: false,
+        value: [
+          {
+            step: 'stop_websocket',
+            success: false,
+            message:
+              'Failed to create WebSocket or perform operations during stopProduction'
+          }
+        ],
+        error:
+          'Failed to create WebSocket or perform operations during stopProduction'
+      };
+    } finally {
+      if (controlPanelWS) {
+        controlPanelWS.close();
+      }
+    }
+  }
 
   for (const source of production.sources) {
     for (const stream_uuid of source.stream_uuids || []) {
@@ -655,7 +681,6 @@ export async function startProduction(
     };
   } // Try to connect control panels and pipeline-to-pipeline connections end
 
-  const controlPanelWS = await createControlPanelWebSocket();
   const htmlSources = production.sources.filter(
     (source) => source.type === 'html'
   );
@@ -663,16 +688,36 @@ export async function startProduction(
     (source) => source.type === 'mediaplayer'
   );
 
-  for (const source of htmlSources) {
-    controlPanelWS.createHtml(source.input_slot);
+  if (htmlSources.length > 0 || mediaPlayerSources.length > 0) {
+    let controlPanelWS;
+    try {
+      controlPanelWS = await createControlPanelWebSocket();
+
+      for (const source of htmlSources) {
+        controlPanelWS.createHtml(source.input_slot);
+      }
+
+      for (const source of mediaPlayerSources) {
+        controlPanelWS.createMediaplayer(source.input_slot);
+      }
+    } catch (error) {
+      Log().error('Failed to create WebSocket');
+      Log().error(error);
+      return {
+        ok: false,
+        value: [
+          { step: 'start', success: true },
+          { step: 'streams', success: true },
+          { step: 'websocket', success: false }
+        ],
+        error: 'Failed to create WebSocket'
+      };
+    } finally {
+      if (controlPanelWS) {
+        controlPanelWS.close();
+      }
+    }
   }
-
-  for (const source of mediaPlayerSources) {
-    controlPanelWS.createMediaplayer(source.input_slot);
-  }
-
-  controlPanelWS.close();
-
   // Try to setup pipeline outputs start
   try {
     for (const pipeline of production_settings.pipelines) {
