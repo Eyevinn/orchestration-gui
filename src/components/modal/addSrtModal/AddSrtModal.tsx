@@ -8,6 +8,7 @@ import { SrtSource } from '../../../interfaces/Source';
 import styles from './AddSrtModal.module.css';
 import { Loader } from '../../loader/Loader';
 import { useIngests } from '../../../hooks/ingests';
+import Input from '../../input/Input';
 
 type AddSrtModalProps = {
   open: boolean;
@@ -39,14 +40,14 @@ export function AddSrtModal({
   const [isNameError, setIsNameError] = useState<boolean>(false);
   const [isIngestNameError, setIsIngestNameError] = useState<boolean>(false);
   const [srtPayload, setSrtPayload] = useState<SrtSource>({
-    mode: 'listener',
+    latency_ms: latency,
     local_ip: localIp,
     local_port: localPort,
-    remote_ip: remoteIp,
-    remote_port: remotePort,
-    latency_ms: latency,
+    mode: 'listener',
     name: name,
-    passphrase: passphrase
+    passphrase: passphrase,
+    remote_ip: remoteIp,
+    remote_port: remotePort
   });
 
   useEffect(() => {
@@ -64,14 +65,14 @@ export function AddSrtModal({
 
   useEffect(() => {
     setSrtPayload({
-      mode: mode === 'Listener' ? 'listener' : 'caller',
+      latency_ms: latency || undefined,
       local_ip: localIp || undefined,
       local_port: localPort || undefined,
-      remote_ip: mode === 'Caller' ? remoteIp : undefined,
-      remote_port: mode === 'Caller' ? remotePort : undefined,
-      latency_ms: latency || undefined,
+      mode: mode === 'Listener' ? 'listener' : 'caller',
       name: name,
-      passphrase: passphrase || undefined
+      passphrase: passphrase || undefined,
+      remote_ip: mode === 'Caller' ? remoteIp : undefined,
+      remote_port: mode === 'Caller' ? remotePort : undefined
     });
   }, [
     mode,
@@ -121,7 +122,7 @@ export function AddSrtModal({
   };
 
   useEffect(() => {
-    if (ingestName === t('inventory_list.select_ingest') || '') {
+    if ([t('inventory_list.select_ingest'), ''].includes(ingestName)) {
       setIsIngestNameError(true);
     } else {
       setIsIngestNameError(false);
@@ -146,8 +147,8 @@ export function AddSrtModal({
 
   const t = useTranslate();
   return (
-    <Modal open={open} outsideClick={handleCloseModal} width="w-1/5">
-      <h1 className="text-xl mb-12 mt-4 px-8">
+    <Modal open={open} outsideClick={handleCloseModal} className="w-1/5">
+      <h1 className=" text-xl mb-12 mt-4 px-8">
         {t('inventory_list.create_srt_source')}
       </h1>
       <div className="flex flex-col items-center space-y-4 w-full px-8">
@@ -188,13 +189,12 @@ export function AddSrtModal({
             {t('inventory_list.name')}:
           </h2>
           <span className="flex flex-col w-full items-center">
-            <input
-              className={`w-full ${
-                isNameError ? 'border-error' : 'border-gray-600'
-              } flex-grow w-full ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500`}
+            <Input
+              className="w-full flex-grow ml-2"
               type="text"
               value={name}
               onChange={handleInputChange(setName, setIsNameError)}
+              error={isNameError}
             />
             {isNameError && (
               <p className="text-xs text-button-delete mt-2">
@@ -207,8 +207,8 @@ export function AddSrtModal({
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.local_ip')}:
           </h2>
-          <input
-            className="flex-grow ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          <Input
+            className="flex-grow ml-2"
             type="text"
             value={localIp}
             onChange={handleInputChange(setLocalIp)}
@@ -218,8 +218,8 @@ export function AddSrtModal({
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.local_port')}:
           </h2>
-          <input
-            className="flex-grow ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          <Input
+            className="flex-grow ml-2"
             type="number"
             value={localPort}
             onChange={handleInputChange(setLocalPort)}
@@ -234,8 +234,8 @@ export function AddSrtModal({
             <h2 className="flex w-1/3 text-left">
               {t('inventory_list.remote_ip')}:
             </h2>
-            <input
-              className="flex-grow ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            <Input
+              className="flex-grow ml-2"
               type="text"
               value={remoteIp}
               onChange={handleInputChange(setRemoteIp)}
@@ -245,8 +245,8 @@ export function AddSrtModal({
             <h2 className="flex w-1/3 text-left">
               {t('inventory_list.remote_port')}:
             </h2>
-            <input
-              className="flex-grow ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+            <Input
+              className="flex-grow ml-2"
               type="number"
               value={remotePort}
               onChange={handleInputChange(setRemotePort)}
@@ -257,8 +257,8 @@ export function AddSrtModal({
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.latency')}:
           </h2>
-          <input
-            className="flex-grow ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          <Input
+            className="flex-grow ml-2"
             type="number"
             value={latency}
             onChange={handleInputChange(setLatency)}
@@ -268,8 +268,8 @@ export function AddSrtModal({
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.passphrase')}:
           </h2>
-          <input
-            className="mb-4 flex-grow ml-2 border text-sm rounded-lg pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+          <Input
+            className="mb-4 flex-grow ml-2"
             type="text"
             value={passphrase}
             onChange={handleInputChange(setPassphrase)}
