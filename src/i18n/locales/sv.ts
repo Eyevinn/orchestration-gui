@@ -31,7 +31,8 @@ export const sv = {
     sync: 'Synkronisera databasen',
     monitoring: 'Starta monitorering',
     start: 'Påbörja',
-    unexpected: 'Oväntat fel'
+    unexpected: 'Oväntat fel',
+    websocket: 'Websocket anslutning'
   },
   stop_production_status: {
     disconnect_connections: 'Frånkoppla anslutningar',
