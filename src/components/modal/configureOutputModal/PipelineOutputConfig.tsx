@@ -237,7 +237,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
         />
 
         <Input
-          onKeyDown={preventCharachters}
+          onKeyDown={preventCharacters}
           type="number"
           label={t('preset.video_kilobit_rate')}
           value={
