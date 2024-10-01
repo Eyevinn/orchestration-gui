@@ -708,7 +708,7 @@ export async function startProduction(
         value: [
           { step: 'start', success: true },
           { step: 'streams', success: true },
-          { step: 'websocket', success: false }
+          { step: 'websocket', success: false, message: `Failed to create websocket: ${error}` }
         ],
         error: 'Failed to create WebSocket'
       };
