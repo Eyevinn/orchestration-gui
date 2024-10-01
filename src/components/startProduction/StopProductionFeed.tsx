@@ -18,7 +18,8 @@ export default function StopProductionFeed({
     remove_pipeline_multiviews: t(
       'stop_production_status.remove_pipeline_multiviews'
     ),
-    unexpected: t('stop_production_status.unexpected')
+    unexpected: t('stop_production_status.unexpected'),
+    websocket: t('stop_production_status.websocket')
   };
   return (
     <div className="flex flex-col mb-4 w-96">

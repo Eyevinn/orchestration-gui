@@ -36,7 +36,8 @@ export const en = {
     disconnect_connections: 'Disconnect connections',
     remove_pipeline_streams: 'Remove streams',
     remove_pipeline_multiviews: 'Remove multiviews',
-    unexpected: 'Enexpeted error'
+    unexpected: 'Enexpeted error',
+    websocket: 'Stop websocket'
   },
   source: {
     type: 'Type: {{type}}',

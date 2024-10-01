@@ -60,7 +60,7 @@ export interface StopProductionStep {
     | 'disconnect_connections'
     | 'remove_pipeline_streams'
     | 'remove_pipeline_multiviews'
-    | 'stop_websocket'
+    | 'websocket'
     | 'unexpected';
   success: boolean;
   message?: string;

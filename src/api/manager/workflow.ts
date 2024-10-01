@@ -346,7 +346,7 @@ export async function stopProduction(
         ok: false,
         value: [
           {
-            step: 'stop_websocket',
+            step: 'websocket',
             success: false,
             message:
               'Failed to create WebSocket or perform operations during stopProduction'
