@@ -49,8 +49,8 @@ export default function MultiviewLayoutSettings({
   const { inputList } = useCreateInputArray(production);
   const t = useTranslate();
 
-  const multiviewPresetNames = multiviewLayouts?.map((preset) => preset.name)
-    ? multiviewLayouts?.map((preset) => preset.name)
+  const multiviewPresetNames = multiviewPresets?.map((preset) => preset.name)
+    ? multiviewPresets?.map((preset) => preset.name)
     : [];
 
   // This useEffect is used to set the drawn layout of the multiviewer on start,
@@ -79,7 +79,7 @@ export default function MultiviewLayoutSettings({
   }, [multiviewLayout]);
 
   const handlePresetUpdate = (name: string) => {
-    const presetLayout = multiviewLayouts?.find(
+    const presetLayout = multiviewPresets?.find(
       (singlePreset) => singlePreset.name === name
     );
     setLayoutToChange('');

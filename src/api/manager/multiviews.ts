@@ -20,7 +20,19 @@ export async function putMultiviewLayout(
   newMultiviewLayout: MultiviewPreset
 ): Promise<void> {
   const db = await getDatabase();
-  await db
-    .collection('multiviews')
-    .insertOne({ ...newMultiviewLayout, _id: new ObjectId() });
+  const collection = db.collection('multiviews');
+  const editLayout = await collection.findOne({
+    name: newMultiviewLayout.name
+  });
+  const newMultiviewLayoutWithoutID = { ...newMultiviewLayout };
+  delete newMultiviewLayoutWithoutID._id;
+
+  if (editLayout) {
+    await collection.updateOne(
+      { name: newMultiviewLayout.name },
+      { $set: { ...newMultiviewLayoutWithoutID } }
+    );
+  } else {
+    await collection.insertOne({ ...newMultiviewLayout, _id: new ObjectId() });
+  }
 }

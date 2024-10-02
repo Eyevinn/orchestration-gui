@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
-import { MultiviewPreset } from '../../../interfaces/preset';
+import { TMultiviewLayout } from '../../../interfaces/preset';
 import Input from './Input';
 import Options from './Options';
 import toast from 'react-hot-toast';
@@ -13,9 +13,11 @@ type MultiviewSettingsProps = {
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
   portDuplicateError: boolean;
-  openConfigModal: (input: string) => void;
-  newMultiviewPreset: MultiviewPreset | null;
+  openConfigModal: () => void;
+  newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
+  setSelectedMultiviewLayout: (layout: TMultiviewLayout | undefined) => void;
+  selectedMultiviewLayout: TMultiviewLayout | undefined;
 };
 
 export default function MultiviewSettingsConfig({
@@ -24,51 +26,30 @@ export default function MultiviewSettingsConfig({
   handleUpdateMultiview,
   portDuplicateError,
   openConfigModal,
-  newMultiviewPreset,
-  productionId
+  newMultiviewLayout,
+  productionId,
+  setSelectedMultiviewLayout,
+  selectedMultiviewLayout
 }: MultiviewSettingsProps) {
   const t = useTranslate();
-  const [multiviewLayouts, loading] = useMultiviewLayouts();
-  const [avaliableMultiviewPresets, setAvaliableMultiviewPresets] = useState<
-    MultiviewPreset[] | undefined
-  >();
-  const [selectedMultiviewPreset, setSelectedMultiviewPreset] = useState<
-    MultiviewPreset | undefined
-  >(multiview);
-
-  // TODO: When possible to edit layout, uncomment the following code
-  // const [modalOpen, setModalOpen] = useState(false);
-  // const toggleConfigModal = () => {
-  //   setModalOpen((state) => !state);
-  // };
+  const [multiviewLayouts] = useMultiviewLayouts();
 
   useEffect(() => {
-    if (multiviewLayouts) {
-      const globalPresets = multiviewLayouts.filter((preset) => {
-        !preset.production_id;
-      });
-
-      const productionPresets = multiviewLayouts.filter((preset) => {
-        preset.production_id?.toString() === productionId;
-      });
-
-      setAvaliableMultiviewPresets([...globalPresets, ...productionPresets]);
-    }
-  }, [multiviewLayouts, productionId]);
-
-  useEffect(() => {
-    if (newMultiviewPreset && lastItem) {
-      setSelectedMultiviewPreset(newMultiviewPreset);
+    if (newMultiviewLayout && lastItem) {
+      setSelectedMultiviewLayout(newMultiviewLayout);
       return;
     }
     if (multiview) {
-      setSelectedMultiviewPreset(multiview);
+      setSelectedMultiviewLayout(multiview);
       return;
     }
-    if (avaliableMultiviewPresets && avaliableMultiviewPresets[0]) {
-      setSelectedMultiviewPreset(avaliableMultiviewPresets[0]);
+    if (multiviewLayouts) {
+      const defaultMultiview = multiviewLayouts.find(
+        (m) => m.productionId !== undefined
+      );
+      setSelectedMultiviewLayout(defaultMultiview);
     }
-  }, [avaliableMultiviewPresets, multiview, newMultiviewPreset]);
+  }, [lastItem, multiview, multiviewLayouts, newMultiviewLayout]);
 
   if (!multiview) {
     if (!multiviewLayouts || multiviewLayouts.length === 0) {
@@ -80,13 +61,13 @@ export default function MultiviewSettingsConfig({
     });
   }
 
-  const handleSetSelectedMultiviewPreset = (name: string) => {
+  const handleSetSelectedMultiviewLayout = (name: string) => {
     const selected = multiviewLayouts?.find((m) => m.name === name);
     if (!selected) {
       toast.error(t('preset.no_multiview_found'));
       return;
     }
-    setSelectedMultiviewPreset(selected);
+    setSelectedMultiviewLayout(selected);
     handleUpdateMultiview({ ...selected, for_pipeline_idx: 0 });
   };
 
@@ -171,11 +152,18 @@ export default function MultiviewSettingsConfig({
       handleUpdateMultiview(updatedMultiview);
     }
   };
-  const multiviewPresetNames = multiviewLayouts?.map((preset) => preset.name)
-    ? multiviewLayouts?.map((preset) => preset.name)
+
+  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
+    (layout) => layout.productionId === productionId || !layout.productionId
+  );
+
+  const multiviewLayoutNames = avaliableMultiviewLayouts?.map(
+    (layout) => layout.name
+  )
+    ? avaliableMultiviewLayouts?.map((layout) => layout.name)
     : [];
 
-  const multiviewOrPreset = multiview ? multiview : selectedMultiviewPreset;
+  const currentValue = multiview ? multiview : selectedMultiviewLayout;
 
   return (
     <div className="flex flex-col gap-2 rounded p-4 pr-7">
@@ -185,48 +173,20 @@ export default function MultiviewSettingsConfig({
       <div className="relative">
         <Options
           label={t('preset.select_multiview_layout')}
-          options={multiviewPresetNames.map((singleItem) => ({
+          options={multiviewLayoutNames.map((singleItem) => ({
             label: singleItem
           }))}
-          value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
-          update={(value) => handleSetSelectedMultiviewPreset(value)}
+          value={currentValue ? currentValue.name : ''}
+          update={(value) => handleSetSelectedMultiviewLayout(value)}
         />
         {lastItem && (
-          // TODO: When possible to edit layout, uncomment the following code and remove the button below
           <button
-            onClick={() => openConfigModal('create')}
+            onClick={() => openConfigModal()}
             title={t('preset.configure_layout')}
             className={`absolute top-0 right-[-10%] min-w-fit`}
           >
             <IconSettings className="text-p" />
           </button>
-          // <>
-          //   <button
-          //     onClick={toggleConfigModal}
-          //     title={t('preset.configure_layout')}
-          //     className={`absolute top-0 right-[-10%] min-w-fit`}
-          //   >
-          //     <IconSettings className="text-p" />
-          //   </button>
-          //   {modalOpen && (
-          //     <div className="absolute top-5 right-[-65%] flex flex-col">
-          //       <button
-          //         type="button"
-          //         className={`min-w-fit bg-zinc-700 rounded-t-sm p-1 border-b-[1px] border-b-zinc-600 hover:bg-zinc-600`}
-          //         onClick={() => openConfigModal('create')}
-          //       >
-          //         {t('preset.create_layout')}
-          //       </button>
-          //       <button
-          //         type="button"
-          //         className={`min-w-fit bg-zinc-700 rounded-b-sm  p-1 hover:bg-zinc-600`}
-          //         onClick={() => openConfigModal('edit')}
-          //       >
-          //         {t('preset.update_layout')}
-          //       </button>
-          //     </div>
-          //   )}
-          // </>
         )}
       </div>
       <div className="flex flex-col gap-3">
@@ -234,8 +194,8 @@ export default function MultiviewSettingsConfig({
           label={t('preset.video_format')}
           options={[{ label: 'AVC' }, { label: 'HEVC' }]}
           value={
-            multiviewOrPreset?.output.video_format
-              ? multiviewOrPreset?.output.video_format
+            currentValue?.output.video_format
+              ? currentValue?.output.video_format
               : 'AVC'
           }
           update={(value) => handleChange('videoFormat', value)}
@@ -244,8 +204,8 @@ export default function MultiviewSettingsConfig({
           type="number"
           label={t('preset.video_kilobit_rate')}
           value={
-            multiviewOrPreset?.output.video_kilobit_rate !== undefined
-              ? multiviewOrPreset?.output.video_kilobit_rate
+            currentValue?.output.video_kilobit_rate !== undefined
+              ? currentValue?.output.video_kilobit_rate
               : '5000'
           }
           update={(value) => handleChange('videoKiloBit', value)}
@@ -254,8 +214,8 @@ export default function MultiviewSettingsConfig({
           label={t('preset.mode')}
           options={[{ label: 'listener' }, { label: 'caller' }]}
           value={
-            multiviewOrPreset?.output.srt_mode
-              ? multiviewOrPreset?.output.srt_mode
+            currentValue?.output.srt_mode
+              ? currentValue?.output.srt_mode
               : 'listener'
           }
           update={(value) => handleChange('srtMode', value)}
@@ -264,8 +224,8 @@ export default function MultiviewSettingsConfig({
           label={t('preset.port')}
           inputError={portDuplicateError}
           value={
-            multiviewOrPreset?.output.local_port
-              ? multiviewOrPreset?.output.local_port
+            currentValue?.output.local_port
+              ? currentValue?.output.local_port
               : '1234'
           }
           update={(value) => handleChange('port', value)}
@@ -273,8 +233,8 @@ export default function MultiviewSettingsConfig({
         <Input
           label={t('preset.ip')}
           value={
-            multiviewOrPreset?.output.local_ip
-              ? multiviewOrPreset?.output.local_ip
+            currentValue?.output.local_ip
+              ? currentValue?.output.local_ip
               : '0.0.0.0'
           }
           update={(value) => handleChange('ip', value)}
@@ -282,8 +242,8 @@ export default function MultiviewSettingsConfig({
         <Input
           label={t('preset.srt_passphrase')}
           value={
-            multiviewOrPreset?.output.srt_passphrase
-              ? multiviewOrPreset?.output.srt_passphrase
+            currentValue?.output.srt_passphrase
+              ? currentValue?.output.srt_passphrase
               : ''
           }
           update={(value) => handleChange('srtPassphrase', value)}

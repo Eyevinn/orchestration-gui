@@ -1,6 +1,11 @@
 'use client';
-
-import React, { useEffect, useState, KeyboardEvent, useContext } from 'react';
+import React, {
+  useEffect,
+  useState,
+  KeyboardEvent,
+  useContext,
+  useMemo
+} from 'react';
 import { PageProps } from '../../../../.next/types/app/production/[id]/page';
 import { AddInput } from '../../../components/addInput/AddInput';
 import { useSources } from '../../../hooks/sources/useSources';
@@ -46,6 +51,7 @@ import { useAddSource } from '../../../hooks/sources/useAddSource';
 import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
+import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -81,13 +87,17 @@ export default function ProductionConfiguration({ params }: PageProps) {
     productionSetup?.sources.map((prod) => prod._id) || [];
 
   //MULTIVIEWS
+  const [updateMuliviewLayouts, setUpdateMuliviewLayouts] = useState(false);
   const getMultiviewLayout = useGetMultiviewLayout();
   const [updateMultiviewViews] = useMultiviews();
+  const [updateSourceInputSlotOnMultiviewLayouts] =
+    useUpdateSourceInputSlotOnMultiviewLayouts();
 
   //FROM LIVE API
   const [pipelines, loadingPipelines, , refreshPipelines] = usePipelines();
   const [controlPanels, loadingControlPanels, , refreshControlPanels] =
     useControlPanels();
+
   //UI STATE
   const [inventoryVisible, setInventoryVisible] = useState(false);
   const [isPresetDropdownHidden, setIsPresetDropdownHidden] = useState(true);
@@ -103,6 +113,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [closeWebsocket] = useWebsocket();
 
   const { locked } = useContext(GlobalContext);
+
+  const memoizedProduction = useMemo(() => productionSetup, [productionSetup]);
 
   const isAddButtonDisabled =
     selectedValue !== 'HTML' && selectedValue !== 'Media Player';
@@ -129,6 +141,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
     });
     setAddSourceStatus(undefined);
   };
+
+  useEffect(() => {
+    if (updateMuliviewLayouts && productionSetup && !productionSetup.isActive) {
+      updateSourceInputSlotOnMultiviewLayouts(productionSetup);
+      setUpdateMuliviewLayouts(false);
+    }
+  }, [productionSetup, updateMuliviewLayouts]);
 
   const setSelectedControlPanel = (controlPanel: string[]) => {
     setProductionSetup((prevState) => {
@@ -695,7 +714,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             disabled={productionSetup?.isActive || locked}
             preset={selectedPreset}
             updatePreset={updatePreset}
-            production={productionSetup}
+            production={memoizedProduction}
           />
           <StartProductionButton
             refreshProduction={refreshProduction}
@@ -742,9 +761,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   locked={locked}
                   updateProduction={(updated) => {
                     updateProduction(productionSetup._id, updated);
+                    setUpdateMuliviewLayouts(true);
                   }}
                   onSourceUpdate={(source: SourceReference) => {
                     updateSource(source, productionSetup);
+                    setUpdateMuliviewLayouts(true);
                   }}
                   onSourceRemoval={(source: SourceReference) => {
                     if (productionSetup && productionSetup.isActive) {
@@ -762,6 +783,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       );
                       if (!updatedSetup) return;
                       setProductionSetup(updatedSetup);
+                      setUpdateMuliviewLayouts(true);
                       putProduction(
                         updatedSetup._id.toString(),
                         updatedSetup

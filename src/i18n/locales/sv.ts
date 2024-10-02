@@ -627,7 +627,9 @@ export const sv = {
     muliview_view: 'Ingång',
     select_option: 'Välj',
     select_multiview_preset: 'Förinställningar',
-    no_port_selected: 'Unik port krävs'
+    no_port_selected: 'Unik port krävs',
+    layout_already_exist:
+      'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

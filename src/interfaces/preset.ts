@@ -1,6 +1,6 @@
 import { WithId, ObjectId } from 'mongodb';
 import { PipelineSettings } from './pipeline';
-import { MultiviewLayout, MultiviewOutputSettings } from './multiview';
+import { MultiviewStructureLayout, MultiviewOutputSettings } from './multiview';
 import { ControlConnection } from './controlConnections';
 
 export interface Preset {
@@ -20,11 +20,16 @@ export interface PresetReference {
 
 export interface MultiviewPreset {
   _id?: ObjectId;
-  production_id?: ObjectId;
   name: string;
-  layout: MultiviewLayout;
+  layout: MultiviewStructureLayout;
   output: MultiviewOutputSettings;
 }
+
+export type TMultiviewLayout = MultiviewPreset & {
+  productionId?: string;
+  multiview_id?: number;
+  for_pipeline_idx?: number;
+};
 
 export type MultiviewPresetWithId = WithId<MultiviewPreset>;
 

@@ -624,7 +624,9 @@ export const en = {
     new_preset_name: 'My layout',
     no_multiview_selected: 'No multiview selected',
     no_multiview_found: 'No multiview found',
-    no_port_selected: 'Unique port needed'
+    no_port_selected: 'Unique port needed',
+    layout_already_exist:
+      'Layout {{layoutNameAlreadyExist}} will be replaced on save'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { MultiviewPreset } from '../interfaces/preset';
+import { TMultiviewLayout } from '../interfaces/preset';
 import { DataHook } from './types';
 import { WithId } from 'mongodb';
 import { API_SECRET_KEY } from '../utils/constants';
 
 export function useGetMultiviewLayouts() {
-  return async (): Promise<MultiviewPreset[]> => {
+  return async (): Promise<TMultiviewLayout[]> => {
     const response = await fetch(`/api/manager/multiviews`, {
       method: 'GET',
       // TODO: Implement api key
@@ -19,7 +19,7 @@ export function useGetMultiviewLayouts() {
 }
 
 export function useGetMultiviewLayout() {
-  return async (id: string): Promise<WithId<MultiviewPreset>> => {
+  return async (id: string): Promise<WithId<TMultiviewLayout>> => {
     const response = await fetch(`/api/manager/multiviews/${id}`, {
       method: 'GET',
       // TODO: Implement api key
@@ -32,9 +32,9 @@ export function useGetMultiviewLayout() {
   };
 }
 
-export function useMultiviewLayouts(): DataHook<MultiviewPreset[]> {
+export function useMultiviewLayouts(): DataHook<TMultiviewLayout[]> {
   const [loading, setLoading] = useState(true);
-  const [multiviewLayouts, setmultiviewLayouts] = useState<MultiviewPreset[]>(
+  const [multiviewLayouts, setmultiviewLayouts] = useState<TMultiviewLayout[]>(
     []
   );
 
@@ -57,7 +57,7 @@ export function useMultiviewLayouts(): DataHook<MultiviewPreset[]> {
 }
 
 export function usePutMultiviewLayout() {
-  return async (newMultiviewLayout: MultiviewPreset): Promise<void> => {
+  return async (newMultiviewLayout: TMultiviewLayout): Promise<void> => {
     const response = await fetch('/api/manager/multiviews', {
       method: 'PUT',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],

@@ -2,22 +2,20 @@ import { useEffect, useState } from 'react';
 import { MultiviewPreset } from '../interfaces/preset';
 import { MultiviewViews } from '../interfaces/multiview';
 
-export type MultiviewViewsWithId = MultiviewViews & { id: number };
-
 export function useSetupMultiviewLayout(preset: MultiviewPreset | null) {
   const [multiviewPreset, setMultiviewPreset] = useState<MultiviewPreset>();
   useEffect(() => {
     if (preset) {
       const downScale = 30;
-      const arr: MultiviewViewsWithId[] = [];
-      preset.layout.views.map((item, index) => {
+      const arr: MultiviewViews[] = [];
+      preset.layout.views.map((view, index) => {
         arr.push({
-          ...item,
-          x: item.x / downScale,
-          y: item.y / downScale,
-          height: item.height / downScale,
-          width: item.width / downScale,
-          id: index
+          ...view,
+          x: view.x / downScale,
+          y: view.y / downScale,
+          height: view.height / downScale,
+          width: view.width / downScale,
+          id: index.toString()
         });
       });
       return setMultiviewPreset({
