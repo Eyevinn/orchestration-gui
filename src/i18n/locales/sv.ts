@@ -533,7 +533,12 @@ export const sv = {
     ingest_uuid: 'Ingest',
     select_ingest: 'Välj ingest',
     no_ingest_selected: 'Du behöver välja ingest',
-    no_name: 'Du behöver fylla i ett namn'
+    no_name: 'Du behöver fylla i ett namn',
+    no_local_ip: 'Du behöver fylla i en lokal IP',
+    no_local_port: 'Du behöver fylla i en lokal port',
+    no_remote_ip: 'Du behöver fylla i en remote IP',
+    no_remote_port: 'Du behöver fylla i en remote port',
+    cancel: 'Avbryt'
   },
   clear: 'Rensa',
   apply: 'Applicera',

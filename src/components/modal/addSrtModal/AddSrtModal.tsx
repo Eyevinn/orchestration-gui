@@ -5,7 +5,6 @@ import { Select } from '../../select/Select';
 import { useState, useEffect } from 'react';
 import { Button } from '../../button/Button';
 import { SrtSource } from '../../../interfaces/Source';
-import styles from './AddSrtModal.module.css';
 import { Loader } from '../../loader/Loader';
 import { useIngests } from '../../../hooks/ingests';
 import Input from '../../input/Input';
@@ -26,6 +25,7 @@ export function AddSrtModal({
   onConfirm
 }: AddSrtModalProps) {
   const ingests = useIngests();
+  const t = useTranslate();
 
   const [ingestUuid, setIngestUuid] = useState<string>('');
   const [ingestName, setIngestName] = useState<string>('');
@@ -39,6 +39,10 @@ export function AddSrtModal({
   const [passphrase, setPassphrase] = useState<string>();
   const [isNameError, setIsNameError] = useState<boolean>(false);
   const [isIngestNameError, setIsIngestNameError] = useState<boolean>(false);
+  const [isLocalPortError, setIsLocalPortError] = useState<boolean>(false);
+  const [isRemotePortError, setIsRemotePortError] = useState<boolean>(false);
+  const [isLocalIpError, setIsLocalIpError] = useState<boolean>(false);
+  const [isRemoteIpError, setIsRemoteIpError] = useState<boolean>(false);
   const [srtPayload, setSrtPayload] = useState<SrtSource>({
     latency_ms: latency,
     local_ip: localIp,
@@ -93,27 +97,96 @@ export function AddSrtModal({
     }
   }, [isNameError]);
 
+  useEffect(() => {
+    if (localIp) {
+      setIsLocalIpError(false);
+    }
+  }, [localIp]);
+
+  useEffect(() => {
+    if (localPort) {
+      setIsLocalPortError(false);
+    }
+  }, [localPort]);
+
+  useEffect(() => {
+    if (remoteIp) {
+      setIsRemoteIpError(false);
+    }
+  }, [remoteIp]);
+
+  useEffect(() => {
+    if (remotePort) {
+      setIsRemotePortError(false);
+    }
+  }, [remotePort]);
+
   const handleCloseModal = () => {
     setIsNameError(false);
     setIsIngestNameError(false);
+    setIsLocalIpError(false);
+    setIsLocalPortError(false);
+    setIsRemoteIpError(false);
+    setIsRemotePortError(false);
+    onAbort();
+  };
+
+  const handleCancel = () => {
+    // Reset all fields
+    setIngestName('');
+    setName('My SRT source');
+    setLocalIp('0.0.0.0');
+    setLocalPort(1234);
+    setRemoteIp('127.0.0.1');
+    setRemotePort(1234);
+    setLatency(120);
+    setPassphrase('');
+
+    // Reset all errors
+    setIsNameError(false);
+    setIsIngestNameError(false);
+    setIsLocalIpError(false);
+    setIsLocalPortError(false);
+    setIsRemoteIpError(false);
+    setIsRemotePortError(false);
+
     onAbort();
   };
 
   const handleCreateSrtSource = () => {
+    let hasError = false;
+
     if (!name) {
       setIsNameError(true);
+      hasError = true;
     }
     if (ingestName === '') {
       setIsIngestNameError(true);
+      hasError = true;
     }
-    if (!name || ingestName === '') {
+    if (!localIp) {
+      setIsLocalIpError(true);
+      hasError = true;
+    }
+    if (!localPort) {
+      setIsLocalPortError(true);
+      hasError = true;
+    }
+    if (!remoteIp && mode === 'Caller') {
+      setIsRemoteIpError(true);
+      hasError = true;
+    }
+    if (!remotePort && mode === 'Caller') {
+      setIsRemotePortError(true);
+      hasError = true;
+    }
+
+    if (hasError) {
       return false;
     }
-    if (!isIngestNameError && !isNameError) {
-      onConfirm(ingestUuid, srtPayload);
-      onAbort();
-    }
-    setIsIngestNameError(false);
+
+    onConfirm(ingestUuid, srtPayload);
+    onAbort();
   };
 
   const handleModeChange = () => {
@@ -122,9 +195,7 @@ export function AddSrtModal({
   };
 
   useEffect(() => {
-    if ([t('inventory_list.select_ingest'), ''].includes(ingestName)) {
-      setIsIngestNameError(true);
-    } else {
+    if (![t('inventory_list.select_ingest'), ''].includes(ingestName)) {
       setIsIngestNameError(false);
     }
   }, [ingestName]);
@@ -145,10 +216,13 @@ export function AddSrtModal({
     };
   };
 
-  const t = useTranslate();
   return (
-    <Modal open={open} outsideClick={handleCloseModal} className="w-1/5">
-      <h1 className=" text-xl mb-12 mt-4 px-8">
+    <Modal
+      open={open}
+      outsideClick={handleCloseModal}
+      className="w-[600px] max-w-full overflow-auto"
+    >
+      <h1 className="text-xl mb-12 mt-4 px-8">
         {t('inventory_list.create_srt_source')}
       </h1>
       <div className="flex flex-col items-center space-y-4 w-full px-8">
@@ -190,7 +264,7 @@ export function AddSrtModal({
           </h2>
           <span className="flex flex-col w-full items-center">
             <Input
-              className="w-full flex-grow ml-2"
+              className="w-full ml-2"
               type="text"
               value={name}
               onChange={handleInputChange(setName, setIsNameError)}
@@ -207,83 +281,125 @@ export function AddSrtModal({
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.local_ip')}:
           </h2>
-          <Input
-            className="flex-grow ml-2"
-            type="text"
-            value={localIp}
-            onChange={handleInputChange(setLocalIp)}
-          />
+          <span className="flex flex-col w-full items-center">
+            <Input
+              className="w-full ml-2"
+              type="text"
+              value={localIp}
+              onChange={handleInputChange(setLocalIp)}
+              error={isLocalIpError}
+            />
+            {isLocalIpError && (
+              <p className="text-xs text-button-delete mt-2">
+                {t('inventory_list.no_local_ip')}
+              </p>
+            )}
+          </span>
         </span>
         <span className="flex items-center w-full">
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.local_port')}:
           </h2>
-          <Input
-            className="flex-grow ml-2"
-            type="number"
-            value={localPort}
-            onChange={handleInputChange(setLocalPort)}
-          />
-        </span>
-        <div
-          className={`${styles.expandableSection} ${
-            mode === 'Caller' ? styles.expanded : styles.collapsed
-          } space-y-4 w-full`}
-        >
-          <span className="flex items-center w-full">
-            <h2 className="flex w-1/3 text-left">
-              {t('inventory_list.remote_ip')}:
-            </h2>
+          <span className="flex flex-col w-full items-center">
             <Input
-              className="flex-grow ml-2"
-              type="text"
-              value={remoteIp}
-              onChange={handleInputChange(setRemoteIp)}
-            />
-          </span>
-          <span className="flex items-center w-full">
-            <h2 className="flex w-1/3 text-left">
-              {t('inventory_list.remote_port')}:
-            </h2>
-            <Input
-              className="flex-grow ml-2"
+              className="w-full ml-2"
               type="number"
-              value={remotePort}
-              onChange={handleInputChange(setRemotePort)}
+              value={localPort}
+              onChange={handleInputChange(setLocalPort)}
+              error={isLocalPortError}
             />
+            {isLocalPortError && (
+              <p className="text-xs text-button-delete mt-2">
+                {t('inventory_list.no_local_port')}
+              </p>
+            )}
           </span>
-        </div>
+        </span>
+        {mode === 'Caller' && (
+          <div className="space-y-4 w-full">
+            <span className="flex items-center w-full">
+              <h2 className="flex-none w-1/3 text-left">
+                {t('inventory_list.remote_ip')}:
+              </h2>
+              <span className="flex flex-col w-full items-center">
+                <Input
+                  className="ml-2 w-full"
+                  type="text"
+                  value={remoteIp}
+                  onChange={handleInputChange(setRemoteIp)}
+                  error={isRemoteIpError}
+                />
+                {isRemoteIpError && (
+                  <p className="text-xs text-button-delete mt-2">
+                    {t('inventory_list.no_remote_ip')}
+                  </p>
+                )}
+              </span>
+            </span>
+            <span className="flex items-center w-full">
+              <h2 className="flex-none w-1/3 text-left">
+                {t('inventory_list.remote_port')}:
+              </h2>
+              <span className="flex flex-col w-full items-center">
+                <Input
+                  className="ml-2 w-full"
+                  type="number"
+                  value={remotePort}
+                  onChange={handleInputChange(setRemotePort)}
+                  error={isRemotePortError}
+                />
+                {isRemotePortError && (
+                  <p className="text-xs text-button-delete mt-2">
+                    {t('inventory_list.no_remote_port')}
+                  </p>
+                )}
+              </span>
+            </span>
+          </div>
+        )}
         <span className="flex items-center w-full">
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.latency')}:
           </h2>
-          <Input
-            className="flex-grow ml-2"
-            type="number"
-            value={latency}
-            onChange={handleInputChange(setLatency)}
-          />
+          <span className="flex flex-col w-full items-center">
+            <Input
+              className="w-full ml-2"
+              type="number"
+              value={latency}
+              onChange={handleInputChange(setLatency)}
+            />
+          </span>
         </span>
         <span className="flex items-center w-full">
           <h2 className="flex-none w-1/3 text-left">
             {t('inventory_list.passphrase')}:
           </h2>
-          <Input
-            className="mb-4 flex-grow ml-2"
-            type="text"
-            value={passphrase}
-            onChange={handleInputChange(setPassphrase)}
-          />
+          <span className="flex flex-col w-full items-center">
+            <Input
+              className="w-full mb-4 ml-2"
+              type="text"
+              value={passphrase}
+              onChange={handleInputChange(setPassphrase)}
+            />
+          </span>
         </span>
       </div>
-      <div className="flex justify-end px-8">
-        {loading ? (
-          <Loader className="w-10 h-5" />
-        ) : (
-          <Button className="justify-self-end" onClick={handleCreateSrtSource}>
-            {t('inventory_list.create_srt')}
+      <div className="flex justify-between px-8 mt-8">
+        <>
+          <Button className="bg-button-abort" onClick={handleCancel}>
+            {t('inventory_list.cancel')}
           </Button>
-        )}
+          {loading ? (
+            <Loader className="w-10 h-5" />
+          ) : (
+            <Button
+              className="justify-self-end"
+              onClick={handleCreateSrtSource}
+            >
+              {t('inventory_list.create_srt')}
+            </Button>
+          )}
+        </>
       </div>
     </Modal>
   );

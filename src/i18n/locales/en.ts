@@ -531,7 +531,12 @@ export const en = {
     ingest_uuid: 'Ingest',
     select_ingest: 'Select an ingest',
     no_ingest_selected: 'You need to select ingest',
-    no_name: 'You need to enter a name'
+    no_name: 'You need to enter a name',
+    no_local_ip: 'You need to enter a local IP',
+    no_local_port: 'You need to enter a local port',
+    no_remote_ip: 'You need to enter a remote IP',
+    no_remote_port: 'You need to enter a remote port',
+    cancel: 'Cancel'
   },
   clear: 'Clear',
   apply: 'Apply',
