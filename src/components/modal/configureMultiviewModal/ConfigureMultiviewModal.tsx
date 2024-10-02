@@ -1,4 +1,4 @@
-import { MultiviewPreset, Preset } from '../../../interfaces/preset';
+import { TMultiviewLayout, Preset } from '../../../interfaces/preset';
 import { Modal } from '../Modal';
 import { useEffect, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
@@ -6,10 +6,10 @@ import toast from 'react-hot-toast';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { Production } from '../../../interfaces/production';
-import { usePutMultiviewPreset } from '../../../hooks/multiviewPreset';
 import deepclone from 'lodash.clonedeep';
 import MultiviewSettingsConfig from '../configureOutputModal/MultiviewSettings';
 import MultiviewLayoutSettings from '../configureOutputModal/MultiviewLayoutSettings/MultiviewLayoutSettings';
+import { usePutMultiviewLayout } from '../../../hooks/multiviewLayout';
 import Decision from '../configureOutputModal/Decision';
 
 type ConfigureMultiviewModalProps = {
@@ -31,10 +31,13 @@ export function ConfigureMultiviewModal({
   const [portDuplicateIndexes, setPortDuplicateIndexes] = useState<number[]>(
     []
   );
-  const [layoutModalOpen, setLayoutModalOpen] = useState<string | null>(null);
-  const [newMultiviewPreset, setNewMultiviewPreset] =
-    useState<MultiviewPreset | null>(null);
-  const addNewPreset = usePutMultiviewPreset();
+  const [layoutModalOpen, setLayoutModalOpen] = useState(false);
+  const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
+    TMultiviewLayout | undefined
+  >();
+  const [newMultiviewLayout, setNewMultiviewLayout] =
+    useState<TMultiviewLayout | null>(null);
+  const addNewLayout = usePutMultiviewLayout();
   const t = useTranslate();
 
   useEffect(() => {
@@ -48,7 +51,7 @@ export function ConfigureMultiviewModal({
   }, [preset.pipelines]);
 
   const clearInputs = () => {
-    setLayoutModalOpen(null);
+    setLayoutModalOpen(false);
     setMultiviews(preset.pipelines[0].multiviews || []);
     onClose();
   };
@@ -81,16 +84,18 @@ export function ConfigureMultiviewModal({
   };
 
   const onUpdateLayoutPreset = () => {
-    if (!newMultiviewPreset) {
+    const noLayoutName = newMultiviewLayout?.name === '';
+    const defaultLayout = newMultiviewLayout?.name.includes('Default');
+    if (!newMultiviewLayout || noLayoutName || defaultLayout) {
       toast.error(t('preset.no_updated_layout'));
       return;
     }
-    addNewPreset(newMultiviewPreset);
-    setLayoutModalOpen(null);
+    addNewLayout(newMultiviewLayout);
+    setLayoutModalOpen(false);
   };
 
   const closeLayoutModal = () => {
-    setLayoutModalOpen(null);
+    setLayoutModalOpen(false);
   };
 
   const findDuplicateValues = (mvs: MultiviewSettings[]) => {
@@ -166,10 +171,8 @@ export function ConfigureMultiviewModal({
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
                       productionId={production?._id}
-                      openConfigModal={(input: string) =>
-                        setLayoutModalOpen(input)
-                      }
-                      newMultiviewPreset={newMultiviewPreset}
+                      openConfigModal={() => setLayoutModalOpen(true)}
+                      newMultiviewLayout={newMultiviewLayout}
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
                       handleUpdateMultiview={(input) =>
@@ -180,6 +183,10 @@ export function ConfigureMultiviewModal({
                           ? portDuplicateIndexes.includes(index)
                           : false
                       }
+                      setSelectedMultiviewLayout={(layout) =>
+                        setSelectedMultiviewLayout(layout)
+                      }
+                      selectedMultiviewLayout={selectedMultiviewLayout}
                     />
                     <div
                       className={`w-full flex ${
@@ -215,12 +222,12 @@ export function ConfigureMultiviewModal({
             })}
         </div>
       )}
-      {!!layoutModalOpen && (
+      {layoutModalOpen && (
         <MultiviewLayoutSettings
-          configMode={layoutModalOpen}
           production={production}
+          selectedMultiviewLayout={selectedMultiviewLayout}
           setNewMultiviewPreset={(newLayout) =>
-            setNewMultiviewPreset(newLayout)
+            setNewMultiviewLayout(newLayout)
           }
         />
       )}
