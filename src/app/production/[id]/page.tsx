@@ -793,6 +793,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               />
               <div className="flex flex-row">
                 <Select
+                  classNames="w-full"
                   disabled={
                     productionSetup?.production_settings === undefined ||
                     productionSetup.production_settings === null
