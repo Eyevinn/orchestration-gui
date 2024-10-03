@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { useTranslate } from '../../i18n/useTranslate';
 import { usePostProduction } from '../../hooks/productions';
 import { refresh } from '../../utils/refresh';
-import { LockButton } from '../lockButton/LockButton';
 
 export function CreateProduction() {
   const router = useRouter();
@@ -49,10 +48,6 @@ export function CreateProduction() {
           {t('production_configuration')}
         </div>
         <div className="flex mr-2 gap-3">
-          <LockButton />
-          <Button className="hover:bg-button-hover-bg">
-            <Link href="/inventory">{t('inventory')}</Link>
-          </Button>
           <Button
             className="hover:bg-button-hover-bg bg-button-bg"
             onClick={handleOpen}

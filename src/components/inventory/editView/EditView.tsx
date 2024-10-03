@@ -24,13 +24,13 @@ export default function EditView({
   return (
     <EditViewContext source={source} updateSource={updateSource}>
       <div className="flex flex-row mb-10 h-[22rem]">
-        <div className="relative w-[38rem]">
+        <div className="relative w-[34rem]">
           <ImageComponent src={getSourceThumbnail(source)} />
         </div>
         <GeneralSettings locked={locked} />
       </div>
 
-      <div className="flex-auto">
+      <div className="flex">
         <AudioChannels source={source} locked={locked} />
       </div>
       <UpdateButtons

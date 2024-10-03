@@ -68,6 +68,7 @@ export const sv = {
   },
   production_configuration: 'Produktionskonfiguration',
   production: {
+    productions: 'Produktioner',
     add_source: 'Lägg till ingång',
     select_preset: 'Välj produktionsmall',
     clear_selection: 'Rensa val',
@@ -613,12 +614,19 @@ export const sv = {
   online: 'ONLINE',
   offline: 'OFFLINE',
   refresh_images: 'Uppdatera Tumnaglar',
+  connections: 'Anslutningar',
   server_error: '{{string}}:n inte ansluten',
   system_controller: 'Systemkontroller',
   database: 'Databas',
   application: 'Program',
   multiview: 'Multiview',
   setting_up: 'Sätter upp anslutning till externa API:n...',
+  lock: {
+    locked: 'Låst',
+    unlocked: 'Olåst',
+    lock: 'Lås',
+    unlock: 'Lås Upp'
+  },
   preset: {
     preset_necessary: 'Preset must be selected!',
     low_delay: 'Low Delay Pipeline',

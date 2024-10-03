@@ -1,10 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useTranslate } from '../../i18n/useTranslate';
-import { useContext, useState } from 'react';
-import { GlobalContext } from '../../contexts/GlobalContext';
-import { IconRefresh } from '@tabler/icons-react';
+import { useState } from 'react';
 import { AddSrtModal } from '../modal/addSrtModal/AddSrtModal';
 import { useCreateSrtSource } from '../../hooks/sources/useCreateSrtSource';
 import { SrtSource } from '../../interfaces/Source';
@@ -19,7 +16,6 @@ export default function HeaderNavigation({
   locked?: boolean;
 }) {
   const t = useTranslate();
-  const { incrementImageRefetchIndex } = useContext(GlobalContext);
 
   const [showSrtModal, setShowSrtModal] = useState<boolean>(false);
   const [createSrtSource, createSourceLoading] = useCreateSrtSource();
@@ -31,22 +27,6 @@ export default function HeaderNavigation({
   return (
     <div className="flex flex-row justify-between">
       <div className="flex m-2 rounded align-center">
-        <Link
-          className="bg-button-bg hover:bg-button-hover-bg text-button-text font-bold py-2 px-4 rounded inline-flex items-center"
-          href={'/'}
-        >
-          <span>{t('homepage')}</span>
-        </Link>
-        <button
-          className="bg-button-bg hover:bg-button-hover-bg text-button-text font-bold py-2 px-4 rounded inline-flex items-center ml-2"
-          onClick={incrementImageRefetchIndex}
-        >
-          <IconRefresh
-            className="text-white mr-1"
-            onClick={incrementImageRefetchIndex}
-          />
-          {t('refresh_images')}
-        </button>
         {isInventoryManagement && (
           <button
             disabled={locked}

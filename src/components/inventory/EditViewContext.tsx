@@ -154,7 +154,7 @@ export default function Context({
     >
       <form
         ref={formReference}
-        className="flex flex-col min-h-full w-full"
+        className="flex flex-col w-full bg-container p-3"
         action=""
         onSubmit={(e) => {
           e.preventDefault();

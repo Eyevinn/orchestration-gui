@@ -16,6 +16,7 @@ const config = {
       colors: {
         background: colors.zinc['900'],
         container: colors.zinc['800'],
+        light: colors.zinc['600'],
         indicatorGreen: GREEN_COLOR,
         indicatorYellow: INDICATOR_YELLOW,
         indicatorRed: INDICATOR_RED,

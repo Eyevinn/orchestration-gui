@@ -1,5 +1,6 @@
 'use client';
 
+import { SessionProvider } from 'next-auth/react';
 import { createContext, useState, PropsWithChildren } from 'react';
 
 interface IGlobalContext {
@@ -20,7 +21,7 @@ export const GlobalContext = createContext<IGlobalContext>({
   }
 });
 
-const GlobalContextProvider = (props: PropsWithChildren) => {
+export const GlobalContextProvider = (props: PropsWithChildren) => {
   const { children } = props;
   const [locked, setLocked] = useState<boolean>(false);
   const [imageRefetchIndex, setImageRefetchIndex] = useState<number>(0);
@@ -34,17 +35,17 @@ const GlobalContextProvider = (props: PropsWithChildren) => {
   };
 
   return (
-    <GlobalContext.Provider
-      value={{
-        locked,
-        imageRefetchIndex,
-        incrementImageRefetchIndex,
-        toggleLocked
-      }}
-    >
-      {children}
-    </GlobalContext.Provider>
+    <SessionProvider>
+      <GlobalContext.Provider
+        value={{
+          locked,
+          imageRefetchIndex,
+          incrementImageRefetchIndex,
+          toggleLocked
+        }}
+      >
+        {children}
+      </GlobalContext.Provider>
+    </SessionProvider>
   );
 };
-
-export default GlobalContextProvider;

@@ -192,7 +192,13 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
       newOutputs[foundOutputIndex].settings =
         getStreamEncoderSettings(pipeline);
     }
-    newOutputs[foundOutputIndex].settings[key] = value as never;
+
+    // Simple workaround to set these values as numbers
+    if (['video_bit_depth', 'video_kilobit_rate'].includes(key)) {
+      newOutputs[foundOutputIndex].settings[key] = Number(value) as never;
+    } else {
+      newOutputs[foundOutputIndex].settings[key] = value as never;
+    }
     setUpdatedOutputs(newOutputs);
   };
 
@@ -242,7 +248,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
           label={t('preset.video_kilobit_rate')}
           value={
             foundOutput?.settings?.video_kilobit_rate ||
-            getStreamEncoderSettings(pipeline).video_kilobit_rate.toString()
+            getStreamEncoderSettings(pipeline).video_kilobit_rate
           }
           update={(value) =>
             handleUpdateOutputSetting('video_kilobit_rate', value, outputId)

@@ -39,7 +39,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
     setCurrentSource(source);
   };
   return (
-    <div className="flex ">
+    <div className="flex h-full">
       <SourceList
         sources={sources}
         action={editSource}
@@ -47,7 +47,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
         locked={locked}
       />
       {currentSource ? (
-        <div className={`p-3 ml-2 mt-2 bg-container rounded h-1/2 min-w-max`}>
+        <div className={`ml-2 mt-2 rounded self-start`}>
           <EditView
             locked={locked}
             source={currentSource}

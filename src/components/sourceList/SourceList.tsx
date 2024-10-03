@@ -53,11 +53,11 @@ const SourceList: React.FC<SourceListProps> = (props) => {
 
   return (
     <FilterContext sources={sources}>
-      <div className="flex max-h-full min-h-[100%] flex-row">
+      <div className="flex h-full flex-row">
         <div
           className={
             inventoryVisible
-              ? `${styles.no_scrollbar}  min-w-fit overflow-hidden max-w-2xl transition-[width] ml-2 mt-2 max-h-[89vh] w-[50%]`
+              ? `${styles.no_scrollbar}  min-w-fit overflow-hidden max-w-2xl transition-[width] ml-2 mt-2 w-[50%]`
               : 'hidden'
           }
         >

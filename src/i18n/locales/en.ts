@@ -66,6 +66,7 @@ export const en = {
   },
   production_configuration: 'Production Configuration',
   production: {
+    productions: 'Productions',
     add_source: 'Add ingest',
     select_preset: 'Select Preset',
     clear_selection: 'Clear Selection',
@@ -510,7 +511,7 @@ export const en = {
       }
     }
   },
-  inventory: 'Inventory Management',
+  inventory: 'Inventory',
   inventory_list: {
     search: 'Search',
     filter: 'Filter on {{type}}',
@@ -610,12 +611,19 @@ export const en = {
   online: 'ONLINE',
   offline: 'OFFLINE',
   refresh_images: 'Refresh Thumbnails',
+  connections: 'Connections',
   server_error: 'No connection with {{string}}',
   system_controller: 'System controller',
   database: 'Database',
   application: 'Application',
   multiview: 'Multiview',
   setting_up: 'Setting up connections to external API:s...',
+  lock: {
+    locked: 'Locked',
+    unlocked: 'Unlocked',
+    lock: 'Lock',
+    unlock: 'Unlock'
+  },
   preset: {
     preset_necessary: 'Preset must be selected!',
     low_delay: 'Low Delay Pipeline',

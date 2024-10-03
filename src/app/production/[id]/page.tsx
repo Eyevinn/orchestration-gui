@@ -39,7 +39,6 @@ import { MonitoringButton } from '../../../components/button/MonitoringButton';
 import { useGetMultiviewPreset } from '../../../hooks/multiviewPreset';
 import { useMultiviews } from '../../../hooks/multiviews';
 import SourceList from '../../../components/sourceList/SourceList';
-import { LockButton } from '../../../components/lockButton/LockButton';
 import { GlobalContext } from '../../../contexts/GlobalContext';
 import { Select } from '../../../components/select/Select';
 import { useAddSource } from '../../../hooks/sources/useAddSource';
@@ -647,7 +646,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     <>
       <HeaderNavigation>
         <input
-          className="m-2 text-4xl text-p text-center bg-transparent"
+          className="m-2 text-4xl text-p text-center bg-transparent grow text-start"
           type="text"
           value={configurationName}
           onChange={(e) => {
@@ -666,7 +665,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
           key={'StartProductionButtonKey'}
           id="presetDropdownDefaultCheckbox"
         >
-          <LockButton />
           <PresetDropdown
             disabled={
               (productionSetup ? productionSetup.isActive : false) || locked

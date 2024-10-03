@@ -1,24 +1,15 @@
-'use client';
 import { CreateProduction } from '../createProduction/CreateProduction';
-import { Suspense, useContext } from 'react';
+import { Suspense } from 'react';
 import { LoadingCover } from '../loader/LoadingCover';
 import ProductionsList from '../productionsList/ProductionsList';
-import { Production } from '../../interfaces/production';
-import { GlobalContext } from '../../contexts/GlobalContext';
 
-type HomePageContentProps = {
-  productions: Production[];
-};
-
-export const HomePageContent = ({ productions }: HomePageContentProps) => {
-  const { locked } = useContext(GlobalContext);
-
+export const HomePageContent = () => {
   return (
     <div>
       <CreateProduction />
       <div className="flex items-center w-full">
         <Suspense fallback={<LoadingCover />}>
-          <ProductionsList productions={productions} locked={locked} />
+          <ProductionsList />
         </Suspense>
       </div>
     </div>

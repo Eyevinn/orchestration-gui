@@ -1,7 +1,7 @@
 import { Toaster } from 'react-hot-toast';
 import DefaultLayout from '../components/layout/DefaultLayout';
 import './globals.css';
-import GlobalContextProvider from '../contexts/GlobalContext';
+import { GlobalContextProvider } from '../contexts/GlobalContext';
 
 export default async function RootLayout({
   children

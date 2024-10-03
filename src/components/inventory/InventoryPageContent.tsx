@@ -1,10 +1,10 @@
 'use client';
+
 import { Suspense, useContext } from 'react';
-import { LockButton } from '../lockButton/LockButton';
 import { useTranslate } from '../../i18n/useTranslate';
-import HeaderNavigation from '../headerNavigation/HeaderNavigation';
 import Inventory from './Inventory';
 import { GlobalContext } from '../../contexts/GlobalContext';
+import HeaderNavigation from '../headerNavigation/HeaderNavigation';
 
 export const InventoryPageContent = () => {
   const t = useTranslate();
@@ -18,7 +18,6 @@ export const InventoryPageContent = () => {
             <h1 className="m-2 text-4xl text-p text-center">
               {t('inventory')}
             </h1>
-            <LockButton />
           </div>
         </div>
       </HeaderNavigation>

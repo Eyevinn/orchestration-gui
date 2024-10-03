@@ -19,18 +19,15 @@ import { Loader } from '../loader/Loader';
 import toast from 'react-hot-toast';
 import { refresh } from '../../utils/refresh';
 import { StopModal } from '../modal/StopModal';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { StartModal } from '../modal/StartModal';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 type ProductionListItemProps = {
   production: Production;
-  locked: boolean;
 };
 
-export function ProductionsListItem({
-  production,
-  locked
-}: ProductionListItemProps) {
+export function ProductionsListItem({ production }: ProductionListItemProps) {
   const [stopProduction, loading] = useStopProduction();
   const [startProduction, loadingStartProduction] = useStartProduction();
   const [startProductionStatus, setStartProductionStatus] =
@@ -40,6 +37,7 @@ export function ProductionsListItem({
   const [stopModalOpen, setStopModalOpen] = useState(false);
   const [startErrorModalOpen, setStartErrorModalOpen] = useState(false);
   const putProduction = usePutProduction();
+  const { locked } = useContext(GlobalContext);
 
   const handleStopProduction = async () => {
     stopProduction(production)

@@ -37,7 +37,15 @@ export const authOptions: NextAuthOptions = {
           .catch(() => null);
       }
     })
-  ]
+  ],
+  callbacks: {
+    session: async ({ session, token }) => {
+      if (session?.user) {
+        session.user.name = token.sub;
+      }
+      return session;
+    }
+  }
 };
 
 export async function isAuthenticated() {
