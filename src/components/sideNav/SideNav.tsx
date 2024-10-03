@@ -57,7 +57,7 @@ const SideNav: React.FC = () => {
       } h-full p-2 pt-4 transition-all duration-500 max-w-[500px]`}
     >
       <div className="flex flex-row-reverse h-16 mb-6 justify-between items-center">
-        <div onClick={toggleOpen} className="">
+        <div onClick={toggleOpen}>
           <Icons
             name={open ? 'IconMenuDeep' : 'IconMenu2'}
             className="text-white hover:cursor-pointer rounded-xl hover:bg-light min-w-[60px] min-h-16 p-2"
