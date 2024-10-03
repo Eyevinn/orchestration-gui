@@ -43,7 +43,7 @@ export function useConfigureMultiviewLayout(
       return setUpdatedPreset({
         ...preset,
         productionId,
-        name: name ? name : preset.name,
+        name: name || preset.name,
         layout: {
           ...preset.layout,
           views: arr

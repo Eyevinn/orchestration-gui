@@ -33,7 +33,7 @@ export function ConfigureMultiviewModal({
   );
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
   const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
-    TMultiviewLayout | undefined
+    { layout: TMultiviewLayout; tableIndex: number } | undefined
   >();
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
@@ -90,6 +90,12 @@ export function ConfigureMultiviewModal({
       toast.error(t('preset.no_updated_layout'));
       return;
     }
+
+    const updatedMultiviews = multiviews.map((item, i) =>
+      i === multiviews.length - 1 ? { ...item, ...newMultiviewLayout } : item
+    );
+
+    setMultiviews(updatedMultiviews);
     addNewLayout(newMultiviewLayout);
     setLayoutModalOpen(false);
   };
@@ -173,6 +179,7 @@ export function ConfigureMultiviewModal({
                       productionId={production?._id}
                       openConfigModal={() => setLayoutModalOpen(true)}
                       newMultiviewLayout={newMultiviewLayout}
+                      tableIndex={index}
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
                       handleUpdateMultiview={(input) =>
@@ -183,9 +190,7 @@ export function ConfigureMultiviewModal({
                           ? portDuplicateIndexes.includes(index)
                           : false
                       }
-                      setSelectedMultiviewLayout={(layout) =>
-                        setSelectedMultiviewLayout(layout)
-                      }
+                      setSelectedMultiviewLayout={setSelectedMultiviewLayout}
                       selectedMultiviewLayout={selectedMultiviewLayout}
                     />
                     <div
@@ -225,10 +230,8 @@ export function ConfigureMultiviewModal({
       {layoutModalOpen && (
         <MultiviewLayoutSettings
           production={production}
-          selectedMultiviewLayout={selectedMultiviewLayout}
-          setNewMultiviewPreset={(newLayout) =>
-            setNewMultiviewLayout(newLayout)
-          }
+          selectedMultiviewLayout={selectedMultiviewLayout?.layout}
+          setNewMultiviewPreset={setNewMultiviewLayout}
         />
       )}
       <Decision

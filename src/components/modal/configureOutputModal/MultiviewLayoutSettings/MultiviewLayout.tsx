@@ -45,8 +45,8 @@ export default function MultiviewLayout({
                   id: singleSource.id,
                   label: singleSource.label
                 }))}
-                value={label ? label : ''}
-                update={(value) => handleChange(id ? id : '', value)}
+                value={label || ''}
+                update={(value) => handleChange(id || '', value)}
                 columnStyle
               />
             )}

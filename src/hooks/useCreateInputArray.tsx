@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Production } from '../interfaces/production';
 import { ResourcesCompactPipelineResponse } from '../../types/ateliere-live';
 import { TListSource } from '../interfaces/multiview';
+import { API_SECRET_KEY } from '../utils/constants';
 
 type ModifiedDataHook<DataType> = [DataType | undefined, boolean];
 
@@ -16,8 +17,7 @@ function GetPipelines(): [
     setLoading(true);
     fetch('/api/manager/pipelines', {
       method: 'GET',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     })
       .then(async (response) => {
         if (response.ok) {

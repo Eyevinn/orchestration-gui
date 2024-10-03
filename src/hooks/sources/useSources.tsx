@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
+import { API_SECRET_KEY } from '../../utils/constants';
 
 export function useSources(
   reloadList?: boolean,
@@ -14,8 +15,7 @@ export function useSources(
     if (!updatedSource || reloadList) {
       fetch('/api/manager/sources?mocked=false', {
         method: 'GET',
-        // TODO: Implement api key
-        headers: [['x-api-key', `Bearer apisecretkey`]]
+        headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
       })
         .then(async (response) => {
           if (response.ok) {

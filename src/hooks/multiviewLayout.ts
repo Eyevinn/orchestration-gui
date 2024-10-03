@@ -8,8 +8,7 @@ export function useGetMultiviewLayouts() {
   return async (): Promise<TMultiviewLayout[]> => {
     const response = await fetch(`/api/manager/multiviews`, {
       method: 'GET',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     });
     if (response.ok) {
       return response.json();
@@ -22,8 +21,7 @@ export function useGetMultiviewLayout() {
   return async (id: string): Promise<WithId<TMultiviewLayout>> => {
     const response = await fetch(`/api/manager/multiviews/${id}`, {
       method: 'GET',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     });
     if (response.ok) {
       return await response.json();
@@ -42,8 +40,7 @@ export function useMultiviewLayouts(): DataHook<TMultiviewLayout[]> {
     setLoading(true);
     fetch('/api/manager/multiviews', {
       method: 'GET',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     })
       .then(async (response) => {
         if (response.ok) {

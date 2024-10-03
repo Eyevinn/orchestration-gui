@@ -108,40 +108,42 @@ export default function MultiviewLayoutSettings({
     }
   };
 
-  if (!selectedMultiviewPreset) {
-    return <></>;
-  }
-
   return (
-    <div className="flex flex-col w-full h-full">
-      {multiviewPresetLayout && (
-        <MultiviewLayout
-          multiviewPresetLayout={multiviewPresetLayout}
-          inputList={inputList}
-          handleChange={handleChange}
-        />
+    <>
+      {selectedMultiviewPreset && (
+        <div className="flex flex-col w-full h-full">
+          {multiviewPresetLayout && (
+            <MultiviewLayout
+              multiviewPresetLayout={multiviewPresetLayout}
+              inputList={inputList}
+              handleChange={handleChange}
+            />
+          )}
+          <div className="flex flex-col w-[50%] h-full">
+            <Options
+              label={t('preset.select_multiview_preset')}
+              options={multiviewPresetNames.map((singleItem) => ({
+                label: singleItem
+              }))}
+              value={
+                selectedMultiviewPreset ? selectedMultiviewPreset.name : ''
+              }
+              update={handlePresetUpdate}
+            />
+            <Input
+              label={t('name')}
+              value={newPresetName ? newPresetName : layoutToChange}
+              update={handlePresetUpdate}
+              placeholder={t('preset.new_preset_name')}
+            />
+            {layoutNameAlreadyExist && (
+              <p className="text-right mr-2 text-button-delete font-bold">
+                {t('preset.layout_already_exist', { layoutNameAlreadyExist })}
+              </p>
+            )}
+          </div>
+        </div>
       )}
-      <div className="flex flex-col w-[50%] h-full">
-        <Options
-          label={t('preset.select_multiview_preset')}
-          options={multiviewPresetNames.map((singleItem) => ({
-            label: singleItem
-          }))}
-          value={selectedMultiviewPreset ? selectedMultiviewPreset.name : ''}
-          update={handlePresetUpdate}
-        />
-        <Input
-          label={t('name')}
-          value={newPresetName ? newPresetName : layoutToChange}
-          update={handlePresetUpdate}
-          placeholder={t('preset.new_preset_name')}
-        />
-        {layoutNameAlreadyExist && (
-          <p className="text-right mr-2 text-button-delete font-bold">
-            {t('preset.layout_already_exist', { layoutNameAlreadyExist })}
-          </p>
-        )}
-      </div>
-    </div>
+    </>
   );
 }

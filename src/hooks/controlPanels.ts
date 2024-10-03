@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { DataHook } from './types';
 import { ResourcesControlPanelResponse } from '../../types/ateliere-live';
+import { API_SECRET_KEY } from '../utils/constants';
 const ONE_MINUTE = 1000 * 60;
 export function useControlPanels(): [
   ...DataHook<ResourcesControlPanelResponse[]>,
@@ -18,8 +19,7 @@ export function useControlPanels(): [
     setLoading(true);
     fetch('/api/manager/controlpanels', {
       method: 'GET',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     })
       .then(async (response) => {
         if (response.ok) {

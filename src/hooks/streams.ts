@@ -8,6 +8,7 @@ import { Production } from '../interfaces/production';
 import { CallbackHook } from './types';
 import { MultiviewSettings } from '../interfaces/multiview';
 import { Result } from '../interfaces/result';
+import { API_SECRET_KEY } from '../utils/constants';
 
 export function useCreateStream(): CallbackHook<
   (
@@ -27,8 +28,7 @@ export function useCreateStream(): CallbackHook<
 
     return fetch(`/api/manager/streams/`, {
       method: 'POST',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]],
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({
         source: source,
         production: production,
@@ -76,8 +76,7 @@ export function useDeleteStream(): CallbackHook<
       const streamRequests = streamUuids.map((streamUuid) => {
         return fetch(`/api/manager/streams/${streamUuid}`, {
           method: 'DELETE',
-          // TODO: Implement api key
-          headers: [['x-api-key', `Bearer apisecretkey`]],
+          headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
           body: JSON.stringify({
             pipelineUUID: pipelineUUID
           })
@@ -155,8 +154,7 @@ export function useDeleteStream(): CallbackHook<
     const streamRequests = streamUuids.map((streamUuid) => {
       return fetch(`/api/manager/streams/${streamUuid}`, {
         method: 'DELETE',
-        // TODO: Implement api key
-        headers: [['x-api-key', `Bearer apisecretkey`]],
+        headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
         body: JSON.stringify({
           multiview: multiview,
           pipelineUUID: pipelineUUID

@@ -1,12 +1,12 @@
 import { Preset, PresetWithId } from '../interfaces/preset';
 import { ObjectId } from 'mongodb';
+import { API_SECRET_KEY } from '../utils/constants';
 
 export function useGetPresets() {
   return async (): Promise<PresetWithId[]> => {
     const response = await fetch(`/api/manager/presets`, {
       method: 'GET',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     });
     if (response.ok) {
       return response.json();
@@ -19,8 +19,7 @@ export function usePutPreset() {
   return async (id: ObjectId, preset: Preset): Promise<void> => {
     const response = await fetch(`/api/manager/presets/${id}`, {
       method: 'PUT',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]],
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify(preset)
     });
     if (response.ok) {

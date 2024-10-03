@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
 import { CallbackHook } from '../types';
 import { Log } from '../../api/logger';
+import { API_SECRET_KEY } from '../../utils/constants';
 
 export function useSetSourceToPurge(): CallbackHook<
   (source: SourceWithId) => void
@@ -14,8 +15,7 @@ export function useSetSourceToPurge(): CallbackHook<
 
       fetch(`/api/manager/inventory/${source._id}`, {
         method: 'PUT',
-        // TODO: Implement api key
-        headers: [['x-api-key', `Bearer apisecretkey`]]
+        headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
       })
         .then((response) => {
           if (!response.ok) {

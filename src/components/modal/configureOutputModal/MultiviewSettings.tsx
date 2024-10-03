@@ -9,6 +9,7 @@ import { IconSettings } from '@tabler/icons-react';
 import { useMultiviewLayouts } from '../../../hooks/multiviewLayout';
 
 type MultiviewSettingsProps = {
+  tableIndex: number;
   lastItem: boolean;
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
@@ -16,11 +17,17 @@ type MultiviewSettingsProps = {
   openConfigModal: () => void;
   newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
-  setSelectedMultiviewLayout: (layout: TMultiviewLayout | undefined) => void;
-  selectedMultiviewLayout: TMultiviewLayout | undefined;
+  setSelectedMultiviewLayout: (props: {
+    layout: TMultiviewLayout;
+    tableIndex: number;
+  }) => void;
+  selectedMultiviewLayout:
+    | { layout: TMultiviewLayout; tableIndex: number }
+    | undefined;
 };
 
 export default function MultiviewSettingsConfig({
+  tableIndex,
   lastItem,
   multiview,
   handleUpdateMultiview,
@@ -33,21 +40,32 @@ export default function MultiviewSettingsConfig({
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewLayouts] = useMultiviewLayouts();
+  const currentValue = multiview || selectedMultiviewLayout?.layout;
+  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
+    (layout) => layout.productionId === productionId || !layout.productionId
+  );
+  const multiviewLayoutNames =
+    avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+  const currentMultiviewValue =
+    selectedMultiviewLayout?.tableIndex === tableIndex
+      ? selectedMultiviewLayout?.layout.name
+      : currentValue?.name;
 
   useEffect(() => {
-    if (newMultiviewLayout && lastItem) {
-      setSelectedMultiviewLayout(newMultiviewLayout);
-      return;
-    }
     if (multiview) {
-      setSelectedMultiviewLayout(multiview);
+      setSelectedMultiviewLayout({ layout: multiview, tableIndex: tableIndex });
       return;
     }
     if (multiviewLayouts) {
       const defaultMultiview = multiviewLayouts.find(
         (m) => m.productionId !== undefined
       );
-      setSelectedMultiviewLayout(defaultMultiview);
+      if (defaultMultiview) {
+        setSelectedMultiviewLayout({
+          layout: defaultMultiview,
+          tableIndex: tableIndex
+        });
+      }
     }
   }, [lastItem, multiview, multiviewLayouts, newMultiviewLayout]);
 
@@ -67,8 +85,19 @@ export default function MultiviewSettingsConfig({
       toast.error(t('preset.no_multiview_found'));
       return;
     }
-    setSelectedMultiviewLayout(selected);
-    handleUpdateMultiview({ ...selected, for_pipeline_idx: 0 });
+    const updatedMultiview = {
+      ...selected,
+      name,
+      layout: {
+        ...selected.layout
+      },
+      output: multiview?.output || selected.output
+    };
+    setSelectedMultiviewLayout({
+      layout: updatedMultiview,
+      tableIndex: tableIndex
+    });
+    handleUpdateMultiview({ ...updatedMultiview, for_pipeline_idx: 0 });
   };
 
   const getNumber = (val: string, prev: number) => {
@@ -153,18 +182,6 @@ export default function MultiviewSettingsConfig({
     }
   };
 
-  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
-    (layout) => layout.productionId === productionId || !layout.productionId
-  );
-
-  const multiviewLayoutNames = avaliableMultiviewLayouts?.map(
-    (layout) => layout.name
-  )
-    ? avaliableMultiviewLayouts?.map((layout) => layout.name)
-    : [];
-
-  const currentValue = multiview ? multiview : selectedMultiviewLayout;
-
   return (
     <div className="flex flex-col gap-2 rounded p-4 pr-7">
       <div className="flex justify-between">
@@ -176,12 +193,12 @@ export default function MultiviewSettingsConfig({
           options={multiviewLayoutNames.map((singleItem) => ({
             label: singleItem
           }))}
-          value={currentValue ? currentValue.name : ''}
+          value={currentMultiviewValue || ''}
           update={(value) => handleSetSelectedMultiviewLayout(value)}
         />
         {lastItem && (
           <button
-            onClick={() => openConfigModal()}
+            onClick={openConfigModal}
             title={t('preset.configure_layout')}
             className={`absolute top-0 right-[-10%] min-w-fit`}
           >
@@ -193,59 +210,35 @@ export default function MultiviewSettingsConfig({
         <Options
           label={t('preset.video_format')}
           options={[{ label: 'AVC' }, { label: 'HEVC' }]}
-          value={
-            currentValue?.output.video_format
-              ? currentValue?.output.video_format
-              : 'AVC'
-          }
+          value={currentValue?.output.video_format || 'AVC'}
           update={(value) => handleChange('videoFormat', value)}
         />
         <Input
           type="number"
           label={t('preset.video_kilobit_rate')}
-          value={
-            currentValue?.output.video_kilobit_rate !== undefined
-              ? currentValue?.output.video_kilobit_rate
-              : '5000'
-          }
+          value={currentValue?.output.video_kilobit_rate || '5000'}
           update={(value) => handleChange('videoKiloBit', value)}
         />
         <Options
           label={t('preset.mode')}
           options={[{ label: 'listener' }, { label: 'caller' }]}
-          value={
-            currentValue?.output.srt_mode
-              ? currentValue?.output.srt_mode
-              : 'listener'
-          }
+          value={currentValue?.output.srt_mode || 'listener'}
           update={(value) => handleChange('srtMode', value)}
         />
         <Input
           label={t('preset.port')}
           inputError={portDuplicateError}
-          value={
-            currentValue?.output.local_port
-              ? currentValue?.output.local_port
-              : '1234'
-          }
+          value={currentValue?.output.local_port || '1234'}
           update={(value) => handleChange('port', value)}
         />
         <Input
           label={t('preset.ip')}
-          value={
-            currentValue?.output.local_ip
-              ? currentValue?.output.local_ip
-              : '0.0.0.0'
-          }
+          value={currentValue?.output.local_ip || '0.0.0.0'}
           update={(value) => handleChange('ip', value)}
         />
         <Input
           label={t('preset.srt_passphrase')}
-          value={
-            currentValue?.output.srt_passphrase
-              ? currentValue?.output.srt_passphrase
-              : ''
-          }
+          value={currentValue?.output.srt_passphrase || ''}
           update={(value) => handleChange('srtPassphrase', value)}
         />
       </div>

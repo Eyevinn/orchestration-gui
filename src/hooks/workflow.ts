@@ -6,6 +6,7 @@ import {
 } from '../interfaces/production';
 import { CallbackHook } from './types';
 import { Result } from '../interfaces/result';
+import { API_SECRET_KEY } from '../utils/constants';
 
 export function useStopProduction(): CallbackHook<
   (production: Production) => Promise<Result<StopProductionStep[]>>
@@ -17,8 +18,7 @@ export function useStopProduction(): CallbackHook<
 
     return fetch('/api/manager/stop', {
       method: 'POST',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]],
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({ production })
     })
       .then((response) => {
@@ -42,8 +42,7 @@ export function useStartProduction(): CallbackHook<
     setLoading(true);
     return fetch('/api/manager/start', {
       method: 'POST',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]],
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify(production)
     })
       .then((response) => {

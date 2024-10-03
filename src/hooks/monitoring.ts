@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Monitoring } from '../interfaces/monitoring';
 import { CallbackHook, DataHook, MonitoringHook } from './types';
+import { API_SECRET_KEY } from '../utils/constants';
 
 const TIMEOUT = 5000;
 export function useMonitoring(id: string): DataHook<Monitoring | undefined> {
@@ -48,8 +49,7 @@ export function useDeleteMonitoring(): CallbackHook<
 
     return fetch(`/api/manager/monitoring/${productionId}`, {
       method: 'DELETE',
-      // TODO: Implement api key
-      headers: [['x-api-key', `Bearer apisecretkey`]]
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     })
       .then((response) => {
         if (response.ok) {

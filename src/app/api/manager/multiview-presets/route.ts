@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isAuthenticated } from '../../../../api/manager/auth';
 import {
   getMultiviewPresets
   // TODO Add this when possibility to update and add mv-presets are added
   // putMultiviewPreset
-} from '../../../../api/manager/presets';
-import { isAuthenticated } from '../../../../api/manager/auth';
+} from '../../../../api/manager/multiview-presets';
 // TODO Add this when possibility to update and add mv-presets are added
 // import { Log } from '../../../../api/logger';
 // import { MultiviewPreset } from '../../../../interfaces/preset';
