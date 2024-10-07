@@ -1,11 +1,6 @@
 'use client';
 
-import React, {
-  ChangeEvent,
-  KeyboardEvent,
-  useContext,
-  useState
-} from 'react';
+import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 import { IconTrash } from '@tabler/icons-react';
 import { SourceReference } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
@@ -72,7 +67,7 @@ export default function SourceCard({
       event.currentTarget.blur();
     }
   };
-  
+
   return (
     <div
       ref={forwardedRef}

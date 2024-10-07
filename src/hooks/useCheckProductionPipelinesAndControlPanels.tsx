@@ -16,7 +16,7 @@ export function useCheckProductionPipelinesAndControlPanels(): CallbackHook<
     pipelines: ResourcesCompactPipelineResponse[] | undefined
   ) => {
     if (!production.production_settings) return production;
-    const productionPipelines = production.production_settings?.pipelines;
+    const productionPipelines = production.production_settings.pipelines;
 
     const activePipelinesForProduction = pipelines?.filter((pipeline) =>
       productionPipelines.some(
