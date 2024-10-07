@@ -51,16 +51,13 @@ import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
+import { useCheckProductionPipelinesAndControlPanels } from '../../../hooks/useCheckProductionPipelinesAndControlPanels';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
 
   //SOURCES
   const [sources] = useSources();
-  // TODO: Is this useEffect needed, filteredSources isn't used anymore?
-  const [filteredSources, setFilteredSources] = useState(
-    new Map<string, SourceWithId>()
-  );
   const [selectedValue, setSelectedValue] = useState<string>(
     t('production.add_other_source_type')
   );
@@ -112,6 +109,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
   // Websocket
   const [closeWebsocket] = useWebsocket();
 
+  const [checkProductionPipelinesAndControlPanels] =
+    useCheckProductionPipelinesAndControlPanels();
+
   const { locked } = useContext(GlobalContext);
 
   const memoizedProduction = useMemo(() => productionSetup, [productionSetup]);
@@ -144,8 +144,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   useEffect(() => {
     if (updateMuliviewLayouts && productionSetup && !productionSetup.isActive) {
-      updateSourceInputSlotOnMultiviewLayouts(productionSetup);
-      setUpdateMuliviewLayouts(false);
+      updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
+        (updatedSetup) => {
+          if (!updatedSetup) return;
+          setProductionSetup(updatedSetup);
+          setUpdateMuliviewLayouts(false);
+          refreshProduction();
+        }
+      );
     }
   }, [productionSetup, updateMuliviewLayouts]);
 
@@ -174,6 +180,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       };
     });
   };
+
   const setSelectedPipelineName = (
     pipelineIndex: number,
     pipelineName?: string,
@@ -201,41 +208,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
     });
   };
 
-  const checkProductionPipelinesAndControlPanels = (production: Production) => {
-    if (!production.production_settings) return production;
-    const productionPipelines = production.production_settings?.pipelines;
-
-    const activePipelinesForProduction = pipelines?.filter((pipeline) =>
-      productionPipelines.some(
-        (productionPipeline) =>
-          productionPipeline.pipeline_name === pipeline.name
-      )
-    );
-    const availablePipelines = productionPipelines.map((productionPipeline) => {
-      const activePipeForProduction = activePipelinesForProduction?.find(
-        (p) => p.name === productionPipeline.pipeline_name
-      );
-      if (activePipeForProduction?.streams.length === 0) {
-        return productionPipeline;
-      }
-      return productionPipeline;
-    });
-
-    return {
-      ...production,
-      production_settings: {
-        ...production.production_settings,
-        pipelines: availablePipelines
-      }
-    };
-  };
-
   const refreshProduction = () => {
     getProduction(params.id).then((config) => {
       // check if production has pipelines in use or control panels in use, if so update production
       const production = config.isActive
         ? config
-        : checkProductionPipelinesAndControlPanels(config);
+        : checkProductionPipelinesAndControlPanels(config, pipelines);
 
       putProduction(production._id, production);
       setProductionSetup(production);
@@ -260,29 +238,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
   useEffect(() => {
     refreshProduction();
   }, []);
-
-  // TODO: Is this useEffect needed, filteredSources isn't used anymore?
-  useEffect(() => {
-    if (productionSetup) {
-      const hasMissingSource = productionSetup?.sources.find(
-        (productionSource) => {
-          if (
-            !['html', 'mediaplayer'].includes(productionSource.type) &&
-            sources
-          ) {
-            !Array.from(sources.values()).find(
-              (source) => source._id.toString() === productionSource._id
-            );
-          }
-        }
-      );
-      if (hasMissingSource) {
-        toast.error(t('error.missing_sources_in_db'));
-      }
-    }
-
-    setFilteredSources(sources);
-  }, [sources]);
 
   useEffect(() => {
     if (selectedValue === t('production.source')) {
@@ -326,6 +281,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   ) => {
     const updatedSetup = updateSetupItem(source, productionSetup);
     setProductionSetup(updatedSetup);
+    setUpdateMuliviewLayouts(true);
     putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
 
