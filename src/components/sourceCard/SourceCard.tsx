@@ -1,7 +1,13 @@
 'use client';
-import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
+
+import React, {
+  ChangeEvent,
+  KeyboardEvent,
+  useContext,
+  useState
+} from 'react';
 import { IconTrash } from '@tabler/icons-react';
-import { SourceReference, Type } from '../../interfaces/Source';
+import { SourceReference } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
 import ImageComponent from '../image/ImageComponent';
@@ -10,38 +16,31 @@ import { GlobalContext } from '../../contexts/GlobalContext';
 
 type SourceCardProps = {
   source?: ISource;
-  label: string;
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
   onSelectingText: (bool: boolean) => void;
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
-  src?: string;
   sourceRef?: SourceReference;
-  type: Type;
 };
 
 export default function SourceCard({
   source,
-  label,
   onSourceUpdate,
   onSourceRemoval,
   onSelectingText,
   forwardedRef,
-  src,
   style,
-  sourceRef,
-  type
+  sourceRef
 }: SourceCardProps) {
-  const [sourceLabel, setSourceLabel] = useState(
-    sourceRef?.label || source?.name
-  );
+  const [sourceLabel, setSourceLabel] = useState(sourceRef?.label || '');
   const t = useTranslate();
   const { locked } = useContext(GlobalContext);
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
   };
+
   const saveText = () => {
     onSelectingText(false);
     if (sourceLabel?.length === 0) {
@@ -67,11 +66,13 @@ export default function SourceCard({
       });
     }
   };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.currentTarget.blur();
     }
   };
+  
   return (
     <div
       ref={forwardedRef}
@@ -91,9 +92,7 @@ export default function SourceCard({
           disabled={locked}
         />
       </div>
-      {source && !sourceRef && (
-        <ImageComponent src={getSourceThumbnail(source)} />
-      )}
+      {source && <ImageComponent src={getSourceThumbnail(source)} />}
       {!source && sourceRef && <ImageComponent type={sourceRef.type} />}
       {(source || sourceRef) && (
         <h2

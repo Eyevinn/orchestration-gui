@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState } from 'react';
 import { SourceReference } from '../../interfaces/Source';
 import { Production } from '../../interfaces/production';
@@ -26,11 +27,9 @@ export default function SourceCards({
   const isISource = (source: SourceReference | ISource): source is ISource => {
     return 'src' in source;
   };
-
   const gridItems: React.JSX.Element[] = [];
   let tempItems = [...items];
   let firstEmptySlot = items.length + 1;
-
   if (!items || items.length === 0) return null;
   for (let i = 0; i < items[items.length - 1].input_slot; i++) {
     if (!items.some((source) => source.input_slot === i + 1)) {
@@ -38,6 +37,7 @@ export default function SourceCards({
       break;
     }
   }
+  const productionSources = productionSetup.sources;
 
   for (let i = 0; i < items[items.length - 1].input_slot; i++) {
     tempItems.every((source) => {
@@ -45,7 +45,6 @@ export default function SourceCards({
       const isSource = isISource(source);
       if (source.input_slot === i + 1) {
         tempItems = tempItems.filter((i) => i._id !== source._id);
-        // console.log(`Adding source "${source.name}" to grid`);
         if (!productionSetup.isActive && !locked) {
           gridItems.push(
             <DragItem
@@ -60,10 +59,11 @@ export default function SourceCards({
             >
               <SourceCard
                 source={isSource ? source : undefined}
-                sourceRef={isSource ? undefined : source}
-                src={isSource ? source.src : undefined}
-                type={isSource ? 'ingest_source' : source.type}
-                label={source.label}
+                sourceRef={
+                  isSource
+                    ? productionSources.find((s) => s._id === source._id)
+                    : source
+                }
                 onSourceUpdate={onSourceUpdate}
                 onSourceRemoval={onSourceRemoval}
                 onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
@@ -73,11 +73,12 @@ export default function SourceCards({
         } else {
           gridItems.push(
             <SourceCard
-              source={isSource ? source : undefined}
-              sourceRef={isSource ? undefined : source}
-              src={isSource ? source.src : undefined}
-              type={isSource ? 'ingest_source' : source.type}
-              label={source.label}
+              key={id === typeof String ? id : id.toString()}
+              sourceRef={
+                isSource
+                  ? productionSources.find((s) => s._id === source._id)
+                  : source
+              }
               onSourceUpdate={onSourceUpdate}
               onSourceRemoval={onSourceRemoval}
               onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
