@@ -15,7 +15,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       status: 403
     });
   }
-  
+
   const data = await request.json();
   const createStreamRequest = data as CreateStreamRequestBody;
 

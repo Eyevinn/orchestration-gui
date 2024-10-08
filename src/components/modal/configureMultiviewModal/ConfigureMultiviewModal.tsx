@@ -7,10 +7,11 @@ import { MultiviewSettings } from '../../../interfaces/multiview';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { Production } from '../../../interfaces/production';
 import deepclone from 'lodash.clonedeep';
-import MultiviewSettingsConfig from '../configureOutputModal/MultiviewSettings';
-import MultiviewLayoutSettings from '../configureOutputModal/MultiviewLayoutSettings/MultiviewLayoutSettings';
+import MultiviewSettingsConfig from './MultiviewSettings';
 import { usePutMultiviewLayout } from '../../../hooks/multiviewLayout';
 import Decision from '../configureOutputModal/Decision';
+import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
+import { IconSettings } from '@tabler/icons-react';
 
 type ConfigureMultiviewModalProps = {
   open: boolean;
@@ -32,9 +33,6 @@ export function ConfigureMultiviewModal({
     []
   );
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
-  const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
-    { layout: TMultiviewLayout; tableIndex: number } | undefined
-  >();
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
@@ -91,11 +89,6 @@ export function ConfigureMultiviewModal({
       return;
     }
 
-    const updatedMultiviews = multiviews.map((item, i) =>
-      i === multiviews.length - 1 ? { ...item, ...newMultiviewLayout } : item
-    );
-
-    setMultiviews(updatedMultiviews);
     addNewLayout(newMultiviewLayout);
     setLayoutModalOpen(false);
   };
@@ -115,6 +108,7 @@ export function ConfigureMultiviewModal({
     ports.forEach((port, index) => {
       if (seenPorts.has(port)) {
         duplicateIndices.push(index);
+
         // Also include the first occurrence if it's not already included
         const firstIndex = ports.indexOf(port);
         if (!duplicateIndices.includes(firstIndex)) {
@@ -173,13 +167,21 @@ export function ConfigureMultiviewModal({
             multiviews.map((singleItem, index) => {
               return (
                 <div className="flex" key={index}>
-                  <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
+                  {index !== 0 && (
+                    <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
+                  )}
+                  <button
+                    onClick={() => setLayoutModalOpen(true)}
+                    title={t('preset.configure_layout')}
+                    className={`absolute top-0 right-[-10%] min-w-fit`}
+                  >
+                    <IconSettings className="text-p" />
+                  </button>
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
                       productionId={production?._id}
                       openConfigModal={() => setLayoutModalOpen(true)}
                       newMultiviewLayout={newMultiviewLayout}
-                      tableIndex={index}
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
                       handleUpdateMultiview={(input) =>
@@ -190,8 +192,6 @@ export function ConfigureMultiviewModal({
                           ? portDuplicateIndexes.includes(index)
                           : false
                       }
-                      setSelectedMultiviewLayout={setSelectedMultiviewLayout}
-                      selectedMultiviewLayout={selectedMultiviewLayout}
                     />
                     <div
                       className={`w-full flex ${
@@ -230,7 +230,6 @@ export function ConfigureMultiviewModal({
       {layoutModalOpen && (
         <MultiviewLayoutSettings
           production={production}
-          selectedMultiviewLayout={selectedMultiviewLayout?.layout}
           setNewMultiviewPreset={setNewMultiviewLayout}
         />
       )}

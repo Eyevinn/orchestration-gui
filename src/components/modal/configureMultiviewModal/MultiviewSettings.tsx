@@ -1,15 +1,14 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { TMultiviewLayout } from '../../../interfaces/preset';
-import Input from './Input';
-import Options from './Options';
+import Input from '../configureOutputModal/Input';
+import Options from '../configureOutputModal/Options';
 import toast from 'react-hot-toast';
 import { IconSettings } from '@tabler/icons-react';
 import { useMultiviewLayouts } from '../../../hooks/multiviewLayout';
 
 type MultiviewSettingsProps = {
-  tableIndex: number;
   lastItem: boolean;
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
@@ -17,43 +16,33 @@ type MultiviewSettingsProps = {
   openConfigModal: () => void;
   newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
-  setSelectedMultiviewLayout: (props: {
-    layout: TMultiviewLayout;
-    tableIndex: number;
-  }) => void;
-  selectedMultiviewLayout:
-    | { layout: TMultiviewLayout; tableIndex: number }
-    | undefined;
 };
 
 export default function MultiviewSettingsConfig({
-  tableIndex,
   lastItem,
   multiview,
   handleUpdateMultiview,
   portDuplicateError,
   openConfigModal,
   newMultiviewLayout,
-  productionId,
-  setSelectedMultiviewLayout,
-  selectedMultiviewLayout
+  productionId
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [multiviewLayouts] = useMultiviewLayouts();
-  const currentValue = multiview || selectedMultiviewLayout?.layout;
+  const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
+    TMultiviewLayout | undefined
+  >();
+  const currentValue = multiview || selectedMultiviewLayout;
   const avaliableMultiviewLayouts = multiviewLayouts?.filter(
     (layout) => layout.productionId === productionId || !layout.productionId
   );
+
   const multiviewLayoutNames =
     avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
-  const currentMultiviewValue =
-    selectedMultiviewLayout?.tableIndex === tableIndex
-      ? selectedMultiviewLayout?.layout.name
-      : currentValue?.name;
 
   useEffect(() => {
     if (multiview) {
-      setSelectedMultiviewLayout({ layout: multiview, tableIndex: tableIndex });
+      setSelectedMultiviewLayout(multiview);
       return;
     }
     if (multiviewLayouts) {
@@ -61,10 +50,7 @@ export default function MultiviewSettingsConfig({
         (m) => m.productionId !== undefined
       );
       if (defaultMultiview) {
-        setSelectedMultiviewLayout({
-          layout: defaultMultiview,
-          tableIndex: tableIndex
-        });
+        setSelectedMultiviewLayout(defaultMultiview);
       }
     }
   }, [lastItem, multiview, multiviewLayouts, newMultiviewLayout]);
@@ -93,10 +79,7 @@ export default function MultiviewSettingsConfig({
       },
       output: multiview?.output || selected.output
     };
-    setSelectedMultiviewLayout({
-      layout: updatedMultiview,
-      tableIndex: tableIndex
-    });
+    setSelectedMultiviewLayout(updatedMultiview);
     handleUpdateMultiview({ ...updatedMultiview, for_pipeline_idx: 0 });
   };
 
@@ -184,8 +167,16 @@ export default function MultiviewSettingsConfig({
 
   return (
     <div className="flex flex-col gap-2 rounded p-4 pr-7">
-      <div className="flex justify-between">
+      <div className="flex justify-between pb-5">
         <h1 className="font-bold">{t('preset.multiview_output_settings')}</h1>
+        {lastItem && (
+          <button
+            onClick={openConfigModal}
+            title={t('preset.configure_layout')}
+          >
+            <IconSettings className="text-p" />
+          </button>
+        )}
       </div>
       <div className="relative">
         <Options
@@ -193,18 +184,9 @@ export default function MultiviewSettingsConfig({
           options={multiviewLayoutNames.map((singleItem) => ({
             label: singleItem
           }))}
-          value={currentMultiviewValue || ''}
+          value={selectedMultiviewLayout?.name || ''}
           update={(value) => handleSetSelectedMultiviewLayout(value)}
         />
-        {lastItem && (
-          <button
-            onClick={openConfigModal}
-            title={t('preset.configure_layout')}
-            className={`absolute top-0 right-[-10%] min-w-fit`}
-          >
-            <IconSettings className="text-p" />
-          </button>
-        )}
       </div>
       <div className="flex flex-col gap-3">
         <Options

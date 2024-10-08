@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useMultiviewPresets } from '../../../../hooks/multiviewPreset';
-import Options from '../Options';
 import { MultiviewPreset } from '../../../../interfaces/preset';
 import { useTranslate } from '../../../../i18n/useTranslate';
 import { useSetupMultiviewLayout } from '../../../../hooks/useSetupMultiviewLayout';
 import { useMultiviewLayouts } from '../../../../hooks/multiviewLayout';
 import { Production } from '../../../../interfaces/production';
 import { useConfigureMultiviewLayout } from '../../../../hooks/useConfigureMultiviewLayout';
-import Input from '../Input';
 import { TMultiviewLayout } from '../../../../interfaces/preset';
 import { useCreateInputArray } from '../../../../hooks/useCreateInputArray';
-import MultiviewLayout from './MultiviewLayout';
 import { TListSource } from '../../../../interfaces/multiview';
+import Options from '../../configureOutputModal/Options';
+import Input from '../../configureOutputModal/Input';
+import MultiviewLayout from './MultiviewLayout';
 
 type ChangeLayout = {
   defaultLabel?: string;
@@ -21,11 +21,9 @@ type ChangeLayout = {
 
 export default function MultiviewLayoutSettings({
   production,
-  selectedMultiviewLayout,
   setNewMultiviewPreset
 }: {
   production: Production | undefined;
-  selectedMultiviewLayout: TMultiviewLayout | undefined;
   setNewMultiviewPreset: (preset: TMultiviewLayout | null) => void;
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
@@ -53,18 +51,21 @@ export default function MultiviewLayoutSettings({
     ? multiviewPresets?.map((preset) => preset.name)
     : [];
 
+  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
+    (layout) => layout.productionId === production?._id || !layout.productionId
+  );
+  const multiviewLayoutNames =
+    avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+
   // This useEffect is used to set the drawn layout of the multiviewer on start,
   // if this fails then the modal will be empty
   useEffect(() => {
-    if (selectedMultiviewLayout) {
-      setLayoutToChange(selectedMultiviewLayout.name);
-      setSelectedMultiviewPreset(selectedMultiviewLayout);
-    } else if (multiviewPresets && multiviewPresets[0]) {
+    if (multiviewPresets && multiviewPresets[0]) {
       setSelectedMultiviewPreset(multiviewPresets[0]);
     }
-  }, [multiviewPresets, selectedMultiviewLayout]);
+  }, [multiviewPresets]);
 
-  const layoutNameAlreadyExist = multiviewLayouts?.find(
+  const layoutNameAlreadyExist = avaliableMultiviewLayouts?.find(
     (singlePreset) => singlePreset.name === multiviewLayout?.name
   )?.name;
 
@@ -78,23 +79,36 @@ export default function MultiviewLayoutSettings({
     }
   }, [multiviewLayout]);
 
-  const handlePresetUpdate = (name: string) => {
-    const presetLayout = multiviewPresets?.find(
+  const handleLayoutUpdate = (name: string, type: string) => {
+    const choosenLayout = avaliableMultiviewLayouts?.find(
+      (singleLayout) => singleLayout.name === name
+    );
+    const addBasePreset = multiviewPresets?.find(
       (singlePreset) => singlePreset.name === name
     );
     setLayoutToChange('');
     setNewPresetName(name);
-    if (presetLayout) {
-      setSelectedMultiviewPreset(presetLayout);
+
+    switch (type) {
+      case 'layout':
+        if (choosenLayout) {
+          setSelectedMultiviewPreset(choosenLayout);
+        }
+        break;
+      case 'preset':
+        if (addBasePreset) {
+          setSelectedMultiviewPreset(addBasePreset);
+        }
+        break;
     }
   };
 
   const handleChange = (viewId: string, value: string) => {
-    if (inputList && multiviewLayouts) {
+    if (inputList && avaliableMultiviewLayouts) {
       // Remove 2 from id to remove id for Preview- and Program-view
       // Add 1 to index to get the correct input_slot
       const idFirstInputView = parseInt(viewId, 10) - 2 + 1;
-      const defaultLabel = multiviewLayouts[0].layout.views.find(
+      const defaultLabel = avaliableMultiviewLayouts[0].layout.views.find(
         (item) => item.input_slot === idFirstInputView
       )?.label;
       inputList.map((source) => {
@@ -112,14 +126,17 @@ export default function MultiviewLayoutSettings({
     <>
       {selectedMultiviewPreset && (
         <div className="flex flex-col w-full h-full">
-          {multiviewPresetLayout && (
-            <MultiviewLayout
-              multiviewPresetLayout={multiviewPresetLayout}
-              inputList={inputList}
-              handleChange={handleChange}
+          <div className="flex flex-col self-center w-[40%] pt-5">
+            <Options
+              label={t('preset.select_multiview_layout')}
+              options={multiviewLayoutNames.map((singleItem) => ({
+                label: singleItem
+              }))}
+              value={
+                selectedMultiviewPreset ? selectedMultiviewPreset.name : ''
+              }
+              update={(value) => handleLayoutUpdate(value, 'layout')}
             />
-          )}
-          <div className="flex flex-col w-[50%] h-full">
             <Options
               label={t('preset.select_multiview_preset')}
               options={multiviewPresetNames.map((singleItem) => ({
@@ -128,12 +145,22 @@ export default function MultiviewLayoutSettings({
               value={
                 selectedMultiviewPreset ? selectedMultiviewPreset.name : ''
               }
-              update={handlePresetUpdate}
+              update={(value) => handleLayoutUpdate(value, 'preset')}
             />
+          </div>
+
+          {multiviewPresetLayout && (
+            <MultiviewLayout
+              multiviewPresetLayout={multiviewPresetLayout}
+              inputList={inputList}
+              handleChange={handleChange}
+            />
+          )}
+          <div className="flex flex-col w-[50%] h-full pt-3">
             <Input
               label={t('name')}
               value={newPresetName ? newPresetName : layoutToChange}
-              update={handlePresetUpdate}
+              update={(value) => handleLayoutUpdate(value, 'layout')}
               placeholder={t('preset.new_preset_name')}
             />
             {layoutNameAlreadyExist && (
