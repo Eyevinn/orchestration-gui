@@ -74,6 +74,7 @@ export default function SourceCards({
           gridItems.push(
             <SourceCard
               key={id === typeof String ? id : id.toString()}
+              source={isSource ? source : undefined}
               sourceRef={
                 isSource
                   ? productionSources.find((s) => s._id === source._id)
