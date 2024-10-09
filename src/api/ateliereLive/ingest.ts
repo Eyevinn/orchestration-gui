@@ -1,6 +1,7 @@
 import {
   ResourcesCompactIngestResponse,
   ResourcesIngestResponse,
+  ResourcesSourceResponse,
   ResourcesThumbnailResponse
 } from '../../../types/ateliere-live';
 import { LIVE_BASE_API_PATH } from '../../constants';
@@ -171,6 +172,28 @@ export async function createSrtSource(
     {
       method: 'POST',
       body: JSON.stringify(payload),
+      headers: {
+        authorization: getAuthorizationHeader()
+      }
+    }
+  );
+  if (response.ok) {
+    return response.json();
+  }
+  const errorText = await response.text();
+  throw new Error(errorText);
+}
+
+export async function getIngestSources(
+  ingestUuid: string
+): Promise<ResourcesSourceResponse[]> {
+  const response = await fetch(
+    new URL(
+      LIVE_BASE_API_PATH + `/ingests/${ingestUuid}/sources?expand=true`,
+      process.env.LIVE_URL
+    ),
+    {
+      method: 'GET',
       headers: {
         authorization: getAuthorizationHeader()
       }

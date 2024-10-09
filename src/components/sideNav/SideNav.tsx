@@ -8,8 +8,9 @@ import SideNavAccount from './SideNavAccount';
 import SideNavLock from './SideNavLock';
 import SideNavRefreshThumbnails from './SideNavRefreshThumbnails';
 import SideNavItemComponent from './SideNavItemComponent';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslate } from '../../i18n/useTranslate';
+import SideNavTeardown from './SideNavTeardown';
 
 export interface SideNavItem {
   label: string;
@@ -23,8 +24,9 @@ export interface SideNavItemBaseProps {
 }
 
 const SideNav: React.FC = () => {
-  const [open, setOpen] = useState<boolean>(
-    typeof window !== 'undefined' ? window.innerWidth >= 1280 : true
+  const [open, setOpen] = useState<boolean>(false);
+  const [width, setWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 1281
   );
   const t = useTranslate();
 
@@ -45,6 +47,20 @@ const SideNav: React.FC = () => {
     }
   ];
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const handleResize = () => setWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (width < 1280) {
+      setOpen(false);
+    }
+  }, [width]);
+
   const toggleOpen = () => {
     setOpen(!open);
   };
@@ -53,8 +69,8 @@ const SideNav: React.FC = () => {
   return (
     <div
       className={`flex flex-col bg-container min-w-0 ${
-        open ? 'w-[450px]' : 'w-20'
-      } h-full p-2 pt-4 transition-all duration-500 max-w-[500px]`}
+        open ? 'w-[450px] min-w-[450px]' : 'min-w-20 w-20'
+      } h-full p-2 pt-4 transition-all duration-500 max-w-[450px]`}
     >
       <div className="flex flex-row-reverse h-16 mb-6 justify-between items-center">
         <div onClick={toggleOpen}>
@@ -84,6 +100,7 @@ const SideNav: React.FC = () => {
           ))}
         </div>
         <div>
+          <SideNavTeardown open={open} />
           <SideNavRefreshThumbnails open={open} />
           <SideNavLock open={open} />
           <SideNavConnections />

@@ -65,3 +65,19 @@ export interface StopProductionStep {
   success: boolean;
   message?: string;
 }
+
+export type TeardownStepNames =
+  | 'pipeline_output_streams'
+  | 'pipeline_multiviewers'
+  | 'pipeline_streams'
+  | 'pipeline_control_connections'
+  | 'reset_pipelines'
+  | 'ingest_streams'
+  | 'ingest_src_sources'
+  | 'teardown_check';
+
+export interface FlowStep {
+  step: string;
+  success: boolean;
+  message?: string;
+}

@@ -621,6 +621,25 @@ export const sv = {
   application: 'Program',
   multiview: 'Multiview',
   setting_up: 'Sätter upp anslutning till externa API:n...',
+  teardown: {
+    name: 'Rensa',
+    warning: 'VARNING!',
+    tearing_down: 'Rensar...',
+    results: 'Resultat',
+    are_you_sure: 'Är du säker?',
+    description: 'Du kommer att:',
+    optional: 'Valfritt:',
+    reset_pipelines: 'Återställa alla pipelines',
+    delete_ingest_srt_sources: 'Stänga ner alla ingest SRT källor',
+    pipeline_output_streams: 'Stänga ner alla pipeline output strömmar',
+    pipeline_multiviewers: 'Stänga ner alla pipeline multiviewers',
+    pipeline_streams: 'Stänga ner alla pipeline strömmar',
+    pipeline_control_connections:
+      'Stänga ner alla pipeline control connections',
+    ingest_streams: 'Stänga ner alla ingest strömmar',
+    ingest_src_sources: 'Stänga ner alla ingest SRT sources',
+    teardown_check: 'Verifiering'
+  },
   lock: {
     locked: 'Låst',
     unlocked: 'Olåst',

@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import {
+  FlowStep,
   Production,
   StartProductionStep,
   StopProductionStep
@@ -7,6 +8,7 @@ import {
 import { CallbackHook } from './types';
 import { Result } from '../interfaces/result';
 import { API_SECRET_KEY } from '../utils/constants';
+import { TeardownOptions } from '../api/manager/teardown';
 
 export function useStopProduction(): CallbackHook<
   (production: Production) => Promise<Result<StopProductionStep[]>>
@@ -53,4 +55,26 @@ export function useStartProduction(): CallbackHook<
   }, []);
 
   return [startProduction, loading];
+}
+
+export function useTeardown(): CallbackHook<
+  (option: TeardownOptions) => Promise<Result<FlowStep[]>>
+> {
+  const [loading, setLoading] = useState(false);
+
+  const teardown = useCallback(async (options: TeardownOptions) => {
+    setLoading(true);
+    return fetch('/api/manager/teardown', {
+      method: 'POST',
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
+      body: JSON.stringify(options)
+    })
+      .then((response) => {
+        return response.json() as Promise<Result<FlowStep[]>>;
+      })
+
+      .finally(() => setLoading(false));
+  }, []);
+
+  return [teardown, loading];
 }

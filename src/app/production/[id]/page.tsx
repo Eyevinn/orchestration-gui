@@ -839,7 +839,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 setSelectedControlPanel={setSelectedControlPanel}
               />
             )}
-
             <div className="w-full flex justify-end">
               <Pipelines production={productionSetup} />
             </div>

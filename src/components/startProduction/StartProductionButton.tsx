@@ -120,6 +120,7 @@ export function StartProductionButton({
         }))
       };
     }
+
     startProduction(productionToStart)
       .then((status) => {
         if (status.ok) {
