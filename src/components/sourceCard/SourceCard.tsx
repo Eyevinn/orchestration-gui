@@ -118,7 +118,7 @@ export default function SourceCard({
         <h2
           className={`${
             source && 'absolute bottom-4'
-          } p-1 text-p text-xs bg-zinc-900 w-full bg-opacity-90 ${
+          } p-1 text-p text-xs bg-zinc-900 w-full bg-opacity-90 z-10 ${
             sourceRef && !source && 'absolute bottom-0'
           }`}
         >
@@ -131,7 +131,7 @@ export default function SourceCard({
         </h2>
       )}
       {source && (
-        <h2 className="absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
+        <h2 className="z-10 px-1 absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
           {t('source.ingest', {
             ingest: source.ingest_name
           })}
