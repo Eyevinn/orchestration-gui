@@ -56,7 +56,7 @@ const SideNavTeardown: React.FC<SideNavItemBaseProps> = (props) => {
         onClick={() => setDisplayModal(true)}
       >
         <Icons
-          name="IconRouteOff"
+          name="IconAlertOctagon"
           className="min-w-8 min-h-8 w-8 h-8 mr-4 stroke-yellow-400"
         />
         <div className="whitespace-nowrap">{t('teardown.name')}</div>
