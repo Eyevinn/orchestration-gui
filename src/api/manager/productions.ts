@@ -91,3 +91,161 @@ export async function deleteProduction(id: string): Promise<void> {
 function deleteMonitoring(db: Db, productionId: string) {
   db.collection('monitoring').deleteMany({ productionId: productionId });
 }
+
+export async function getProductionPipelineSourceAlignment(
+  productionId: string,
+  pipelineId: string,
+  sourceId: number
+) {
+  const production = await getProduction(productionId);
+
+  if (!production) {
+    console.error('Production not found');
+    return null;
+  }
+
+  const pipeline = production.production_settings.pipelines.find(
+    (p) => p.pipeline_id === pipelineId
+  );
+
+  if (!pipeline) {
+    console.error('Pipeline not found');
+    return null;
+  }
+
+  const source = pipeline?.sources?.find(
+    (source) => String(source.source_id) === String(sourceId)
+  );
+
+  if (!source) {
+    console.error('Source not found');
+    return null;
+  }
+
+  const alignment =
+    source?.settings?.alignment_ms !== undefined
+      ? source.settings.alignment_ms
+      : pipeline?.alignment_ms;
+
+  return alignment;
+}
+
+export async function setProductionPipelineSourceAlignment(
+  productionId: string,
+  pipelineId: string,
+  sourceId: number,
+  alignment_ms: number
+) {
+  const db = await getDatabase();
+
+  try {
+    const result = await db.collection('productions').updateOne(
+      {
+        _id: new ObjectId(productionId),
+        'production_settings.pipelines.pipeline_id': pipelineId,
+        'production_settings.pipelines.sources.source_id': sourceId
+      },
+      {
+        $set: {
+          'production_settings.pipelines.$[p].sources.$[s].settings.alignment_ms':
+            alignment_ms
+        }
+      },
+      {
+        arrayFilters: [
+          { 'p.pipeline_id': pipelineId },
+          { 's.source_id': sourceId }
+        ]
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      console.error('No matching pipeline or source found to update');
+      return null;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Database error:', error);
+    throw new Error('Error updating pipeline source alignment');
+  }
+}
+
+export async function getProductionSourceLatency(
+  productionId: string,
+  pipelineId: string,
+  sourceId: number
+) {
+  const production = await getProduction(productionId);
+
+  if (!production) {
+    console.error('Production not found');
+    return null;
+  }
+
+  const pipeline = production.production_settings.pipelines.find(
+    (p) => p.pipeline_id === pipelineId
+  );
+
+  if (!pipeline) {
+    console.error('Pipeline not found');
+    return null;
+  }
+
+  const source = pipeline?.sources?.find(
+    (source) => String(source.source_id) === String(sourceId)
+  );
+
+  if (!source) {
+    console.error('Source not found');
+    return null;
+  }
+
+  const latency =
+    source?.settings?.max_network_latency_ms !== undefined
+      ? source.settings.max_network_latency_ms
+      : pipeline?.max_network_latency_ms;
+
+  return latency;
+}
+
+export async function setProductionPipelineSourceLatency(
+  productionId: string,
+  pipelineId: string,
+  sourceId: number,
+  max_network_latency_ms: number
+) {
+  const db = await getDatabase();
+
+  try {
+    const result = await db.collection('productions').updateOne(
+      {
+        _id: new ObjectId(productionId),
+        'production_settings.pipelines.pipeline_id': pipelineId,
+        'production_settings.pipelines.sources.source_id': sourceId
+      },
+      {
+        $set: {
+          'production_settings.pipelines.$[p].sources.$[s].settings.max_network_latency_ms':
+            max_network_latency_ms
+        }
+      },
+      {
+        arrayFilters: [
+          { 'p.pipeline_id': pipelineId },
+          { 's.source_id': sourceId }
+        ]
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      console.error('No matching pipeline or source found to update');
+      return null;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Database error:', error);
+    throw new Error('Error updating pipeline source latency');
+  }
+}

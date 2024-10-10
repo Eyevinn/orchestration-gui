@@ -82,6 +82,14 @@ export const sv = {
     add_other_source_type: 'Lägg till annan källtyp',
     configure_outputs: 'Konfigurera Outputs'
   },
+  configure_alignment_latency: {
+    source_name: 'Källnamn',
+    error: 'Alignmentvärdet måste vara högre än latencyvärdet',
+    configure_alignment_latency:
+      'Ställ in alignment och latency för strömmarna på produktionens pipelines',
+    save: 'Spara',
+    cancel: 'Avbryt'
+  },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',
   homepage: 'Startsidan',

@@ -52,6 +52,9 @@ import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
 import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPipelines';
+import { ISource } from '../../../hooks/useDragableItems';
+import { useUpdateStream } from '../../../hooks/streams';
+import { usePutProductionPipelineSourceAlignmentAndLatency } from '../../../hooks/productions';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -108,6 +111,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   // Websocket
   const [closeWebsocket] = useWebsocket();
+
+  const [updateStream, loading] = useUpdateStream();
+
+  const putProductionPipelineSourceAlignmentAndLatency =
+    usePutProductionPipelineSourceAlignmentAndLatency();
 
   const [checkProductionPipelines] = useCheckProductionPipelines();
 
@@ -272,6 +280,57 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const updateProduction = (id: string, productionSetup: Production) => {
     setProductionSetup(productionSetup);
     putProduction(id, productionSetup);
+  };
+
+  const handleSetPipelineSourceSettings = (
+    source: ISource,
+    sourceId: number,
+    data: {
+      pipeline_uuid: string;
+      stream_uuid: string;
+      alignment: number;
+      latency: number;
+    }[]
+  ) => {
+    if (
+      productionSetup?._id &&
+      source?.ingest_name &&
+      source?.ingest_source_name
+    ) {
+      data.forEach(({ pipeline_uuid, stream_uuid, alignment, latency }) => {
+        putProductionPipelineSourceAlignmentAndLatency(
+          productionSetup._id,
+          pipeline_uuid,
+          source.ingest_name,
+          source.ingest_source_name,
+          alignment,
+          latency
+        );
+        updateStream(stream_uuid, alignment);
+
+        const updatedProduction = {
+          ...productionSetup,
+          productionSettings: {
+            ...productionSetup.production_settings,
+            pipelines: productionSetup.production_settings.pipelines.map(
+              (pipeline) => {
+                if (pipeline.pipeline_id === pipeline_uuid) {
+                  pipeline.sources?.map((source) => {
+                    if (source.source_id === sourceId) {
+                      source.settings.alignment_ms = alignment;
+                      source.settings.max_network_latency_ms = latency;
+                    }
+                  });
+                }
+                return pipeline;
+              }
+            )
+          }
+        };
+
+        setProductionSetup(updatedProduction);
+      });
+    }
   };
 
   const updateSource = (
@@ -711,6 +770,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             {productionSetup?.sources && sources.size > 0 && (
               <DndProvider backend={HTML5Backend}>
                 <SourceCards
+                  onConfirm={handleSetPipelineSourceSettings}
                   productionSetup={productionSetup}
                   locked={locked}
                   updateProduction={(updated) => {
@@ -747,6 +807,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       });
                     }
                   }}
+                  loading={loading}
                 />
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal

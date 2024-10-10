@@ -23,11 +23,11 @@ export async function GET(
 
   try {
     const ingestUuid = await getUuidFromIngestName(params.ingest_name);
-    const sourceId = await getSourceIdFromSourceName(
+    const sourceId = ingestUuid ? await getSourceIdFromSourceName(
       ingestUuid,
       params.source_name
-    );
-    const base64Image = await getSourceThumbnail(ingestUuid, sourceId);
+    ) : 0;
+    const base64Image = await getSourceThumbnail(ingestUuid || '', sourceId || 0);
     if (!base64Image) {
       return new NextResponse('image not found', { status: 404 });
     }

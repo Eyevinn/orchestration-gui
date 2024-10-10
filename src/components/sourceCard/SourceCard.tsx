@@ -1,34 +1,59 @@
 'use client';
-
-import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
-import { IconTrash } from '@tabler/icons-react';
+import React, {
+  ChangeEvent,
+  KeyboardEvent,
+  useContext,
+  useRef,
+  useState
+} from 'react';
+import { IconTrash, IconSettings } from '@tabler/icons-react';
 import { SourceReference } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
 import { ISource } from '../../hooks/useDragableItems';
 import ImageComponent from '../image/ImageComponent';
 import { getSourceThumbnail } from '../../utils/source';
 import { GlobalContext } from '../../contexts/GlobalContext';
+import { ConfigureAlignmentLatencyModal } from '../modal/ConfigureAlignmentLatencyModal';
+import { Production } from '../../interfaces/production';
+import { useUpdateStream } from '../../hooks/streams';
 
 type SourceCardProps = {
   source?: ISource;
+  loading: boolean;
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
   onSelectingText: (bool: boolean) => void;
+  onConfirm: (
+    source: ISource,
+    sourceId: number,
+    data: {
+      pipeline_uuid: string;
+      stream_uuid: string;
+      alignment: number;
+      latency: number;
+    }[]
+  ) => void;
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   sourceRef?: SourceReference;
+  productionSetup?: Production;
 };
 
 export default function SourceCard({
   source,
+  loading,
   onSourceUpdate,
   onSourceRemoval,
   onSelectingText,
+  onConfirm,
   forwardedRef,
   style,
-  sourceRef
+  sourceRef,
+  productionSetup
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(sourceRef?.label || '');
+  const [isAlignmentModalOpen, setIsAlignmentModalOpen] = useState(false);
+
   const t = useTranslate();
   const { locked } = useContext(GlobalContext);
 
@@ -112,6 +137,14 @@ export default function SourceCard({
           })}
         </h2>
       )}
+      {productionSetup && productionSetup.isActive && source && (
+        <button
+          className="absolute bottom-0 left-0 text-p hover:border-l hover:border-t bg-zinc-700 hover:bg-zinc-600 min-w-fit p-1 rounded-tr-lg z-50"
+          onClick={() => setIsAlignmentModalOpen(true)}
+        >
+          <IconSettings className="text-p w-4 h-4" />
+        </button>
+      )}
       {(source || sourceRef) && (
         <button
           disabled={locked}
@@ -137,6 +170,16 @@ export default function SourceCard({
         >
           <IconTrash className="text-p w-4 h-4" />
         </button>
+      )}
+      {source && productionSetup?.isActive && (
+        <ConfigureAlignmentLatencyModal
+          productionId={productionSetup._id}
+          source={source}
+          open={isAlignmentModalOpen}
+          onAbort={() => setIsAlignmentModalOpen(false)}
+          onConfirm={onConfirm}
+          loading={loading}
+        />
       )}
     </div>
   );
