@@ -51,7 +51,7 @@ import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
-import { useCheckProductionPipelinesAndControlPanels } from '../../../hooks/useCheckProductionPipelinesAndControlPanels';
+import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPipelines';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -109,8 +109,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   // Websocket
   const [closeWebsocket] = useWebsocket();
 
-  const [checkProductionPipelinesAndControlPanels] =
-    useCheckProductionPipelinesAndControlPanels();
+  const [checkProductionPipelines] = useCheckProductionPipelines();
 
   const { locked } = useContext(GlobalContext);
 
@@ -213,7 +212,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       // check if production has pipelines in use or control panels in use, if so update production
       const production = config.isActive
         ? config
-        : checkProductionPipelinesAndControlPanels(config, pipelines);
+        : checkProductionPipelines(config, pipelines);
 
       putProduction(production._id, production);
       setProductionSetup(production);

@@ -3,7 +3,7 @@ import { CallbackHook } from './types';
 import { Production } from '../interfaces/production';
 import { ResourcesCompactPipelineResponse } from '../../types/ateliere-live';
 
-export function useCheckProductionPipelinesAndControlPanels(): CallbackHook<
+export function useCheckProductionPipelines(): CallbackHook<
   (
     production: Production,
     pipelines: ResourcesCompactPipelineResponse[] | undefined
@@ -11,7 +11,7 @@ export function useCheckProductionPipelinesAndControlPanels(): CallbackHook<
 > {
   const [loading, setLoading] = useState(false);
 
-  const checkProductionPipelinesAndControlPanels = (
+  const checkProductionPipelines = (
     production: Production,
     pipelines: ResourcesCompactPipelineResponse[] | undefined
   ) => {
@@ -42,5 +42,5 @@ export function useCheckProductionPipelinesAndControlPanels(): CallbackHook<
       }
     };
   };
-  return [checkProductionPipelinesAndControlPanels, loading];
+  return [checkProductionPipelines, loading];
 }

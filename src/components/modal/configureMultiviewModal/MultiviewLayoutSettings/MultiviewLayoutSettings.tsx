@@ -51,11 +51,11 @@ export default function MultiviewLayoutSettings({
     ? multiviewPresets?.map((preset) => preset.name)
     : [];
 
-  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
+  const availableMultiviewLayouts = multiviewLayouts?.filter(
     (layout) => layout.productionId === production?._id || !layout.productionId
   );
   const multiviewLayoutNames =
-    avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+    availableMultiviewLayouts?.map((layout) => layout.name) || [];
 
   // This useEffect is used to set the drawn layout of the multiviewer on start,
   // if this fails then the modal will be empty
@@ -65,7 +65,7 @@ export default function MultiviewLayoutSettings({
     }
   }, [multiviewPresets]);
 
-  const layoutNameAlreadyExist = avaliableMultiviewLayouts?.find(
+  const layoutNameAlreadyExist = availableMultiviewLayouts?.find(
     (singlePreset) => singlePreset.name === multiviewLayout?.name
   )?.name;
 
@@ -80,7 +80,7 @@ export default function MultiviewLayoutSettings({
   }, [multiviewLayout]);
 
   const handleLayoutUpdate = (name: string, type: string) => {
-    const choosenLayout = avaliableMultiviewLayouts?.find(
+    const chosenLayout = availableMultiviewLayouts?.find(
       (singleLayout) => singleLayout.name === name
     );
     const addBasePreset = multiviewPresets?.find(
@@ -91,8 +91,8 @@ export default function MultiviewLayoutSettings({
 
     switch (type) {
       case 'layout':
-        if (choosenLayout) {
-          setSelectedMultiviewPreset(choosenLayout);
+        if (chosenLayout) {
+          setSelectedMultiviewPreset(chosenLayout);
         }
         break;
       case 'preset':
@@ -104,11 +104,11 @@ export default function MultiviewLayoutSettings({
   };
 
   const handleChange = (viewId: string, value: string) => {
-    if (inputList && avaliableMultiviewLayouts) {
+    if (inputList && availableMultiviewLayouts) {
       // Remove 2 from id to remove id for Preview- and Program-view
       // Add 1 to index to get the correct input_slot
       const idFirstInputView = parseInt(viewId, 10) - 2 + 1;
-      const defaultLabel = avaliableMultiviewLayouts[0].layout.views.find(
+      const defaultLabel = availableMultiviewLayouts[0].layout.views.find(
         (item) => item.input_slot === idFirstInputView
       )?.label;
       inputList.map((source) => {
