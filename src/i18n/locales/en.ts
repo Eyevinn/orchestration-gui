@@ -80,6 +80,14 @@ export const en = {
     add_other_source_type: 'Add other source type',
     configure_outputs: 'Configure Outputs'
   },
+  configure_alignment_latency: {
+    configure_alignment_latency:
+      'Configure alignment and latency for the pipeline streams',
+    source_name: 'Source name',
+    error: 'The alignment value must be higher than the latency',
+    save: 'Save',
+    cancel: 'Cancel'
+  },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',
   homepage: 'Home',

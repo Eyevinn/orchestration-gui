@@ -76,7 +76,7 @@ export async function createStream(
     });
 
     const sourceId = await getSourceIdFromSourceName(
-      ingestUuid,
+      ingestUuid || '',
       source.ingest_source_name,
       false
     );
@@ -108,8 +108,8 @@ export async function createStream(
       );
 
       const stream: PipelineStreamSettings = {
-        ingest_id: ingestUuid,
-        source_id: sourceId,
+        ingest_id: ingestUuid || '',
+        source_id: sourceId || 0,
         pipeline_id: pipeline.pipeline_id!,
         input_slot: input_slot,
         alignment_ms: pipeline.alignment_ms,
@@ -354,6 +354,29 @@ export async function deleteStream(streamUuid: string) {
   );
   if (response.ok) {
     return;
+  }
+  throw await response.json();
+}
+
+export async function updateStream(streamUuid: string, alignment_ms: number) {
+  const response = await fetch(
+    new URL(
+      LIVE_BASE_API_PATH + `/streams/${streamUuid}`,
+      process.env.LIVE_URL
+    ),
+    {
+      method: 'PATCH',
+      headers: {
+        authorization: getAuthorizationHeader()
+      },
+      body: JSON.stringify({ alignment_ms: alignment_ms }),
+      next: {
+        revalidate: 0
+      }
+    }
+  );
+  if (response.ok) {
+    return true;
   }
   throw await response.json();
 }

@@ -183,3 +183,35 @@ export function useDeleteStream(): CallbackHook<
   };
   return [deleteStream, loading];
 }
+
+export function useUpdateStream(): CallbackHook<
+  (streamUuid: string, alignment_ms: number) => void
+> {
+  const [loading, setLoading] = useState(false);
+
+  const updateStream = async (
+    streamUuid: string,
+    alignment_ms: number
+  ): Promise<void> => {
+    setLoading(true);
+    const response = await fetch(`/api/manager/streams/${streamUuid}`, {
+      method: 'PATCH',
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
+      body: JSON.stringify({ alignment_ms: alignment_ms })
+    });
+
+    setLoading(false);
+
+    if (response.status === 204) {
+      return;
+    }
+
+    if (response.ok) {
+      return await response.json();
+    }
+
+    throw await response.text();
+  };
+
+  return [updateStream, loading];
+}

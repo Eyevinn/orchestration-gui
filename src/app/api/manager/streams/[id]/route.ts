@@ -1,12 +1,19 @@
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../api/manager/auth';
-import { deleteStream } from '../../../../../api/ateliereLive/pipelines/streams/streams';
+import {
+  deleteStream,
+  updateStream
+} from '../../../../../api/ateliereLive/pipelines/streams/streams';
 import { MultiviewSettings } from '../../../../../interfaces/multiview';
 import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
 import { DeleteSourceStep } from '../../../../../interfaces/Source';
 import { Result } from '../../../../../interfaces/result';
 import { Log } from '../../../../../api/logger';
+
+export type UpdateStreamRequestBody = {
+  alignment_ms: number;
+};
 
 export async function DELETE(
   request: NextRequest,
@@ -130,6 +137,37 @@ export async function DELETE(
         ],
         error: e
       } satisfies Result<DeleteSourceStep[]>)
+    );
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Params }
+): Promise<NextResponse> {
+  if (!(await isAuthenticated())) {
+    return new NextResponse(`Not Authorized!`, {
+      status: 403
+    });
+  }
+
+  const data = await request.json();
+  const updateStreamRequest = data as UpdateStreamRequestBody;
+
+  try {
+    const result = await updateStream(
+      params.id,
+      updateStreamRequest.alignment_ms
+    );
+    return new NextResponse(JSON.stringify(result), {
+      status: 200
+    });
+  } catch (error) {
+    return new NextResponse(
+      JSON.stringify({ message: `Error updating stream! Error: ${error}` }),
+      {
+        status: 500
+      }
     );
   }
 }
