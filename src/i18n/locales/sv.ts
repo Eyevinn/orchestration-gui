@@ -630,14 +630,13 @@ export const sv = {
     description: 'Du kommer att:',
     optional: 'Valfritt:',
     reset_pipelines: 'Återställa alla pipelines',
-    delete_ingest_srt_sources: 'Stänga ner alla ingest SRT källor',
     pipeline_output_streams: 'Stänga ner alla pipeline output strömmar',
     pipeline_multiviewers: 'Stänga ner alla pipeline multiviewers',
     pipeline_streams: 'Stänga ner alla pipeline strömmar',
     pipeline_control_connections:
       'Stänga ner alla pipeline control connections',
     ingest_streams: 'Stänga ner alla ingest strömmar',
-    ingest_src_sources: 'Stänga ner alla ingest SRT sources',
+    ingest_src_sources: 'Stänga ner alla ingest SRT källor',
     teardown_check: 'Verifiering'
   },
   lock: {

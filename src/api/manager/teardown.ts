@@ -181,7 +181,7 @@ export async function teardown(
   }
 
   // INGESTS
-  // DO NOT TO THESE STEPS IF PIPELINES WERE SPECIFIED IN THE OPTIONS
+  // DO NOT DO THESE STEPS IF PIPELINES WERE SPECIFIED IN THE OPTIONS
   if (!pipes) {
     let ingests: ResourcesCompactIngestResponse[];
     // STEP 7

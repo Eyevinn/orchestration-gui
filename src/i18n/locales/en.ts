@@ -627,7 +627,6 @@ export const en = {
     description: 'You are about to:',
     optional: 'Optional:',
     reset_pipelines: 'Reset all pipelines',
-    delete_ingest_srt_sources: 'Delete all ingest SRT sources',
     pipeline_output_streams: 'Delete all pipeline output streams',
     pipeline_multiviewers: 'Delete all pipeline multiviewer outputs',
     pipeline_streams: 'Delete all pipeline streams',

@@ -130,7 +130,7 @@ const SideNavTeardown: React.FC<SideNavItemBaseProps> = (props) => {
                   }
                 />
                 <label className="ml-2 mt-1 text-left text-zinc-300 hover:cursor-pointer">
-                  {t('teardown.delete_ingest_srt_sources')}
+                  {t('teardown.ingest_src_sources')}
                 </label>
               </div>
             </div>
