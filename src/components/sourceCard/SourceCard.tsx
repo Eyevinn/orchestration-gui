@@ -90,25 +90,12 @@ export default function SourceCard({
       {source && <ImageComponent src={getSourceThumbnail(source)} />}
       {!source && sourceRef && <ImageComponent type={sourceRef.type} />}
       {(source || sourceRef) && (
-        <h2
-          className={`${
-            source && 'absolute bottom-4'
-          } p-1 text-p text-xs bg-zinc-900 w-full bg-opacity-90 z-10 ${
-            sourceRef && !source && 'absolute bottom-0'
-          }`}
-        >
+        <h2 className="p-1 text-p text-xs bg-zinc-900 w-full bg-opacity-90 z-10 absolute bottom-0">
           {t('source.input_slot', {
             input_slot:
               sourceRef?.input_slot?.toString() ||
               source?.input_slot?.toString() ||
               ''
-          })}
-        </h2>
-      )}
-      {source && (
-        <h2 className="z-10 px-1 absolute bottom-0 text-p text-xs bg-zinc-900 w-full bg-opacity-90">
-          {t('source.ingest', {
-            ingest: source.ingest_name
           })}
         </h2>
       )}
