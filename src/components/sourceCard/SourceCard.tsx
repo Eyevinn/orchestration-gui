@@ -139,7 +139,7 @@ export default function SourceCard({
       )}
       {productionSetup && productionSetup.isActive && source && (
         <button
-          className="absolute bottom-0 left-0 text-p hover:border-l hover:border-t bg-zinc-700 hover:bg-zinc-600 min-w-fit p-1 rounded-tr-lg z-50"
+          className="absolute top-0 left-0 text-p hover:border bg-zinc-600 hover:bg-zinc-500 min-w-fit p-1 rounded-br-lg z-50"
           onClick={() => setIsAlignmentModalOpen(true)}
         >
           <IconSettings className="text-p w-4 h-4" />
