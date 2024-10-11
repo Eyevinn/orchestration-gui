@@ -55,6 +55,7 @@ import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPi
 import { ISource } from '../../../hooks/useDragableItems';
 import { useUpdateStream } from '../../../hooks/streams';
 import { usePutProductionPipelineSourceAlignmentAndLatency } from '../../../hooks/productions';
+import { useIngestSourceId } from '../../../hooks/ingests';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -113,6 +114,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [closeWebsocket] = useWebsocket();
 
   const [updateStream, loading] = useUpdateStream();
+  const [getIngestSourceId, ingestSourceIdLoading] = useIngestSourceId();
 
   const putProductionPipelineSourceAlignmentAndLatency =
     usePutProductionPipelineSourceAlignmentAndLatency();
@@ -486,9 +488,52 @@ export default function ProductionConfiguration({ params }: PageProps) {
           )
         : false)
     ) {
+      let updatedSetup = productionSetup;
+
+      for (
+        let i = 0;
+        i < productionSetup.production_settings.pipelines.length;
+        i++
+      ) {
+        const pipeline = productionSetup.production_settings.pipelines[i];
+
+        if (!pipeline.sources) {
+          pipeline.sources = [];
+        }
+
+        const newSource = {
+          source_id: await getIngestSourceId(
+            selectedSource.ingest_name,
+            selectedSource.ingest_source_name
+          ),
+          settings: {
+            alignment_ms: pipeline.alignment_ms,
+            max_network_latency_ms: pipeline.max_network_latency_ms
+          }
+        };
+
+        updatedSetup = {
+          ...productionSetup,
+          production_settings: {
+            ...productionSetup.production_settings,
+            pipelines: productionSetup.production_settings.pipelines.map(
+              (p, index) => {
+                if (index === i) {
+                  if (!p.sources) {
+                    p.sources = [];
+                  }
+                  p.sources.push(newSource);
+                }
+                return p;
+              }
+            )
+          }
+        } as Production;
+      }
+
       const result = await createStream(
         selectedSource,
-        productionSetup,
+        updatedSetup,
         firstEmptySlot(productionSetup)
       );
       if (!result.ok) {
