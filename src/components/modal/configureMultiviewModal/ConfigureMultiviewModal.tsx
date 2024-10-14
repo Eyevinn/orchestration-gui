@@ -148,6 +148,9 @@ export function ConfigureMultiviewModal({
   };
 
   const addNewMultiview = (newMultiview: MultiviewSettings) => {
+    // Remove _id from newMultiview to avoid conflicts with existing multiviews
+    delete newMultiview._id;
+
     setMultiviews((prevMultiviews) =>
       prevMultiviews ? [...prevMultiviews, newMultiview] : [newMultiview]
     );
@@ -215,7 +218,12 @@ export function ConfigureMultiviewModal({
                         <button
                           type="button"
                           title={t('preset.add_another_multiview')}
-                          onClick={() => addNewMultiview(singleItem)}
+                          onClick={() =>
+                            addNewMultiview({
+                              ...singleItem,
+                              multiview_id: (singleItem.multiview_id ?? 0) + 1
+                            })
+                          }
                         >
                           <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
                         </button>

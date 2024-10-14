@@ -17,6 +17,7 @@ export async function getProduction(id: string): Promise<ProductionWithId> {
     .collection('productions')
     .findOne({ _id: new ObjectId(id) })) as ProductionWithId;
 }
+
 export async function setProductionsIsActiveFalse(): Promise<
   UpdateResult<Document>
 > {
@@ -25,6 +26,7 @@ export async function setProductionsIsActiveFalse(): Promise<
     .collection('productions')
     .updateMany({}, { $set: { isActive: false } });
 }
+
 export async function putProduction(
   id: string,
   production: Production

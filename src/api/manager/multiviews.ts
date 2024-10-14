@@ -1,23 +1,23 @@
 import { ObjectId, WithId } from 'mongodb';
-import { MultiviewPreset } from '../../interfaces/preset';
+import { TMultiviewLayout } from '../../interfaces/preset';
 import { getDatabase } from '../mongoClient/dbClient';
 
-export async function getMultiviewLayouts(): Promise<MultiviewPreset[]> {
+export async function getMultiviewLayouts(): Promise<TMultiviewLayout[]> {
   const db = await getDatabase();
-  return await db.collection<MultiviewPreset>('multiviews').find({}).toArray();
+  return await db.collection<TMultiviewLayout>('multiviews').find({}).toArray();
 }
 
 export async function getMultiviewLayout(
   id: string
-): Promise<WithId<MultiviewPreset>> {
+): Promise<WithId<TMultiviewLayout>> {
   const db = await getDatabase();
   return (await db
-    .collection<MultiviewPreset>('multiviews')
-    .findOne({ _id: new ObjectId(id) })) as WithId<MultiviewPreset>;
+    .collection<TMultiviewLayout>('multiviews')
+    .findOne({ _id: new ObjectId(id) })) as WithId<TMultiviewLayout>;
 }
 
 export async function putMultiviewLayout(
-  newMultiviewLayout: MultiviewPreset
+  newMultiviewLayout: TMultiviewLayout
 ): Promise<void> {
   const db = await getDatabase();
   const collection = db.collection('multiviews');

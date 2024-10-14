@@ -18,13 +18,3 @@ export async function getMultiviewPreset(
     .collection<MultiviewPreset>('multiview-presets')
     .findOne({ _id: new ObjectId(id) })) as WithId<MultiviewPreset>;
 }
-
-// TODO Add this when possibility to update and add mv-presets are added
-// export async function putMultiviewPreset(
-//   newMultiviewPreset: MultiviewPreset
-// ): Promise<void> {
-//   const db = await getDatabase();
-//   await db
-//     .collection('multiview-presets')
-//     .insertOne({ ...newMultiviewPreset, _id: new ObjectId() });
-// }

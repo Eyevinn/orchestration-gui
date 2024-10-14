@@ -80,7 +80,8 @@ export const sv = {
     source: 'Källa',
     add: 'Lägg till',
     add_other_source_type: 'Lägg till annan källtyp',
-    configure_outputs: 'Konfigurera Outputs'
+    configure_outputs: 'Konfigurera Outputs',
+    manage_multiviewers: 'Uppdatera multiviewers'
   },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',

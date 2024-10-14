@@ -78,7 +78,8 @@ export const en = {
     source: 'Source',
     add: 'Add',
     add_other_source_type: 'Add other source type',
-    configure_outputs: 'Configure Outputs'
+    configure_outputs: 'Configure Outputs',
+    manage_multiviewers: 'Manage multiviewers'
   },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',

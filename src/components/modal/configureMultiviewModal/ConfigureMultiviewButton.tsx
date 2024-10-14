@@ -38,10 +38,14 @@ export function ConfigureMultiviewButton({
           disabled ? 'bg-button-bg/50 pointer-events-none' : 'bg-button-bg'
         }`}
       >
-        Multiviewer
-        <IconSettings
-          className={`${disabled ? 'text-p/50' : 'text-p'} inline ml-2`}
-        />
+        {production?.isActive
+          ? t('production.manage_multiviewers')
+          : 'Multiviewer'}
+        {!production?.isActive && (
+          <IconSettings
+            className={`${disabled ? 'text-p/50' : 'text-p'} inline ml-2`}
+          />
+        )}
       </Button>
       {preset && (
         <ConfigureMultiviewModal

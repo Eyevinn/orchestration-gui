@@ -30,8 +30,7 @@ export function useMonitoring(id: string): DataHook<Monitoring | undefined> {
 const getMonitoring = async (id: string): Promise<Monitoring | undefined> => {
   const response = await fetch(`/api/manager/monitoring/${id}`, {
     method: 'GET',
-    // TODO: Implement api key
-    headers: [['x-api-key', `Bearer apisecretkey`]]
+    headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
   });
   if (response.ok) {
     return response.json();
