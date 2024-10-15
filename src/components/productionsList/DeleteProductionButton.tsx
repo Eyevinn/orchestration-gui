@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { Loader } from '../loader/Loader';
 import { useRouter } from 'next/navigation';
 import { DeleteModal } from '../modal/DeleteModal';
+import { useDeleteMultiviewLayout } from '../../hooks/multiviewLayout';
 
 type DeleteProductionButtonProps = {
   id: string;
@@ -22,6 +23,7 @@ export function DeleteProductionButton({
 }: DeleteProductionButtonProps) {
   const router = useRouter();
   const deleteProduction = useDeleteProduction();
+  const deleteLayouts = useDeleteMultiviewLayout();
 
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -30,10 +32,11 @@ export function DeleteProductionButton({
   const onConfirm = useCallback(async () => {
     setModalOpen(false);
     setLoading(true);
-    deleteProduction(id)
+    await deleteProduction(id);
+    deleteLayouts(id)
       .then(() => router.refresh())
       .finally(() => setLoading(false));
-  }, [router, deleteProduction, id]);
+  }, [deleteProduction, id, deleteLayouts, router]);
 
   return (
     <>

@@ -46,3 +46,10 @@ export async function deleteLayout(id: string): Promise<void> {
   });
   Log().info('Deleted multiview layout', id);
 }
+
+export async function deleteLayouts(id: string): Promise<void> {
+  const db = await getDatabase();
+
+  await db.collection('multiviews').deleteMany({ productionId: id });
+  Log().info('Deleted layouts for production', id);
+}
