@@ -663,7 +663,7 @@ export const sv = {
     no_multiview_selected: 'Ingen multiview vald',
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
-    configure_layout: 'Justera komposition',
+    configure_layouts: 'Justera kompositioner',
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
     no_updated_layout: 'Ingen uppdaterad komposition',

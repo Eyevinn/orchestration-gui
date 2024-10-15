@@ -657,7 +657,7 @@ export const en = {
     stream_name: 'Stream',
     multiview_output_settings: 'Multiview output',
     select_multiview_layout: 'Layout',
-    configure_layout: 'Configure layout',
+    configure_layouts: 'Configure layouts',
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',

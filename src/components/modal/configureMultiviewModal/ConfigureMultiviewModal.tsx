@@ -234,7 +234,7 @@ export function ConfigureMultiviewModal({
             type="button"
             onClick={() => setLayoutModalOpen(true)}
           >
-            {t('preset.configure_layout')}
+            {t('preset.configure_layouts')}
             <IconSettings className="text-p inline ml-2" />
           </Button>
         )}
