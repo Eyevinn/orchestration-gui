@@ -1,8 +1,8 @@
 import { Preset } from '../../../interfaces/preset';
 import { Modal } from '../Modal';
 import Decision from './Decision';
-import PipelineOutputConfig, { PipelineTypes } from './PipelineOutputConfig';
-import { useState } from 'react';
+import PipelineOutputConfig from './PipelineOutputConfig';
+import { useEffect, useState } from 'react';
 import { PipelineOutput, PipelineSettings } from '../../../interfaces/pipeline';
 import { usePipelines } from '../../../hooks/pipelines';
 import cloneDeep from 'lodash.clonedeep';
@@ -16,7 +16,6 @@ type ConfigureOutputModalProps = {
 
 export interface OutputStream {
   name: string;
-  id: string;
   pipelineIndex: number;
   ip: string;
   srtMode: string;
@@ -25,6 +24,7 @@ export interface OutputStream {
   videoFormat: string;
   videoBit: number;
   videoKiloBit: number;
+  srt_stream_id: string;
 }
 
 const DEFAULT_PORT_MUMBER = 9900;
@@ -43,6 +43,10 @@ export function ConfigureOutputModal({
     useState<number>(DEFAULT_PORT_MUMBER);
 
   const [pipes] = usePipelines();
+
+  useEffect(() => {
+    setPipelines(preset.pipelines || []);
+  }, [preset]);
 
   const onSave = () => {
     const locations = pipelines

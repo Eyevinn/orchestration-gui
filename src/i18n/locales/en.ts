@@ -649,6 +649,7 @@ export const en = {
     port: 'Port',
     mode: 'Mode',
     srt_passphrase: 'Passphrase',
+    srt_stream_id: 'SRT ID',
     video_settings: 'Video settings',
     video_format: 'Format',
     video_bit_depth: 'Bit depth',

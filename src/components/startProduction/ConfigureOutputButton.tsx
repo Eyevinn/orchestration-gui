@@ -6,6 +6,7 @@ import { Preset } from '../../interfaces/preset';
 import { useTranslate } from '../../i18n/useTranslate';
 import { Button } from '../button/Button';
 import { ConfigureOutputModal } from '../modal/configureOutputModal/ConfigureOutputModal';
+import { PipelineSettings } from '../../interfaces/pipeline';
 
 type ConfigureOutputButtonProps = {
   preset?: Preset;

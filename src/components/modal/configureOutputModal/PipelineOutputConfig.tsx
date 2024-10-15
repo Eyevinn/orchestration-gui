@@ -45,6 +45,7 @@ const createNewStream = (portNumber: number, pipeline: PipelineSettings) => {
     srt_mode: 'listener',
     srt_passphrase: '',
     video_gop_length: 50,
+    srt_stream_id: '',
     ...getStreamEncoderSettings(pipeline)
   };
 };
@@ -115,6 +116,9 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
         case 'srtPassphrase':
           newStream.srt_passphrase = value;
           break;
+        case 'srt_stream_id':
+          newStream.srt_stream_id = value;
+          break;
       }
       setUpdatedOutputs(newOutputs);
     }
@@ -142,7 +146,6 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
     ): OutputStream => {
       return {
         name: `Stream ${index + 1}`,
-        id: '',
         pipelineIndex: 0,
         ip: stream.local_ip,
         srtMode: stream.srt_mode,
@@ -150,7 +153,8 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
         port: stream.local_port,
         videoFormat: stream.video_format,
         videoBit: stream.video_bit_depth,
-        videoKiloBit: stream.video_kilobit_rate
+        videoKiloBit: stream.video_kilobit_rate,
+        srt_stream_id: stream.srt_stream_id
       };
     };
     return outputStreams.map((stream, index) => {

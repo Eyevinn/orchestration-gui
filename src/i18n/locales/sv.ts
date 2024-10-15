@@ -653,6 +653,7 @@ export const sv = {
     port: 'Port',
     mode: 'Läge',
     srt_passphrase: 'Lösenord',
+    srt_stream_id: 'SRT ID',
     video_settings: 'Videoinställningar',
     video_format: 'Format',
     video_bit_depth: 'Bit depth',
