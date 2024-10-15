@@ -203,7 +203,7 @@ export function ConfigureMultiviewModal({
                       {multiviews.length > 1 && (
                         <button
                           type="button"
-                          title="Add another multiview"
+                          title={t('preset.remove_multiview')}
                           onClick={() => removeNewMultiview(index)}
                         >
                           <IconTrash
@@ -214,7 +214,7 @@ export function ConfigureMultiviewModal({
                       {multiviews.length === index + 1 && (
                         <button
                           type="button"
-                          title="Add another multiview"
+                          title={t('preset.add_another_multiview')}
                           onClick={() => addNewMultiview(singleItem)}
                         >
                           <IconPlus className="mr-2 text-green-400 hover:text-green-200" />

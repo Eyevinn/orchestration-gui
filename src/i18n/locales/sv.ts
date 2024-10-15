@@ -673,7 +673,9 @@ export const sv = {
     select_multiview_preset: 'Förinställningar',
     no_port_selected: 'Unik port krävs',
     layout_already_exist:
-      'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar'
+      'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
+    remove_multiview: 'Ta bort multiview',
+    add_another_multiview: 'Lägg till ny multiview'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',
