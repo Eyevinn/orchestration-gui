@@ -30,7 +30,9 @@ export function useGetMultiviewLayout() {
   };
 }
 
-export function useMultiviewLayouts(refresh: boolean): DataHook<TMultiviewLayout[]> {
+export function useMultiviewLayouts(
+  refresh: boolean
+): DataHook<TMultiviewLayout[]> {
   const [loading, setLoading] = useState(true);
   const [multiviewLayouts, setmultiviewLayouts] = useState<TMultiviewLayout[]>(
     []
@@ -39,7 +41,7 @@ export function useMultiviewLayouts(refresh: boolean): DataHook<TMultiviewLayout
   useEffect(() => {
     setmultiviewLayouts([]);
 
-    if(!refresh) {
+    if (!refresh) {
       return;
     }
 

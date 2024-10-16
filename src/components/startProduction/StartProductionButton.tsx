@@ -41,7 +41,7 @@ export function StartProductionButton({
   const [deleteMonitoring] = useDeleteMonitoring();
   const [modalOpen, setModalOpen] = useState(false);
   const [stopModalOpen, setStopModalOpen] = useState(false);
-  const [multiviewLayouts] = useMultiviewLayouts();
+  const [multiviewLayouts] = useMultiviewLayouts(true);
 
   const onClick = () => {
     if (!production) return;

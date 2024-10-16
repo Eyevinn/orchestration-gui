@@ -34,8 +34,7 @@ export default function MultiviewLayoutSettings({
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
-  const [refresh, setRefresh] =
-    useState(true);
+  const [refresh, setRefresh] = useState(true);
   const [changedLayout, setChangedLayout] = useState<ChangeLayout | null>(null);
   const [newPresetName, setNewPresetName] = useState<string | null>(null);
   const [layoutToChange, setLayoutToChange] = useState<string>('');
@@ -71,8 +70,8 @@ export default function MultiviewLayoutSettings({
       (layout) => layout.productionId === production?._id
     ) || [];
   const globalMultiviewLayouts = multiviewLayouts?.filter(
-      (layout) => !layout.productionId
-    );
+    (layout) => !layout.productionId
+  );
   const deleteDisabled = productionLayouts.length < 1;
 
   // This useEffect is used to set the drawn layout of the multiviewer on start,
@@ -191,21 +190,23 @@ export default function MultiviewLayoutSettings({
                 }
                 update={(value) => handleLayoutUpdate(value, 'layout')}
               />
-              <button
-                type="button"
-                title={t('preset.remove_layout')}
-                className="absolute top-0 right-[-10%] min-w-fit"
-                onClick={() => removeMultiviewLayout()}
-                disabled={deleteDisabled}
-              >
-                <IconTrash
-                  className={`ml-4 ${
-                    deleteDisabled
-                      ? 'pointer-events-none text-zinc-400'
-                      : 'text-button-delete hover:text-red-400'
-                  }`}
-                />
-              </button>
+              {!production?.isActive && (
+                <button
+                  type="button"
+                  title={t('preset.remove_layout')}
+                  className="absolute top-0 right-[-10%] min-w-fit"
+                  onClick={() => removeMultiviewLayout()}
+                  disabled={deleteDisabled}
+                >
+                  <IconTrash
+                    className={`ml-4 ${
+                      deleteDisabled
+                        ? 'pointer-events-none text-zinc-400'
+                        : 'text-button-delete hover:text-red-400'
+                    }`}
+                  />
+                </button>
+              )}
             </div>
             <Options
               label={t('preset.select_multiview_preset')}

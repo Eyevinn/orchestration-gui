@@ -679,7 +679,8 @@ export const sv = {
     remove_layout: 'Ta bort komposition',
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
-    not_possible_delete_global_layout: 'Det går inte att ta bort globala kompositioner',
+    not_possible_delete_global_layout:
+      'Det går inte att ta bort globala kompositioner',
     could_not_delete_layout: 'Kunde inte ta bort kompositionen'
   },
   error: {
