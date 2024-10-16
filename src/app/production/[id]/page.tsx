@@ -52,7 +52,17 @@ import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
 import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPipelines';
+import { ISource } from '../../../hooks/useDragableItems';
+import { useUpdateStream } from '../../../hooks/streams';
+import { usePutProductionPipelineSourceAlignmentAndLatency } from '../../../hooks/productions';
+import { useIngestSourceId } from '../../../hooks/ingests';
 import cloneDeep from 'lodash.clonedeep';
+import {
+  useAddMultiviewersOnRunningProduction,
+  useRemoveMultiviewersOnRunningProduction,
+  useUpdateMultiviewersOnRunningProduction
+} from '../../../hooks/workflow';
+import { MultiviewSettings } from '../../../interfaces/multiview';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -90,6 +100,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [updateMultiviewViews] = useMultiviews();
   const [updateSourceInputSlotOnMultiviewLayouts] =
     useUpdateSourceInputSlotOnMultiviewLayouts();
+  const [addMultiviewersOnRunningProduction] =
+    useAddMultiviewersOnRunningProduction();
+  const [updateMultiviewersOnRunningProduction] =
+    useUpdateMultiviewersOnRunningProduction();
+  const [removeMultiviewersOnRunningProduction] =
+    useRemoveMultiviewersOnRunningProduction();
 
   //FROM LIVE API
   const [pipelines, loadingPipelines, , refreshPipelines] = usePipelines();
@@ -109,6 +125,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   // Websocket
   const [closeWebsocket] = useWebsocket();
+
+  const [updateStream, loading] = useUpdateStream();
+  const [getIngestSourceId, ingestSourceIdLoading] = useIngestSourceId();
+
+  const putProductionPipelineSourceAlignmentAndLatency =
+    usePutProductionPipelineSourceAlignmentAndLatency();
 
   const [checkProductionPipelines] = useCheckProductionPipelines();
 
@@ -143,7 +165,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
 
   useEffect(() => {
-    if (updateMuliviewLayouts && productionSetup && !productionSetup.isActive) {
+    if (updateMuliviewLayouts && productionSetup) {
       updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
         (updatedSetup) => {
           if (!updatedSetup) return;
@@ -255,7 +277,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   const updatePreset = (preset: Preset) => {
     if (!productionSetup?._id) return;
-    putProduction(productionSetup?._id.toString(), {
+
+    const presetMultiviews = preset.pipelines[0].multiviews;
+    const productionMultiviews =
+      productionSetup.production_settings.pipelines[0].multiviews;
+
+    const updatedPreset = {
       ...productionSetup,
       production_settings: {
         ...preset,
@@ -273,7 +300,56 @@ export default function ProductionConfiguration({ params }: PageProps) {
           };
         })
       }
-    }).then(() => {
+    };
+
+    if (productionSetup.isActive && presetMultiviews && productionMultiviews) {
+      const productionMultiviewsMap = new Map(
+        productionMultiviews.map((item) => [item.multiview_id, item])
+      );
+      const presetMultiviewsMap = new Map(
+        presetMultiviews.map((item) => [item.multiview_id, item])
+      );
+
+      const additions: MultiviewSettings[] = [];
+      const updates: MultiviewSettings[] = [];
+
+      presetMultiviews.forEach((newItem) => {
+        const oldItem = productionMultiviewsMap.get(newItem.multiview_id);
+
+        if (!oldItem) {
+          additions.push(newItem);
+        } else if (JSON.stringify(oldItem) !== JSON.stringify(newItem)) {
+          updates.push(newItem);
+        }
+      });
+
+      const removals = productionMultiviews.filter(
+        (oldItem) => !presetMultiviewsMap.has(oldItem.multiview_id)
+      );
+
+      if (additions.length > 0) {
+        addMultiviewersOnRunningProduction(
+          (productionSetup?._id.toString(), updatedPreset),
+          additions
+        );
+      }
+
+      if (updates.length > 0) {
+        updateMultiviewersOnRunningProduction(
+          (productionSetup?._id.toString(), updatedPreset),
+          updates
+        );
+      }
+
+      if (removals.length > 0) {
+        removeMultiviewersOnRunningProduction(
+          (productionSetup?._id.toString(), updatedPreset),
+          removals
+        );
+      }
+    }
+
+    putProduction(productionSetup?._id.toString(), updatedPreset).then(() => {
       refreshProduction();
     });
   };
@@ -281,6 +357,57 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const updateProduction = (id: string, productionSetup: Production) => {
     setProductionSetup(productionSetup);
     putProduction(id, productionSetup);
+  };
+
+  const handleSetPipelineSourceSettings = (
+    source: ISource,
+    sourceId: number,
+    data: {
+      pipeline_uuid: string;
+      stream_uuid: string;
+      alignment: number;
+      latency: number;
+    }[]
+  ) => {
+    if (
+      productionSetup?._id &&
+      source?.ingest_name &&
+      source?.ingest_source_name
+    ) {
+      data.forEach(({ pipeline_uuid, stream_uuid, alignment, latency }) => {
+        putProductionPipelineSourceAlignmentAndLatency(
+          productionSetup._id,
+          pipeline_uuid,
+          source.ingest_name,
+          source.ingest_source_name,
+          alignment,
+          latency
+        );
+        updateStream(stream_uuid, alignment);
+
+        const updatedProduction = {
+          ...productionSetup,
+          productionSettings: {
+            ...productionSetup.production_settings,
+            pipelines: productionSetup.production_settings.pipelines.map(
+              (pipeline) => {
+                if (pipeline.pipeline_id === pipeline_uuid) {
+                  pipeline.sources?.map((source) => {
+                    if (source.source_id === sourceId) {
+                      source.settings.alignment_ms = alignment;
+                      source.settings.max_network_latency_ms = latency;
+                    }
+                  });
+                }
+                return pipeline;
+              }
+            )
+          }
+        };
+
+        setProductionSetup(updatedProduction);
+      });
+    }
   };
 
   const updateSource = (
@@ -436,9 +563,52 @@ export default function ProductionConfiguration({ params }: PageProps) {
           )
         : false)
     ) {
+      let updatedSetup = productionSetup;
+
+      for (
+        let i = 0;
+        i < productionSetup.production_settings.pipelines.length;
+        i++
+      ) {
+        const pipeline = productionSetup.production_settings.pipelines[i];
+
+        if (!pipeline.sources) {
+          pipeline.sources = [];
+        }
+
+        const newSource = {
+          source_id: await getIngestSourceId(
+            selectedSource.ingest_name,
+            selectedSource.ingest_source_name
+          ),
+          settings: {
+            alignment_ms: pipeline.alignment_ms,
+            max_network_latency_ms: pipeline.max_network_latency_ms
+          }
+        };
+
+        updatedSetup = {
+          ...productionSetup,
+          production_settings: {
+            ...productionSetup.production_settings,
+            pipelines: productionSetup.production_settings.pipelines.map(
+              (p, index) => {
+                if (index === i) {
+                  if (!p.sources) {
+                    p.sources = [];
+                  }
+                  p.sources.push(newSource);
+                }
+                return p;
+              }
+            )
+          }
+        } as Production;
+      }
+
       const result = await createStream(
         selectedSource,
-        productionSetup,
+        updatedSetup,
         firstEmptySlot(productionSetup)
       );
       if (!result.ok) {
@@ -631,7 +801,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     <>
       <HeaderNavigation>
         <input
-          className="m-2 text-4xl text-p text-center bg-transparent grow text-start"
+          className="m-2 text-4xl text-p bg-transparent grow text-start"
           type="text"
           value={configurationName}
           onChange={(e) => {
@@ -674,7 +844,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             updatePreset={updatePreset}
           />
           <ConfigureMultiviewButton
-            disabled={productionSetup?.isActive || locked}
+            disabled={locked || !hasSelectedPipelines()}
             preset={selectedPreset}
             updatePreset={updatePreset}
             production={memoizedProduction}
@@ -682,7 +852,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
           <StartProductionButton
             refreshProduction={refreshProduction}
             production={productionSetup}
-            disabled={(!selectedPreset ? true : false) || locked}
+            disabled={
+              (!selectedPreset ? true : false) ||
+              locked ||
+              !hasSelectedPipelines()
+            }
           />
         </div>
       </HeaderNavigation>
@@ -720,6 +894,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             {productionSetup?.sources && sources.size > 0 && (
               <DndProvider backend={HTML5Backend}>
                 <SourceCards
+                  onConfirm={handleSetPipelineSourceSettings}
                   productionSetup={productionSetup}
                   locked={locked}
                   updateProduction={(updated) => {
@@ -756,6 +931,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       });
                     }
                   }}
+                  loading={loading}
                 />
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal

@@ -78,7 +78,16 @@ export const en = {
     source: 'Source',
     add: 'Add',
     add_other_source_type: 'Add other source type',
-    configure_outputs: 'Configure Outputs'
+    configure_outputs: 'Configure Outputs',
+    manage_multiviewers: 'Manage multiviewers'
+  },
+  configure_alignment_latency: {
+    configure_alignment_latency:
+      'Configure alignment and latency for the pipeline streams',
+    source_name: 'Source name',
+    error: 'The alignment value must be higher than the latency',
+    save: 'Save',
+    cancel: 'Cancel'
   },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',
@@ -658,7 +667,7 @@ export const en = {
     stream_name: 'Stream',
     multiview_output_settings: 'Multiview output',
     select_multiview_layout: 'Layout',
-    configure_layout: 'Configure layout',
+    configure_layouts: 'Configure layouts',
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',
@@ -676,7 +685,10 @@ export const en = {
     add_another_multiview: 'Add another multiview',
     not_possible_delete_global_layout: 'Global layout can not be deleted',
     could_not_delete_layout: 'Could not delete layout',
-    layout_deleted: 'Layout deleted'
+    layout_deleted: 'Layout deleted',
+    confirm_update_multiviewers:
+      'Are you sure you want to update multiviewers for the running production?',
+    confirm_update: 'Update multiviewers'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

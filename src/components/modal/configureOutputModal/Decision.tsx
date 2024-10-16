@@ -4,13 +4,18 @@ import { Button } from '../../button/Button';
 interface IDecision {
   onClose: () => void;
   onSave: () => void;
+  className?: string;
 }
 
-export default function Decision({ onClose, onSave }: IDecision) {
+export default function Decision({ onClose, onSave, className }: IDecision) {
   const t = useTranslate();
 
   return (
-    <div className="flex justify-center w-full min-w-max mt-10 gap-16">
+    <div
+      className={`flex justify-center w-full min-w-max gap-16 ${
+        className ? className : 'mt-10'
+      }`}
+    >
       <Button className="hover:bg-red-500" onClick={onClose} state="warning">
         {t('close')}
       </Button>

@@ -61,6 +61,7 @@ export default function MultiviewSettingsConfig({
     }
     handleUpdateMultiview({
       ...multiviewLayouts[0],
+      _id: multiviewLayouts[0]._id?.toString(),
       for_pipeline_idx: 0
     });
   }
@@ -80,7 +81,11 @@ export default function MultiviewSettingsConfig({
       output: multiview?.output || selected.output
     };
     setSelectedMultiviewLayout(updatedMultiview);
-    handleUpdateMultiview({ ...updatedMultiview, for_pipeline_idx: 0 });
+    handleUpdateMultiview({
+      ...updatedMultiview,
+      _id: updatedMultiview._id?.toString(),
+      for_pipeline_idx: 0
+    });
   };
 
   const getNumber = (val: string, prev: number) => {
@@ -169,16 +174,8 @@ export default function MultiviewSettingsConfig({
     <div className="flex flex-col gap-2 rounded p-4 pr-7">
       <div className="flex justify-between pb-5">
         <h1 className="font-bold">{t('preset.multiview_output_settings')}</h1>
-        {lastItem && (
-          <button
-            onClick={openConfigModal}
-            title={t('preset.configure_layout')}
-          >
-            <IconSettings className="text-p" />
-          </button>
-        )}
       </div>
-      <div className="relative">
+      <div>
         <Options
           label={t('preset.select_multiview_layout')}
           options={multiviewLayoutNames.map((singleItem) => ({

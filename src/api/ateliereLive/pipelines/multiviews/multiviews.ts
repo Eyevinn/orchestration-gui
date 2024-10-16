@@ -142,8 +142,14 @@ export async function createMultiviewForPipeline(
       );
 
       if (response.ok) {
+        Log().info(
+          `Created multiview for pipeline '${pipelineUUID}' from preset`
+        );
         return await response.json();
       }
+      Log().info(
+        `ERROR: Could not create multiview for pipeline '${pipelineUUID}' from preset`
+      );
       throw await response.text();
     }
   );
@@ -173,8 +179,14 @@ export async function deleteMultiviewFromPipeline(
   );
 
   if (response.ok) {
+    Log().info(
+      `Deleted multiview ${multiviewId} for pipeline '${pipelineUUID}' from preset`
+    );
     return;
   }
+  Log().info(
+    `ERROR: Could not delete multiview ${multiviewId} for pipeline '${pipelineUUID}' from preset`
+  );
   throw await response.text();
 }
 
@@ -216,7 +228,13 @@ export async function updateMultiviewForPipeline(
     }
   );
   if (response.ok) {
+    Log().info(
+      `Updated multiview ${multiviewId} for pipeline '${pipelineUUID}' from preset`
+    );
     return await response.json();
   }
+  Log().info(
+    `ERROR: Could not update multiview ${multiviewId} for pipeline '${pipelineUUID}' from preset`
+  );
   throw await response.text();
 }

@@ -11,15 +11,28 @@ import { EmptySlotCard } from '../emptySlotCard/EmptySlotCard';
 export default function SourceCards({
   productionSetup,
   locked,
+  loading,
   updateProduction,
   onSourceUpdate,
-  onSourceRemoval
+  onSourceRemoval,
+  onConfirm
 }: {
   productionSetup: Production;
   locked: boolean;
+  loading: boolean;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference) => void;
   onSourceRemoval: (source: SourceReference) => void;
+  onConfirm: (
+    source: ISource,
+    sourceId: number,
+    data: {
+      pipeline_uuid: string;
+      stream_uuid: string;
+      alignment: number;
+      latency: number;
+    }[]
+  ) => void;
 }) {
   const [items, moveItem] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);
@@ -67,6 +80,9 @@ export default function SourceCards({
                 onSourceUpdate={onSourceUpdate}
                 onSourceRemoval={onSourceRemoval}
                 onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
+                productionSetup={productionSetup}
+                onConfirm={onConfirm}
+                loading={loading}
               />
             </DragItem>
           );
@@ -83,6 +99,9 @@ export default function SourceCards({
               onSourceUpdate={onSourceUpdate}
               onSourceRemoval={onSourceRemoval}
               onSelectingText={(isSelecting) => setSelectingText(isSelecting)}
+              onConfirm={onConfirm}
+              productionSetup={productionSetup}
+              loading={loading}
             />
           );
         }

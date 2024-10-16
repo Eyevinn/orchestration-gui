@@ -33,7 +33,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const body = (await request.json()) as MultiviewPreset;
     const newMultiviewLayout = await putMultiviewLayout(body);
-    return await new NextResponse(JSON.stringify(newMultiviewLayout), {
+    return new NextResponse(JSON.stringify(newMultiviewLayout), {
       status: 200
     });
   } catch (error) {

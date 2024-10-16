@@ -9,6 +9,14 @@ export interface SrtOutput {
   url: string;
 }
 
+export interface PipelineSource {
+  source_id: number;
+  settings: {
+    alignment_ms?: number;
+    max_network_latency_ms?: number;
+  };
+}
+
 export interface ManagerPipelineResponse {
   pipeline: ResourcesPipelineResponse;
   status: {
@@ -71,6 +79,7 @@ export interface PipelineSettings {
       protocol: string;
     }
   ];
+  sources?: PipelineSource[];
 }
 
 export interface PipelineOutput {

@@ -16,7 +16,9 @@ import {
 } from '../ateliereLive/pipelines/pipelines';
 import {
   createMultiviewForPipeline,
-  deleteAllMultiviewsFromPipeline
+  deleteAllMultiviewsFromPipeline,
+  deleteMultiviewFromPipeline,
+  updateMultiviewForPipeline
 } from '../ateliereLive/pipelines/multiviews/multiviews';
 import {
   getSourceIdFromSourceName,
@@ -52,6 +54,7 @@ import { getDatabase } from '../mongoClient/dbClient';
 import { updatedMonitoringForProduction } from './job/syncMonitoring';
 import { createControlPanelWebSocket } from '../ateliereLive/websocket';
 import { ObjectId } from 'mongodb';
+import { MultiviewSettings } from '../../interfaces/multiview';
 
 const isUsed = (pipeline: ResourcesPipelineResponse) => {
   const hasStreams = pipeline.streams.length > 0;
@@ -91,7 +94,7 @@ async function connectIngestSources(
       throw `Could not find UUID for ${source.ingest_name}`;
     });
     const sourceId = await getSourceIdFromSourceName(
-      ingestUuid,
+      ingestUuid || '',
       source.ingest_source_name,
       false
     );
@@ -116,9 +119,14 @@ async function connectIngestSources(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
 
+      const pipelineSource = pipeline.sources?.find(
+        (source) => source.source_id === sourceId
+      );
+
       const stream: PipelineStreamSettings = {
         pipeline_id: pipeline.pipeline_id!,
-        alignment_ms: pipeline.alignment_ms,
+        alignment_ms:
+          pipelineSource?.settings.alignment_ms || pipeline.alignment_ms,
         audio_format: pipeline.audio_format,
         audio_sampling_frequency: pipeline.audio_sampling_frequency,
         bit_depth: pipeline.bit_depth,
@@ -130,13 +138,15 @@ async function connectIngestSources(
         frame_rate_n: pipeline.frame_rate_n,
         gop_length: pipeline.gop_length,
         height: pipeline.height,
-        max_network_latency_ms: pipeline.max_network_latency_ms,
+        max_network_latency_ms:
+          pipelineSource?.settings.max_network_latency_ms ||
+          pipeline.max_network_latency_ms,
         pic_mode: pipeline.pic_mode,
         speed_quality_balance: pipeline.speed_quality_balance,
         video_kilobit_rate: pipeline.video_kilobit_rate,
         width: pipeline.width,
-        ingest_id: ingestUuid,
-        source_id: sourceId,
+        ingest_id: ingestUuid || '',
+        source_id: sourceId || 0,
         input_slot: input_slot,
         audio_mapping: JSON.stringify(audioMapping),
         interfaces: [
@@ -464,11 +474,6 @@ export async function stopProduction(
       }
     }
     Log().info(`Pipeline '${id}' stopped`);
-
-    const pipelines = await getPipelines();
-    const pipelineFeedbackStreams = pipelines.find(
-      (p) => p.uuid === id
-    )?.feedback_streams;
   }
 
   if (
@@ -808,7 +813,7 @@ export async function startProduction(
           { step: 'pipeline_outputs', success: false },
           { step: 'multiviews', success: false }
         ],
-        error: 'Unknown error occured'
+        error: 'Could not start multiviews'
       };
     }
     return {
@@ -825,6 +830,15 @@ export async function startProduction(
   } // Try to setup multiviews end
 
   try {
+    const sourceIds = production.sources
+      .filter(
+        (source) => source.type !== 'mediaplayer' && source.type !== 'html'
+      )
+      .map((source) => source._id?.toString())
+      .filter((id): id is string => id !== undefined);
+
+    const sourcesWithId = sourceIds ? await getSourcesByIds(sourceIds) : [];
+
     // Store updated production in database
     await putProduction(production._id.toString(), {
       ...production,
@@ -839,6 +853,46 @@ export async function startProduction(
           input_slot: source.input_slot
         };
       }),
+      production_settings: {
+        ...production.production_settings,
+        pipelines: await Promise.all(
+          production.production_settings.pipelines.map(async (pipeline) => {
+            const newSources = await Promise.all(
+              sourcesWithId.map(async (source) => {
+                const ingestUuid = await getUuidFromIngestName(
+                  source.ingest_name
+                );
+                if (!ingestUuid) {
+                  throw new Error(
+                    `Ingest UUID not found for ingest name: ${source.ingest_name}`
+                  );
+                }
+                const sourceId = await getSourceIdFromSourceName(
+                  ingestUuid,
+                  source.ingest_source_name
+                );
+
+                return {
+                  source_id: sourceId || 0,
+                  settings: {
+                    alignment_ms:
+                      pipeline.sources?.find((s) => s.source_id === sourceId)
+                        ?.settings.alignment_ms || pipeline.alignment_ms,
+                    max_network_latency_ms:
+                      pipeline.sources?.find((s) => s.source_id === sourceId)
+                        ?.settings.max_network_latency_ms ||
+                      pipeline.max_network_latency_ms
+                  }
+                };
+              })
+            );
+            return {
+              ...pipeline,
+              sources: newSources
+            };
+          })
+        )
+      },
       isActive: true
     }).catch(async (error) => {
       Log().error(error);
@@ -939,6 +993,268 @@ export async function startProduction(
         }
       ],
       error: 'Failed to create monitoring object in database'
+    };
+  }
+}
+
+export async function postMultiviewersOnRunningProduction(
+  production: Production,
+  additions: MultiviewSettings[]
+) {
+  try {
+    const multiview = production.production_settings.pipelines[0].multiviews;
+    if (!multiview) {
+      Log().error(
+        `No multiview settings specified for production: ${production.name}`
+      );
+      throw `No multiview settings specified for production: ${production.name}`;
+    }
+
+    const productionSettings = {
+      ...production.production_settings,
+      pipelines: production.production_settings.pipelines.map((pipeline) => {
+        return {
+          ...pipeline,
+          multiviews: additions
+        };
+      })
+    };
+
+    const runtimeMultiviews = await createMultiviewForPipeline(
+      productionSettings,
+      production.sources
+    ).catch(async (error) => {
+      Log().error(
+        `Failed to create multiview for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}'`,
+        error
+      );
+      throw `Failed to create multiview for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}': ${error}`;
+    });
+
+    const multiviewsWithUpdatedId: MultiviewSettings[] = [
+      ...multiview.slice(0, multiview.length - runtimeMultiviews.length),
+      ...runtimeMultiviews.map((runtimeMultiview, index) => {
+        return {
+          ...multiview[multiview.length - runtimeMultiviews.length + index],
+          multiview_id: runtimeMultiview.id
+        };
+      })
+    ];
+
+    await putProduction(production._id.toString(), {
+      ...production,
+      production_settings: {
+        ...production.production_settings,
+        pipelines: production.production_settings.pipelines.map((pipeline) => {
+          return {
+            ...pipeline,
+            multiviews: multiviewsWithUpdatedId
+          };
+        })
+      }
+    }).catch(async (error) => {
+      Log().error(
+        `Failed to save multiviews for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}' to database`,
+        error
+      );
+      throw error;
+    });
+
+    return {
+      ok: true,
+      value: {
+        success: true,
+        steps: [
+          {
+            step: 'create_multiview',
+            success: true
+          }
+        ]
+      }
+    };
+  } catch (e) {
+    Log().error('Could not create multiviews');
+    Log().error(e);
+    if (typeof e !== 'string') {
+      return {
+        ok: false,
+        value: {
+          success: true,
+          steps: [
+            {
+              step: 'create_multiview',
+              success: false
+            }
+          ]
+        },
+        error: 'Could not create multiviews'
+      };
+    }
+    return {
+      ok: false,
+      value: {
+        success: true,
+        steps: [
+          {
+            step: 'create_multiview',
+            success: false,
+            message: e
+          }
+        ]
+      },
+      error: e
+    };
+  }
+}
+
+export async function putMultiviewersOnRunningProduction(
+  production: Production,
+  updates: MultiviewSettings[]
+) {
+  try {
+    updates.map(async (multiview) => {
+      const views = multiview.layout.views;
+
+      if (
+        multiview.multiview_id &&
+        production.production_settings.pipelines[0].pipeline_id
+      ) {
+        await updateMultiviewForPipeline(
+          production.production_settings.pipelines[0].pipeline_id,
+          multiview.multiview_id,
+          views
+        );
+      }
+    });
+
+    return {
+      ok: true,
+      value: {
+        success: true,
+        steps: [
+          {
+            step: 'update_multiview',
+            success: true
+          }
+        ]
+      }
+    };
+  } catch (e) {
+    Log().error('Could not update multiviews');
+    Log().error(e);
+    if (typeof e !== 'string') {
+      return {
+        ok: false,
+        value: {
+          success: true,
+          steps: [
+            {
+              step: 'update_multiview',
+              success: false
+            }
+          ]
+        },
+        error: 'Could not update multiviews'
+      };
+    }
+    return {
+      ok: false,
+      value: {
+        success: true,
+        steps: [
+          {
+            step: 'update_multiview',
+            success: false,
+            message: e
+          }
+        ]
+      },
+      error: e
+    };
+  }
+}
+
+export async function deleteMultiviewersOnRunningProduction(
+  production: Production,
+  removals: MultiviewSettings[]
+) {
+  try {
+    const pipeline = production.production_settings.pipelines.find((p) =>
+      p.multiviews ? p.multiviews?.length > 0 : undefined
+    );
+    const multiviewIndexArray = pipeline?.multiviews
+      ? pipeline.multiviews.map((p) => p.for_pipeline_idx)
+      : undefined;
+
+    const multiviewIndex = multiviewIndexArray?.find((p) => p !== undefined);
+
+    const pipelineUUID =
+      multiviewIndex !== undefined
+        ? production.production_settings.pipelines[multiviewIndex].pipeline_id
+        : undefined;
+
+    if (!pipelineUUID) return;
+
+    await Promise.allSettled(
+      removals.map((multiview) => {
+        if (multiview.multiview_id) {
+          deleteMultiviewFromPipeline(
+            pipelineUUID,
+            multiview.multiview_id
+          ).catch((error) => {
+            Log().error(
+              `Failed to remove multiview '${multiview.multiview_id}' from pipeline '${pipelineUUID}'`,
+              error
+            );
+            throw `Failed to remove multiview '${multiview.multiview_id}' from pipeline '${pipelineUUID}': ${error}`;
+          });
+        }
+      })
+    );
+
+    return {
+      ok: true,
+      value: {
+        success: true,
+        steps: [
+          {
+            step: 'delete_multiview',
+            success: true
+          }
+        ]
+      }
+    };
+  } catch (e) {
+    Log().error('Could not delete multiviews');
+    Log().error(e);
+    if (typeof e !== 'string') {
+      return {
+        ok: false,
+        value: {
+          success: true,
+          steps: [
+            {
+              step: 'delete_multiview',
+              success: false
+            }
+          ]
+        },
+        error: 'Could not delete multiviews'
+      };
+    }
+    return {
+      ok: false,
+      value: {
+        success: true,
+        steps: [
+          {
+            step: 'delete_multiview',
+            success: false,
+            message: e
+          }
+        ]
+      },
+      error: e
     };
   }
 }

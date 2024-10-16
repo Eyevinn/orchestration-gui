@@ -80,7 +80,16 @@ export const sv = {
     source: 'Källa',
     add: 'Lägg till',
     add_other_source_type: 'Lägg till annan källtyp',
-    configure_outputs: 'Konfigurera Outputs'
+    configure_outputs: 'Konfigurera Outputs',
+    manage_multiviewers: 'Uppdatera multiviewers'
+  },
+  configure_alignment_latency: {
+    source_name: 'Källnamn',
+    error: 'Alignmentvärdet måste vara högre än latencyvärdet',
+    configure_alignment_latency:
+      'Ställ in alignment och latency för strömmarna på produktionens pipelines',
+    save: 'Spara',
+    cancel: 'Avbryt'
   },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',
@@ -664,7 +673,7 @@ export const sv = {
     no_multiview_selected: 'Ingen multiview vald',
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
-    configure_layout: 'Justera komposition',
+    configure_layouts: 'Justera kompositioner',
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
     no_updated_layout: 'Ingen uppdaterad komposition',
@@ -681,7 +690,10 @@ export const sv = {
     layout_deleted: 'Kompositionen har tagits bort',
     not_possible_delete_global_layout:
       'Det går inte att ta bort globala kompositioner',
-    could_not_delete_layout: 'Kunde inte ta bort kompositionen'
+    could_not_delete_layout: 'Kunde inte ta bort kompositionen',
+    confirm_update_multiviewers:
+      'Är du säker på att du vill uppdatera multiview för pågående produktion?',
+    confirm_update: 'Uppdatera multiviewers'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

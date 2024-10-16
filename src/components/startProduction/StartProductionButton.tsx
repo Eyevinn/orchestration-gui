@@ -106,7 +106,13 @@ export function StartProductionButton({
             ),
             {
               ...pipelineToUpdateMultiview,
-              multiviews: [{ ...multiviewLayouts[0], for_pipeline_idx: 0 }]
+              multiviews: [
+                {
+                  ...multiviewLayouts[0],
+                  for_pipeline_idx: 0,
+                  _id: multiviewLayouts[0]._id?.toString()
+                }
+              ]
             }
           ]
         }

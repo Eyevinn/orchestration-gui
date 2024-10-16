@@ -52,18 +52,3 @@ export function useMultiviewPresets(): DataHook<MultiviewPreset[]> {
 
   return [multiviewPresets, loading, undefined];
 }
-
-// TODO Add this when possibility to update and add mv-presets are added
-// export function usePutMultiviewPreset() {
-//   return async (newMultiviewPreset: MultiviewPreset): Promise<void> => {
-//     const response = await fetch('/api/manager/presets', {
-//       method: 'PUT',
-//       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
-//       body: JSON.stringify(newMultiviewPreset)
-//     });
-//     if (response.ok) {
-//       return;
-//     }
-//     throw await response.text();
-//   };
-// }

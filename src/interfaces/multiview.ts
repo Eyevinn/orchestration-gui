@@ -42,4 +42,5 @@ export interface MultiviewSettings {
   name: string;
   layout: MultiviewStructureLayout;
   output: MultiviewOutputSettings;
+  _id?: string;
 }

@@ -6,7 +6,7 @@ import { Modal as BaseModal } from '@mui/base';
 type BaseModalProps = {
   open: boolean;
   forwardRef?: LegacyRef<HTMLDivElement> | null;
-  outsideClick: () => void;
+  outsideClick?: () => void;
   className?: string;
 };
 
@@ -16,16 +16,21 @@ export function Modal({ open, children, outsideClick, className }: ModalProps) {
   const element = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (element.current && !element.current.contains(event.target as Node)) {
-        outsideClick();
-      }
-    };
+    if (outsideClick) {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          element.current &&
+          !element.current.contains(event.target as Node)
+        ) {
+          outsideClick();
+        }
+      };
 
-    document.addEventListener('click', handleClickOutside, true);
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true);
-    };
+      document.addEventListener('click', handleClickOutside, true);
+      return () => {
+        document.removeEventListener('click', handleClickOutside, true);
+      };
+    }
   }, [outsideClick]);
 
   return (

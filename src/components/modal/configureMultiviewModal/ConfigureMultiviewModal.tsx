@@ -12,6 +12,8 @@ import { usePutMultiviewLayout } from '../../../hooks/multiviewLayout';
 import Decision from '../configureOutputModal/Decision';
 import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 import { IconSettings } from '@tabler/icons-react';
+import { UpdateMultiviewersModal } from '../UpdateMultiviewersModal';
+import { Button } from '../../button/Button';
 
 type ConfigureMultiviewModalProps = {
   open: boolean;
@@ -33,6 +35,7 @@ export function ConfigureMultiviewModal({
     []
   );
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
+  const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
@@ -59,6 +62,14 @@ export function ConfigureMultiviewModal({
   }, [multiviews]);
 
   const onSave = () => {
+    if (production?.isActive && !confirmUpdateModalOpen) {
+      setConfirmUpdateModalOpen(true);
+      return;
+    }
+    if (production?.isActive && confirmUpdateModalOpen) {
+      setConfirmUpdateModalOpen(false);
+    }
+
     const presetToUpdate = deepclone(preset);
 
     if (!multiviews) {
@@ -148,6 +159,9 @@ export function ConfigureMultiviewModal({
   };
 
   const addNewMultiview = (newMultiview: MultiviewSettings) => {
+    // Remove _id from newMultiview to avoid conflicts with existing multiviews
+    delete newMultiview._id;
+
     setMultiviews((prevMultiviews) =>
       prevMultiviews ? [...prevMultiviews, newMultiview] : [newMultiview]
     );
@@ -159,7 +173,7 @@ export function ConfigureMultiviewModal({
   };
 
   return (
-    <Modal open={open} outsideClick={() => clearInputs()}>
+    <Modal open={open}>
       {!layoutModalOpen && (
         <div className="flex gap-3">
           {multiviews &&
@@ -170,13 +184,6 @@ export function ConfigureMultiviewModal({
                   {index !== 0 && (
                     <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
                   )}
-                  <button
-                    onClick={() => setLayoutModalOpen(true)}
-                    title={t('preset.configure_layout')}
-                    className={`absolute top-0 right-[-10%] min-w-fit`}
-                  >
-                    <IconSettings className="text-p" />
-                  </button>
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
                       productionId={production?._id}
@@ -215,7 +222,12 @@ export function ConfigureMultiviewModal({
                         <button
                           type="button"
                           title={t('preset.add_another_multiview')}
-                          onClick={() => addNewMultiview(singleItem)}
+                          onClick={() =>
+                            addNewMultiview({
+                              ...singleItem,
+                              multiview_id: (singleItem.multiview_id ?? 0) + 1
+                            })
+                          }
                         >
                           <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
                         </button>
@@ -233,10 +245,31 @@ export function ConfigureMultiviewModal({
           setNewMultiviewPreset={setNewMultiviewLayout}
         />
       )}
-      <Decision
-        onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
-        onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
-      />
+      <div className="flex flex-col">
+        {!layoutModalOpen && (
+          <Button
+            className="flex self-center hover:bg-green-400 min-w-fit max-w-fit mt-10"
+            type="button"
+            onClick={() => setLayoutModalOpen(true)}
+          >
+            {t('preset.configure_layouts')}
+            <IconSettings className="text-p inline ml-2" />
+          </Button>
+        )}
+        <Decision
+          className="mt-6"
+          onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
+          onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
+        />
+      </div>
+
+      {confirmUpdateModalOpen && (
+        <UpdateMultiviewersModal
+          open={confirmUpdateModalOpen}
+          onAbort={() => setConfirmUpdateModalOpen(false)}
+          onConfirm={() => onSave()}
+        />
+      )}
     </Modal>
   );
 }
