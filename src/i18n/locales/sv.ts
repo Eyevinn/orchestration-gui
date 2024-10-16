@@ -83,6 +83,14 @@ export const sv = {
     configure_outputs: 'Konfigurera Outputs',
     manage_multiviewers: 'Uppdatera multiviewers'
   },
+  configure_alignment_latency: {
+    source_name: 'Källnamn',
+    error: 'Alignmentvärdet måste vara högre än latencyvärdet',
+    configure_alignment_latency:
+      'Ställ in alignment och latency för strömmarna på produktionens pipelines',
+    save: 'Spara',
+    cancel: 'Avbryt'
+  },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',
   homepage: 'Startsidan',
@@ -665,7 +673,7 @@ export const sv = {
     no_multiview_selected: 'Ingen multiview vald',
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
-    configure_layout: 'Justera komposition',
+    configure_layouts: 'Justera kompositioner',
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
     no_updated_layout: 'Ingen uppdaterad komposition',

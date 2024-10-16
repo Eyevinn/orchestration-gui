@@ -13,6 +13,7 @@ import Decision from '../configureOutputModal/Decision';
 import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 import { IconSettings } from '@tabler/icons-react';
 import { UpdateMultiviewersModal } from '../UpdateMultiviewersModal';
+import { Button } from '../../button/Button';
 
 type ConfigureMultiviewModalProps = {
   open: boolean;
@@ -183,13 +184,6 @@ export function ConfigureMultiviewModal({
                   {index !== 0 && (
                     <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
                   )}
-                  <button
-                    onClick={() => setLayoutModalOpen(true)}
-                    title={t('preset.configure_layout')}
-                    className={`absolute top-0 right-[-10%] min-w-fit`}
-                  >
-                    <IconSettings className="text-p" />
-                  </button>
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
                       productionId={production?._id}
@@ -251,10 +245,23 @@ export function ConfigureMultiviewModal({
           setNewMultiviewPreset={setNewMultiviewLayout}
         />
       )}
-      <Decision
-        onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
-        onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
-      />
+      <div className="flex flex-col">
+        {!layoutModalOpen && (
+          <Button
+            className="flex self-center hover:bg-green-400 min-w-fit max-w-fit mt-10"
+            type="button"
+            onClick={() => setLayoutModalOpen(true)}
+          >
+            {t('preset.configure_layouts')}
+            <IconSettings className="text-p inline ml-2" />
+          </Button>
+        )}
+        <Decision
+          className="mt-6"
+          onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
+          onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
+        />
+      </div>
 
       {confirmUpdateModalOpen && (
         <UpdateMultiviewersModal

@@ -81,6 +81,14 @@ export const en = {
     configure_outputs: 'Configure Outputs',
     manage_multiviewers: 'Manage multiviewers'
   },
+  configure_alignment_latency: {
+    configure_alignment_latency:
+      'Configure alignment and latency for the pipeline streams',
+    source_name: 'Source name',
+    error: 'The alignment value must be higher than the latency',
+    save: 'Save',
+    cancel: 'Cancel'
+  },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',
   homepage: 'Home',
@@ -659,7 +667,7 @@ export const en = {
     stream_name: 'Stream',
     multiview_output_settings: 'Multiview output',
     select_multiview_layout: 'Layout',
-    configure_layout: 'Configure layout',
+    configure_layouts: 'Configure layouts',
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',

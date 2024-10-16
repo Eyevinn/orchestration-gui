@@ -94,7 +94,7 @@ async function connectIngestSources(
       throw `Could not find UUID for ${source.ingest_name}`;
     });
     const sourceId = await getSourceIdFromSourceName(
-      ingestUuid,
+      ingestUuid || '',
       source.ingest_source_name,
       false
     );
@@ -119,9 +119,14 @@ async function connectIngestSources(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
 
+      const pipelineSource = pipeline.sources?.find(
+        (source) => source.source_id === sourceId
+      );
+
       const stream: PipelineStreamSettings = {
         pipeline_id: pipeline.pipeline_id!,
-        alignment_ms: pipeline.alignment_ms,
+        alignment_ms:
+          pipelineSource?.settings.alignment_ms || pipeline.alignment_ms,
         audio_format: pipeline.audio_format,
         audio_sampling_frequency: pipeline.audio_sampling_frequency,
         bit_depth: pipeline.bit_depth,
@@ -133,13 +138,15 @@ async function connectIngestSources(
         frame_rate_n: pipeline.frame_rate_n,
         gop_length: pipeline.gop_length,
         height: pipeline.height,
-        max_network_latency_ms: pipeline.max_network_latency_ms,
+        max_network_latency_ms:
+          pipelineSource?.settings.max_network_latency_ms ||
+          pipeline.max_network_latency_ms,
         pic_mode: pipeline.pic_mode,
         speed_quality_balance: pipeline.speed_quality_balance,
         video_kilobit_rate: pipeline.video_kilobit_rate,
         width: pipeline.width,
-        ingest_id: ingestUuid,
-        source_id: sourceId,
+        ingest_id: ingestUuid || '',
+        source_id: sourceId || 0,
         input_slot: input_slot,
         audio_mapping: JSON.stringify(audioMapping),
         interfaces: [
@@ -467,11 +474,6 @@ export async function stopProduction(
       }
     }
     Log().info(`Pipeline '${id}' stopped`);
-
-    const pipelines = await getPipelines();
-    const pipelineFeedbackStreams = pipelines.find(
-      (p) => p.uuid === id
-    )?.feedback_streams;
   }
 
   if (
@@ -828,6 +830,15 @@ export async function startProduction(
   } // Try to setup multiviews end
 
   try {
+    const sourceIds = production.sources
+      .filter(
+        (source) => source.type !== 'mediaplayer' && source.type !== 'html'
+      )
+      .map((source) => source._id?.toString())
+      .filter((id): id is string => id !== undefined);
+
+    const sourcesWithId = sourceIds ? await getSourcesByIds(sourceIds) : [];
+
     // Store updated production in database
     await putProduction(production._id.toString(), {
       ...production,
@@ -842,6 +853,46 @@ export async function startProduction(
           input_slot: source.input_slot
         };
       }),
+      production_settings: {
+        ...production.production_settings,
+        pipelines: await Promise.all(
+          production.production_settings.pipelines.map(async (pipeline) => {
+            const newSources = await Promise.all(
+              sourcesWithId.map(async (source) => {
+                const ingestUuid = await getUuidFromIngestName(
+                  source.ingest_name
+                );
+                if (!ingestUuid) {
+                  throw new Error(
+                    `Ingest UUID not found for ingest name: ${source.ingest_name}`
+                  );
+                }
+                const sourceId = await getSourceIdFromSourceName(
+                  ingestUuid,
+                  source.ingest_source_name
+                );
+
+                return {
+                  source_id: sourceId || 0,
+                  settings: {
+                    alignment_ms:
+                      pipeline.sources?.find((s) => s.source_id === sourceId)
+                        ?.settings.alignment_ms || pipeline.alignment_ms,
+                    max_network_latency_ms:
+                      pipeline.sources?.find((s) => s.source_id === sourceId)
+                        ?.settings.max_network_latency_ms ||
+                      pipeline.max_network_latency_ms
+                  }
+                };
+              })
+            );
+            return {
+              ...pipeline,
+              sources: newSources
+            };
+          })
+        )
+      },
       isActive: true
     }).catch(async (error) => {
       Log().error(error);

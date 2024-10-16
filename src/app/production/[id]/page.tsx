@@ -52,6 +52,10 @@ import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
 import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPipelines';
+import { ISource } from '../../../hooks/useDragableItems';
+import { useUpdateStream } from '../../../hooks/streams';
+import { usePutProductionPipelineSourceAlignmentAndLatency } from '../../../hooks/productions';
+import { useIngestSourceId } from '../../../hooks/ingests';
 import cloneDeep from 'lodash.clonedeep';
 import {
   useAddMultiviewersOnRunningProduction,
@@ -121,6 +125,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   // Websocket
   const [closeWebsocket] = useWebsocket();
+
+  const [updateStream, loading] = useUpdateStream();
+  const [getIngestSourceId, ingestSourceIdLoading] = useIngestSourceId();
+
+  const putProductionPipelineSourceAlignmentAndLatency =
+    usePutProductionPipelineSourceAlignmentAndLatency();
 
   const [checkProductionPipelines] = useCheckProductionPipelines();
 
@@ -349,6 +359,57 @@ export default function ProductionConfiguration({ params }: PageProps) {
     putProduction(id, productionSetup);
   };
 
+  const handleSetPipelineSourceSettings = (
+    source: ISource,
+    sourceId: number,
+    data: {
+      pipeline_uuid: string;
+      stream_uuid: string;
+      alignment: number;
+      latency: number;
+    }[]
+  ) => {
+    if (
+      productionSetup?._id &&
+      source?.ingest_name &&
+      source?.ingest_source_name
+    ) {
+      data.forEach(({ pipeline_uuid, stream_uuid, alignment, latency }) => {
+        putProductionPipelineSourceAlignmentAndLatency(
+          productionSetup._id,
+          pipeline_uuid,
+          source.ingest_name,
+          source.ingest_source_name,
+          alignment,
+          latency
+        );
+        updateStream(stream_uuid, alignment);
+
+        const updatedProduction = {
+          ...productionSetup,
+          productionSettings: {
+            ...productionSetup.production_settings,
+            pipelines: productionSetup.production_settings.pipelines.map(
+              (pipeline) => {
+                if (pipeline.pipeline_id === pipeline_uuid) {
+                  pipeline.sources?.map((source) => {
+                    if (source.source_id === sourceId) {
+                      source.settings.alignment_ms = alignment;
+                      source.settings.max_network_latency_ms = latency;
+                    }
+                  });
+                }
+                return pipeline;
+              }
+            )
+          }
+        };
+
+        setProductionSetup(updatedProduction);
+      });
+    }
+  };
+
   const updateSource = (
     source: SourceReference,
     productionSetup: Production
@@ -502,9 +563,52 @@ export default function ProductionConfiguration({ params }: PageProps) {
           )
         : false)
     ) {
+      let updatedSetup = productionSetup;
+
+      for (
+        let i = 0;
+        i < productionSetup.production_settings.pipelines.length;
+        i++
+      ) {
+        const pipeline = productionSetup.production_settings.pipelines[i];
+
+        if (!pipeline.sources) {
+          pipeline.sources = [];
+        }
+
+        const newSource = {
+          source_id: await getIngestSourceId(
+            selectedSource.ingest_name,
+            selectedSource.ingest_source_name
+          ),
+          settings: {
+            alignment_ms: pipeline.alignment_ms,
+            max_network_latency_ms: pipeline.max_network_latency_ms
+          }
+        };
+
+        updatedSetup = {
+          ...productionSetup,
+          production_settings: {
+            ...productionSetup.production_settings,
+            pipelines: productionSetup.production_settings.pipelines.map(
+              (p, index) => {
+                if (index === i) {
+                  if (!p.sources) {
+                    p.sources = [];
+                  }
+                  p.sources.push(newSource);
+                }
+                return p;
+              }
+            )
+          }
+        } as Production;
+      }
+
       const result = await createStream(
         selectedSource,
-        productionSetup,
+        updatedSetup,
         firstEmptySlot(productionSetup)
       );
       if (!result.ok) {
@@ -790,6 +894,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             {productionSetup?.sources && sources.size > 0 && (
               <DndProvider backend={HTML5Backend}>
                 <SourceCards
+                  onConfirm={handleSetPipelineSourceSettings}
                   productionSetup={productionSetup}
                   locked={locked}
                   updateProduction={(updated) => {
@@ -826,6 +931,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       });
                     }
                   }}
+                  loading={loading}
                 />
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal
