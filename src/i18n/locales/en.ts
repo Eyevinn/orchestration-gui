@@ -673,7 +673,10 @@ export const en = {
     layout_already_exist:
       'Layout {{layoutNameAlreadyExist}} will be replaced on save',
     remove_multiview: 'Remove multiview',
-    add_another_multiview: 'Add another multiview'
+    add_another_multiview: 'Add another multiview',
+    confirm_update_multiviewers:
+      'Are you sure you want to update multiviewers for the running production?',
+    confirm_update: 'Update multiviewers'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

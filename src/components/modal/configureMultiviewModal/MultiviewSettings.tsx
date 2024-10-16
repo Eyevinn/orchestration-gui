@@ -61,6 +61,7 @@ export default function MultiviewSettingsConfig({
     }
     handleUpdateMultiview({
       ...multiviewLayouts[0],
+      _id: multiviewLayouts[0]._id?.toString(),
       for_pipeline_idx: 0
     });
   }
@@ -80,7 +81,11 @@ export default function MultiviewSettingsConfig({
       output: multiview?.output || selected.output
     };
     setSelectedMultiviewLayout(updatedMultiview);
-    handleUpdateMultiview({ ...updatedMultiview, for_pipeline_idx: 0 });
+    handleUpdateMultiview({
+      ...updatedMultiview,
+      _id: updatedMultiview._id?.toString(),
+      for_pipeline_idx: 0
+    });
   };
 
   const getNumber = (val: string, prev: number) => {

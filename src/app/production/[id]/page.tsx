@@ -53,7 +53,11 @@ import { ConfigureMultiviewButton } from '../../../components/modal/configureMul
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
 import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPipelines';
 import cloneDeep from 'lodash.clonedeep';
-import { useUpdateMultiviewersOnRunningProduction } from '../../../hooks/workflow';
+import {
+  useAddMultiviewersOnRunningProduction,
+  useRemoveMultiviewersOnRunningProduction,
+  useUpdateMultiviewersOnRunningProduction
+} from '../../../hooks/workflow';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 
 export default function ProductionConfiguration({ params }: PageProps) {
@@ -92,8 +96,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [updateMultiviewViews] = useMultiviews();
   const [updateSourceInputSlotOnMultiviewLayouts] =
     useUpdateSourceInputSlotOnMultiviewLayouts();
+  const [addMultiviewersOnRunningProduction] =
+    useAddMultiviewersOnRunningProduction();
   const [updateMultiviewersOnRunningProduction] =
     useUpdateMultiviewersOnRunningProduction();
+  const [removeMultiviewersOnRunningProduction] =
+    useRemoveMultiviewersOnRunningProduction();
 
   //FROM LIVE API
   const [pipelines, loadingPipelines, , refreshPipelines] = usePipelines();
@@ -309,12 +317,26 @@ export default function ProductionConfiguration({ params }: PageProps) {
         (oldItem) => !presetMultiviewsMap.has(oldItem.multiview_id)
       );
 
-      updateMultiviewersOnRunningProduction(
-        (productionSetup?._id.toString(), updatedPreset),
-        additions,
-        updates,
-        removals
-      );
+      if (additions.length > 0) {
+        addMultiviewersOnRunningProduction(
+          (productionSetup?._id.toString(), updatedPreset),
+          additions
+        );
+      }
+
+      if (updates.length > 0) {
+        updateMultiviewersOnRunningProduction(
+          (productionSetup?._id.toString(), updatedPreset),
+          updates
+        );
+      }
+
+      if (removals.length > 0) {
+        removeMultiviewersOnRunningProduction(
+          (productionSetup?._id.toString(), updatedPreset),
+          removals
+        );
+      }
     }
 
     putProduction(productionSetup?._id.toString(), updatedPreset).then(() => {

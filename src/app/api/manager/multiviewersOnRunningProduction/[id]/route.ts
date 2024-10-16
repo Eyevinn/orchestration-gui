@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       Log().error(error);
       const errorResponse = {
         ok: false,
-        error: 'unexpected'
+        error: 'Could not update multiviewers'
       };
       return new NextResponse(JSON.stringify(errorResponse), { status: 500 });
     });
@@ -44,7 +44,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       Log().error(error);
       const errorResponse = {
         ok: false,
-        error: 'unexpected'
+        error: 'Could not remove multiviewers'
       };
       return new NextResponse(JSON.stringify(errorResponse), { status: 500 });
     });

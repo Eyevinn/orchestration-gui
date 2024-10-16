@@ -19,7 +19,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       Log().error(error);
       const errorResponse = {
         ok: false,
-        error: 'unexpected'
+        error: 'Could not add multiviewers'
       };
       return new NextResponse(JSON.stringify(errorResponse), { status: 500 });
     });

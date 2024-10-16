@@ -677,7 +677,10 @@ export const sv = {
     layout_already_exist:
       'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
     remove_multiview: 'Ta bort multiview',
-    add_another_multiview: 'Lägg till ny multiview'
+    add_another_multiview: 'Lägg till ny multiview',
+    confirm_update_multiviewers:
+      'Är du säker på att du vill uppdatera multiview för pågående produktion?',
+    confirm_update: 'Uppdatera multiviewers'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

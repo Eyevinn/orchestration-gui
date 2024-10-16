@@ -12,6 +12,7 @@ import { usePutMultiviewLayout } from '../../../hooks/multiviewLayout';
 import Decision from '../configureOutputModal/Decision';
 import MultiviewLayoutSettings from './MultiviewLayoutSettings/MultiviewLayoutSettings';
 import { IconSettings } from '@tabler/icons-react';
+import { UpdateMultiviewersModal } from '../UpdateMultiviewersModal';
 
 type ConfigureMultiviewModalProps = {
   open: boolean;
@@ -33,6 +34,7 @@ export function ConfigureMultiviewModal({
     []
   );
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
+  const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
@@ -59,6 +61,14 @@ export function ConfigureMultiviewModal({
   }, [multiviews]);
 
   const onSave = () => {
+    if (production?.isActive && !confirmUpdateModalOpen) {
+      setConfirmUpdateModalOpen(true);
+      return;
+    }
+    if (production?.isActive && confirmUpdateModalOpen) {
+      setConfirmUpdateModalOpen(false);
+    }
+
     const presetToUpdate = deepclone(preset);
 
     if (!multiviews) {
@@ -162,7 +172,7 @@ export function ConfigureMultiviewModal({
   };
 
   return (
-    <Modal open={open} outsideClick={() => clearInputs()}>
+    <Modal open={open}>
       {!layoutModalOpen && (
         <div className="flex gap-3">
           {multiviews &&
@@ -245,6 +255,14 @@ export function ConfigureMultiviewModal({
         onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
         onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
       />
+
+      {confirmUpdateModalOpen && (
+        <UpdateMultiviewersModal
+          open={confirmUpdateModalOpen}
+          onAbort={() => setConfirmUpdateModalOpen(false)}
+          onConfirm={() => onSave()}
+        />
+      )}
     </Modal>
   );
 }

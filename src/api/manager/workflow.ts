@@ -811,7 +811,7 @@ export async function startProduction(
           { step: 'pipeline_outputs', success: false },
           { step: 'multiviews', success: false }
         ],
-        error: 'Unknown error occured'
+        error: 'Could not start multiviews'
       };
     }
     return {
@@ -951,7 +951,8 @@ export async function postMultiviewersOnRunningProduction(
   additions: MultiviewSettings[]
 ) {
   try {
-    if (!production.production_settings.pipelines[0].multiviews) {
+    const multiview = production.production_settings.pipelines[0].multiviews;
+    if (!multiview) {
       Log().error(
         `No multiview settings specified for production: ${production.name}`
       );
@@ -979,11 +980,33 @@ export async function postMultiviewersOnRunningProduction(
       throw `Failed to create multiview for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}': ${error}`;
     });
 
-    runtimeMultiviews.flatMap((runtimeMultiview, index) => {
-      const multiview = production.production_settings.pipelines[0].multiviews;
-      if (multiview && multiview[index]) {
-        return (multiview[index].multiview_id = runtimeMultiview.id);
+    const multiviewsWithUpdatedId: MultiviewSettings[] = [
+      ...multiview.slice(0, multiview.length - runtimeMultiviews.length),
+      ...runtimeMultiviews.map((runtimeMultiview, index) => {
+        return {
+          ...multiview[multiview.length - runtimeMultiviews.length + index],
+          multiview_id: runtimeMultiview.id
+        };
+      })
+    ];
+
+    await putProduction(production._id.toString(), {
+      ...production,
+      production_settings: {
+        ...production.production_settings,
+        pipelines: production.production_settings.pipelines.map((pipeline) => {
+          return {
+            ...pipeline,
+            multiviews: multiviewsWithUpdatedId
+          };
+        })
       }
+    }).catch(async (error) => {
+      Log().error(
+        `Failed to save multiviews for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}' to database`,
+        error
+      );
+      throw error;
     });
 
     return {
@@ -999,7 +1022,7 @@ export async function postMultiviewersOnRunningProduction(
       }
     };
   } catch (e) {
-    Log().error('Could not start multiviews');
+    Log().error('Could not create multiviews');
     Log().error(e);
     if (typeof e !== 'string') {
       return {
@@ -1013,7 +1036,7 @@ export async function postMultiviewersOnRunningProduction(
             }
           ]
         },
-        error: 'Unknown error occured'
+        error: 'Could not create multiviews'
       };
     }
     return {
@@ -1023,7 +1046,8 @@ export async function postMultiviewersOnRunningProduction(
         steps: [
           {
             step: 'create_multiview',
-            success: false
+            success: false,
+            message: e
           }
         ]
       },
@@ -1065,7 +1089,7 @@ export async function putMultiviewersOnRunningProduction(
       }
     };
   } catch (e) {
-    Log().error('Could not start multiviews');
+    Log().error('Could not update multiviews');
     Log().error(e);
     if (typeof e !== 'string') {
       return {
@@ -1079,7 +1103,7 @@ export async function putMultiviewersOnRunningProduction(
             }
           ]
         },
-        error: 'Unknown error occured'
+        error: 'Could not update multiviews'
       };
     }
     return {
@@ -1089,7 +1113,8 @@ export async function putMultiviewersOnRunningProduction(
         steps: [
           {
             step: 'update_multiview',
-            success: false
+            success: false,
+            message: e
           }
         ]
       },
@@ -1149,7 +1174,7 @@ export async function deleteMultiviewersOnRunningProduction(
       }
     };
   } catch (e) {
-    Log().error('Could not start multiviews');
+    Log().error('Could not delete multiviews');
     Log().error(e);
     if (typeof e !== 'string') {
       return {
@@ -1163,7 +1188,7 @@ export async function deleteMultiviewersOnRunningProduction(
             }
           ]
         },
-        error: 'Unknown error occured'
+        error: 'Could not delete multiviews'
       };
     }
     return {
@@ -1173,7 +1198,8 @@ export async function deleteMultiviewersOnRunningProduction(
         steps: [
           {
             step: 'delete_multiview',
-            success: false
+            success: false,
+            message: e
           }
         ]
       },
