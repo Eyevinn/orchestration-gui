@@ -1,6 +1,7 @@
 import { ObjectId, WithId } from 'mongodb';
 import { MultiviewPreset } from '../../interfaces/preset';
 import { getDatabase } from '../mongoClient/dbClient';
+import { Log } from '../logger';
 
 export async function getMultiviewLayouts(): Promise<MultiviewPreset[]> {
   const db = await getDatabase();
@@ -35,4 +36,13 @@ export async function putMultiviewLayout(
   } else {
     await collection.insertOne({ ...newMultiviewLayout, _id: new ObjectId() });
   }
+}
+
+export async function deleteLayout(id: string): Promise<void> {
+  const db = await getDatabase();
+
+  await db.collection('multiviews').deleteOne({
+    _id: { $eq: new ObjectId(id) }
+  });
+  Log().info('Deleted multiview layout', id);
 }

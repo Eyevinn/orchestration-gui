@@ -3,7 +3,10 @@ import { useMultiviewPresets } from '../../../../hooks/multiviewPreset';
 import { MultiviewPreset } from '../../../../interfaces/preset';
 import { useTranslate } from '../../../../i18n/useTranslate';
 import { useSetupMultiviewLayout } from '../../../../hooks/useSetupMultiviewLayout';
-import { useMultiviewLayouts } from '../../../../hooks/multiviewLayout';
+import {
+  useDeleteMultiviewLayout,
+  useMultiviewLayouts
+} from '../../../../hooks/multiviewLayout';
 import { Production } from '../../../../interfaces/production';
 import { useConfigureMultiviewLayout } from '../../../../hooks/useConfigureMultiviewLayout';
 import { TMultiviewLayout } from '../../../../interfaces/preset';
@@ -12,6 +15,9 @@ import { TListSource } from '../../../../interfaces/multiview';
 import Options from '../../configureOutputModal/Options';
 import Input from '../../configureOutputModal/Input';
 import MultiviewLayout from './MultiviewLayout';
+import { IconTrash } from '@tabler/icons-react';
+import toast from 'react-hot-toast';
+import { set } from 'lodash';
 
 type ChangeLayout = {
   defaultLabel?: string;
@@ -28,10 +34,12 @@ export default function MultiviewLayoutSettings({
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
+  const [refresh, setRefresh] =
+    useState(true);
   const [changedLayout, setChangedLayout] = useState<ChangeLayout | null>(null);
   const [newPresetName, setNewPresetName] = useState<string | null>(null);
   const [layoutToChange, setLayoutToChange] = useState<string>('');
-  const [multiviewLayouts] = useMultiviewLayouts();
+  const [multiviewLayouts] = useMultiviewLayouts(refresh);
   const [multiviewPresets] = useMultiviewPresets();
   const { multiviewPresetLayout } = useSetupMultiviewLayout(
     selectedMultiviewPreset
@@ -45,6 +53,7 @@ export default function MultiviewLayoutSettings({
     newPresetName
   );
   const { inputList } = useCreateInputArray(production);
+  const deleteLayout = useDeleteMultiviewLayout();
   const t = useTranslate();
 
   const multiviewPresetNames = multiviewPresets?.map((preset) => preset.name)
@@ -57,6 +66,15 @@ export default function MultiviewLayoutSettings({
   const multiviewLayoutNames =
     availableMultiviewLayouts?.map((layout) => layout.name) || [];
 
+  const productionLayouts =
+    multiviewLayouts?.filter(
+      (layout) => layout.productionId === production?._id
+    ) || [];
+  const globalMultiviewLayouts = multiviewLayouts?.filter(
+      (layout) => !layout.productionId
+    );
+  const deleteDisabled = productionLayouts.length < 1;
+
   // This useEffect is used to set the drawn layout of the multiviewer on start,
   // if this fails then the modal will be empty
   useEffect(() => {
@@ -64,6 +82,12 @@ export default function MultiviewLayoutSettings({
       setSelectedMultiviewPreset(multiviewPresets[0]);
     }
   }, [multiviewPresets]);
+
+  useEffect(() => {
+    if (multiviewLayouts) {
+      setRefresh(false);
+    }
+  }, [multiviewLayouts]);
 
   const layoutNameAlreadyExist = availableMultiviewLayouts?.find(
     (singlePreset) => singlePreset.name === multiviewLayout?.name
@@ -122,21 +146,63 @@ export default function MultiviewLayoutSettings({
     }
   };
 
+  const removeMultiviewLayout = () => {
+    const layoutToRemove = productionLayouts.find(
+      (layout) => layout.name === newPresetName
+    );
+    const globalLayoutToRemove = globalMultiviewLayouts?.find(
+      (layout) => layout.name === newPresetName
+    );
+
+    if (!layoutToRemove && globalLayoutToRemove) {
+      toast.error(t('preset.not_possible_delete_global_layout'));
+      return;
+    }
+    if (layoutToRemove && !layoutToRemove._id) {
+      toast.error(t('preset.could_not_delete_layout'));
+      return;
+    }
+    if (layoutToRemove && layoutToRemove._id) {
+      deleteLayout(layoutToRemove._id.toString()).then(() => {
+        setRefresh(true);
+        setNewPresetName('');
+        toast.success(t('preset.layout_deleted'));
+      });
+    }
+  };
+
   return (
     <>
       {selectedMultiviewPreset && (
         <div className="flex flex-col w-full h-full">
           <div className="flex flex-col self-center w-[40%] pt-5">
-            <Options
-              label={t('preset.select_multiview_layout')}
-              options={multiviewLayoutNames.map((singleItem) => ({
-                label: singleItem
-              }))}
-              value={
-                selectedMultiviewPreset ? selectedMultiviewPreset.name : ''
-              }
-              update={(value) => handleLayoutUpdate(value, 'layout')}
-            />
+            <div className="relative">
+              <Options
+                label={t('preset.select_multiview_layout')}
+                options={multiviewLayoutNames.map((singleItem) => ({
+                  label: singleItem
+                }))}
+                value={
+                  selectedMultiviewPreset ? selectedMultiviewPreset.name : ''
+                }
+                update={(value) => handleLayoutUpdate(value, 'layout')}
+              />
+              <button
+                type="button"
+                title={t('preset.remove_multiview')}
+                className="absolute top-0 right-[-10%] min-w-fit"
+                onClick={() => removeMultiviewLayout()}
+                disabled={deleteDisabled}
+              >
+                <IconTrash
+                  className={`ml-4 ${
+                    deleteDisabled
+                      ? 'pointer-events-none text-zinc-400'
+                      : 'text-button-delete hover:text-red-400'
+                  }`}
+                />
+              </button>
+            </div>
             <Options
               label={t('preset.select_multiview_preset')}
               options={multiviewPresetNames.map((singleItem) => ({

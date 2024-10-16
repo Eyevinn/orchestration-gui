@@ -3,7 +3,10 @@ import { isAuthenticated } from '../../../../../api/manager/auth';
 import { Params } from 'next/dist/shared/lib/router/utils/route-matcher';
 import { updateMultiviewForPipeline } from '../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
 import { MultiviewViews } from '../../../../../interfaces/multiview';
-import { getMultiviewLayout } from '../../../../../api/manager/multiviews';
+import {
+  deleteLayout,
+  getMultiviewLayout
+} from '../../../../../api/manager/multiviews';
 
 type PutMultiviewRequest = {
   pipelineId: string;
@@ -50,5 +53,30 @@ export async function PUT(
     return new NextResponse(JSON.stringify(e), {
       status: 500
     });
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Params }
+): Promise<NextResponse> {
+  if (!(await isAuthenticated())) {
+    return new NextResponse(`Not Authorized!`, {
+      status: 403
+    });
+  }
+  try {
+    await deleteLayout(params.id);
+    return new NextResponse(null, {
+      status: 200
+    });
+  } catch (error) {
+    console.log(error);
+    return new NextResponse(
+      `Error occurred while posting to DB! Error: ${error}`,
+      {
+        status: 500
+      }
+    );
   }
 }

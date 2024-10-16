@@ -676,7 +676,10 @@ export const sv = {
     layout_already_exist:
       'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
     remove_multiview: 'Ta bort multiview',
-    add_another_multiview: 'Lägg till ny multiview'
+    add_another_multiview: 'Lägg till ny multiview',
+    layout_deleted: 'Kompositionen har tagits bort',
+    not_possible_delete_global_layout: 'Det går inte att ta bort globala kompositioner',
+    could_not_delete_layout: 'Kunde inte ta bort kompositionen'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

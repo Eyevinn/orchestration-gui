@@ -672,7 +672,10 @@ export const en = {
     layout_already_exist:
       'Layout {{layoutNameAlreadyExist}} will be replaced on save',
     remove_multiview: 'Remove multiview',
-    add_another_multiview: 'Add another multiview'
+    add_another_multiview: 'Add another multiview',
+    not_possible_delete_global_layout: 'Global layout can not be deleted',
+    could_not_delete_layout: 'Could not delete layout',
+    layout_deleted: 'Layout deleted'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

@@ -28,7 +28,7 @@ export default function MultiviewSettingsConfig({
   productionId
 }: MultiviewSettingsProps) {
   const t = useTranslate();
-  const [multiviewLayouts] = useMultiviewLayouts();
+  const [multiviewLayouts] = useMultiviewLayouts(true);
   const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
     TMultiviewLayout | undefined
   >();

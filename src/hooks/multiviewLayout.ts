@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { TMultiviewLayout } from '../interfaces/preset';
 import { DataHook } from './types';
 import { WithId } from 'mongodb';
@@ -30,13 +30,19 @@ export function useGetMultiviewLayout() {
   };
 }
 
-export function useMultiviewLayouts(): DataHook<TMultiviewLayout[]> {
+export function useMultiviewLayouts(refresh: boolean): DataHook<TMultiviewLayout[]> {
   const [loading, setLoading] = useState(true);
   const [multiviewLayouts, setmultiviewLayouts] = useState<TMultiviewLayout[]>(
     []
   );
 
   useEffect(() => {
+    setmultiviewLayouts([]);
+
+    if(!refresh) {
+      return;
+    }
+
     setLoading(true);
     fetch('/api/manager/multiviews', {
       method: 'GET',
@@ -48,7 +54,7 @@ export function useMultiviewLayouts(): DataHook<TMultiviewLayout[]> {
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [refresh]);
 
   return [multiviewLayouts, loading, undefined];
 }
@@ -59,6 +65,19 @@ export function usePutMultiviewLayout() {
       method: 'PUT',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify(newMultiviewLayout)
+    });
+    if (response.ok) {
+      return;
+    }
+    throw await response.text();
+  };
+}
+
+export function useDeleteMultiviewLayout() {
+  return async (id: string): Promise<void> => {
+    const response = await fetch(`/api/manager/multiviews/${id}`, {
+      method: 'DELETE',
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     });
     if (response.ok) {
       return;
