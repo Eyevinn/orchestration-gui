@@ -657,6 +657,7 @@ export const en = {
     port: 'Port',
     mode: 'Mode',
     srt_passphrase: 'Passphrase',
+    srt_stream_id: 'SRT ID',
     video_settings: 'Video settings',
     video_format: 'Format',
     video_bit_depth: 'Bit depth',
@@ -677,7 +678,9 @@ export const en = {
     no_multiview_found: 'No multiview found',
     no_port_selected: 'Unique port needed',
     layout_already_exist:
-      'Layout {{layoutNameAlreadyExist}} will be replaced on save'
+      'Layout {{layoutNameAlreadyExist}} will be replaced on save',
+    remove_multiview: 'Remove multiview',
+    add_another_multiview: 'Add another multiview'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

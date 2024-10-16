@@ -56,6 +56,11 @@ export default function StreamAccordion({
 
       <div className={`${active ? 'block' : 'hidden'} w-full`}>
         <div className="bg-container rounded text-p">
+          <Input
+            label={t('preset.srt_stream_id')}
+            value={stream.srt_stream_id}
+            update={(value) => update('srt_stream_id', value)}
+          />
           <Options
             label={t('preset.mode')}
             options={[{ label: 'listener' }, { label: 'caller' }]}

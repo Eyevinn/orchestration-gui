@@ -110,6 +110,7 @@ export interface PipelineOutputSettings {
   video_format: string;
   video_gop_length: number;
   video_kilobit_rate: number;
+  srt_stream_id: string;
 }
 
 export interface PipelineStreamSettings {

@@ -56,6 +56,8 @@ import { ISource } from '../../../hooks/useDragableItems';
 import { useUpdateStream } from '../../../hooks/streams';
 import { usePutProductionPipelineSourceAlignmentAndLatency } from '../../../hooks/productions';
 import { useIngestSourceId } from '../../../hooks/ingests';
+import cloneDeep from 'lodash.clonedeep';
+
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -195,11 +197,19 @@ export default function ProductionConfiguration({ params }: PageProps) {
     pipelineName?: string,
     id?: string
   ) => {
+    const selectedPresetCopy = cloneDeep(selectedPreset);
+    const foundPipeline = selectedPresetCopy?.pipelines[pipelineIndex];
+    if (foundPipeline) {
+      foundPipeline.outputs = [];
+      foundPipeline.pipeline_name = pipelineName;
+    }
+    setSelectedPreset(selectedPresetCopy);
     setProductionSetup((prevState) => {
       const updatedPipelines = prevState?.production_settings.pipelines;
       if (!updatedPipelines) return;
       updatedPipelines[pipelineIndex].pipeline_name = pipelineName;
       updatedPipelines[pipelineIndex].pipeline_id = id;
+      updatedPipelines[pipelineIndex].outputs = [];
       putProduction(prevState._id, {
         ...prevState,
         production_settings: {
@@ -432,7 +442,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     const id = `${preset.name}-${index}-id`;
     return (
       <li
-        key={preset.name}
+        key={preset.name + index}
         className="flex w-40 px-1 mb-1 hover:bg-gray-600"
         onClick={() => {
           updateSelectedPreset(preset);
@@ -916,7 +926,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   return (
                     <PipelineNameDropDown
                       disabled={productionSetup.isActive || locked}
-                      key={pipeline.pipeline_readable_name}
+                      key={pipeline.pipeline_readable_name + i}
                       label={pipeline.pipeline_readable_name}
                       options={pipelines?.map((pipeline) => ({
                         option: pipeline.name,

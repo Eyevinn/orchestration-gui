@@ -288,7 +288,8 @@ function buildOutputStreamSettings(
       srt_mode: s.srt_mode, // 'listener' or 'caller'
       srt_latency_ms: s.srt_latency_ms, // 120
       srt_passphrase: s.srt_passphrase, // ''
-      video_gop_length: s.video_gop_length
+      video_gop_length: s.video_gop_length,
+      srt_stream_id: s.srt_stream_id
     };
   });
   Log().info(`Creating streams for output ${output.uuid}.'`, outputSettings);
