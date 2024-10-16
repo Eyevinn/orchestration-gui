@@ -58,7 +58,6 @@ import { usePutProductionPipelineSourceAlignmentAndLatency } from '../../../hook
 import { useIngestSourceId } from '../../../hooks/ingests';
 import cloneDeep from 'lodash.clonedeep';
 
-
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
 
