@@ -32,16 +32,16 @@ export default function Options({
         onChange={(e) => {
           update(e.target.value);
         }}
-        value={value}
+        value={value === '' && columnStyle ? undefined : value}
         className="cursor-pointer px-2 border justify-center text-sm rounded-lg w-6/12 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none"
       >
-        {columnStyle && <option value={''}>{t('preset.select_option')}</option>}
-        {options.map((value, i) => (
+        {columnStyle && <option value="">{t('preset.select_option')}</option>}
+        {options.map((option, i) => (
           <option
-            value={value.id ? value.id : value.label}
-            key={value.id ? value.id.toString() : value.label + i}
+            value={option.id ? option.id.toString() : option.label}
+            key={option.id ? option.id.toString() : option.label + i}
           >
-            {value.label}
+            {option.label}
           </option>
         ))}
       </select>

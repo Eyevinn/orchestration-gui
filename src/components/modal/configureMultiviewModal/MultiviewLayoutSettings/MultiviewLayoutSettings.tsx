@@ -135,6 +135,7 @@ export default function MultiviewLayoutSettings({
       const defaultLabel = availableMultiviewLayouts[0].layout.views.find(
         (item) => item.input_slot === idFirstInputView
       )?.label;
+
       inputList.map((source) => {
         if (value === '') {
           setChangedLayout({ defaultLabel, viewId });
@@ -165,6 +166,9 @@ export default function MultiviewLayoutSettings({
     if (layoutToRemove && layoutToRemove._id) {
       deleteLayout(layoutToRemove._id.toString()).then(() => {
         setRefresh(true);
+        if (multiviewPresets && multiviewPresets[0]) {
+          setSelectedMultiviewPreset(multiviewPresets[0]);
+        }
         setNewPresetName('');
         toast.success(t('preset.layout_deleted'));
       });
@@ -189,7 +193,7 @@ export default function MultiviewLayoutSettings({
               />
               <button
                 type="button"
-                title={t('preset.remove_multiview')}
+                title={t('preset.remove_layout')}
                 className="absolute top-0 right-[-10%] min-w-fit"
                 onClick={() => removeMultiviewLayout()}
                 disabled={deleteDisabled}

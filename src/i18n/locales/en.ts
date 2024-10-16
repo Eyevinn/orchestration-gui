@@ -672,6 +672,7 @@ export const en = {
     layout_already_exist:
       'Layout {{layoutNameAlreadyExist}} will be replaced on save',
     remove_multiview: 'Remove multiview',
+    remove_layout: 'Remove layout',
     add_another_multiview: 'Add another multiview',
     not_possible_delete_global_layout: 'Global layout can not be deleted',
     could_not_delete_layout: 'Could not delete layout',

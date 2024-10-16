@@ -676,6 +676,7 @@ export const sv = {
     layout_already_exist:
       'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
     remove_multiview: 'Ta bort multiview',
+    remove_layout: 'Ta bort komposition',
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
     not_possible_delete_global_layout: 'Det går inte att ta bort globala kompositioner',
