@@ -682,7 +682,7 @@ export const sv = {
     select_option: 'Välj',
     select_multiview_preset: 'Förinställningar',
     no_port_selected: 'Unik port krävs',
-    unique_stream_id: 'Unik stream ID krävs',
+    unique_stream_id: 'Unikt stream ID krävs',
     layout_already_exist:
       'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
     remove_multiview: 'Ta bort multiview',
