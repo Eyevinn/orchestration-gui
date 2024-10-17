@@ -34,9 +34,9 @@ export function ConfigureMultiviewModal({
   const [portDuplicateIndexes, setPortDuplicateIndexes] = useState<number[]>(
     []
   );
-  const [streamIdDuplicateIndexes, setStreamIdDuplicateIndexes] = useState<number[]>(
-    []
-  );
+  const [streamIdDuplicateIndexes, setStreamIdDuplicateIndexes] = useState<
+    number[]
+  >([]);
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
   const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
@@ -122,8 +122,7 @@ export function ConfigureMultiviewModal({
         item.output.local_ip + ':' + item.output.local_port.toString()
     );
     const streamIds = mvs.map(
-      (item: MultiviewSettings) =>
-        item.output.srt_stream_id
+      (item: MultiviewSettings) => item.output.srt_stream_id
     );
     const duplicatePortIndices: number[] = [];
     const duplicateStreamIdIndices: number[] = [];
@@ -148,7 +147,7 @@ export function ConfigureMultiviewModal({
       if (streamId === '') {
         return;
       }
-      
+
       if (seenIds.has(streamId)) {
         duplicateStreamIdIndices.push(index);
 
