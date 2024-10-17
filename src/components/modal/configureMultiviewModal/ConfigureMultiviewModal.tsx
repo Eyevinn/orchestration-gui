@@ -34,6 +34,9 @@ export function ConfigureMultiviewModal({
   const [portDuplicateIndexes, setPortDuplicateIndexes] = useState<number[]>(
     []
   );
+  const [streamIdDuplicateIndexes, setStreamIdDuplicateIndexes] = useState<number[]>(
+    []
+  );
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
   const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
@@ -113,35 +116,66 @@ export function ConfigureMultiviewModal({
       (item: MultiviewSettings) =>
         item.output.local_ip + ':' + item.output.local_port.toString()
     );
-    const duplicateIndices: number[] = [];
+    const streamIds = mvs.map(
+      (item: MultiviewSettings) =>
+        item.output.srt_stream_id
+    );
+    const duplicatePortIndices: number[] = [];
+    const duplicateStreamIdIndices: number[] = [];
     const seenPorts = new Set();
+    const seenIds = new Set();
 
     ports.forEach((port, index) => {
       if (seenPorts.has(port)) {
-        duplicateIndices.push(index);
+        duplicatePortIndices.push(index);
 
         // Also include the first occurrence if it's not already included
         const firstIndex = ports.indexOf(port);
-        if (!duplicateIndices.includes(firstIndex)) {
-          duplicateIndices.push(firstIndex);
+        if (!duplicatePortIndices.includes(firstIndex)) {
+          duplicatePortIndices.push(firstIndex);
         }
       } else {
         seenPorts.add(port);
       }
     });
 
-    return duplicateIndices;
+    streamIds.forEach((streamId, index) => {
+      if (seenIds.has(streamId)) {
+        duplicateStreamIdIndices.push(index);
+
+        // Also include the first occurrence if it's not already included
+        const firstIndex = streamIds.indexOf(streamId);
+        if (!duplicateStreamIdIndices.includes(firstIndex)) {
+          duplicateStreamIdIndices.push(firstIndex);
+        }
+      } else {
+        seenIds.add(streamId);
+      }
+    });
+
+    return {
+      hasDuplicatePort: duplicatePortIndices,
+      hasDuplicateStreamId: duplicateStreamIdIndices
+    };
   };
 
   const runDuplicateCheck = (mvs: MultiviewSettings[]) => {
-    const hasDuplicates = findDuplicateValues(mvs);
+    const { hasDuplicatePort, hasDuplicateStreamId } = findDuplicateValues(mvs);
 
-    if (hasDuplicates.length > 0) {
-      setPortDuplicateIndexes(hasDuplicates);
+    if (hasDuplicatePort.length > 0) {
+      setPortDuplicateIndexes(hasDuplicatePort);
     }
 
-    if (hasDuplicates.length === 0) {
+    if (hasDuplicateStreamId.length > 0) {
+      setStreamIdDuplicateIndexes(hasDuplicateStreamId);
+    }
+
+    if (hasDuplicatePort.length === 0) {
       setPortDuplicateIndexes([]);
+    }
+
+    if (hasDuplicateStreamId.length === 0) {
+      setStreamIdDuplicateIndexes([]);
     }
   };
 
@@ -196,6 +230,11 @@ export function ConfigureMultiviewModal({
                       portDuplicateError={
                         portDuplicateIndexes.length > 0
                           ? portDuplicateIndexes.includes(index)
+                          : false
+                      }
+                      streamIdDuplicateError={
+                        streamIdDuplicateIndexes.length > 0
+                          ? streamIdDuplicateIndexes.includes(index)
                           : false
                       }
                     />

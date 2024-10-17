@@ -12,6 +12,7 @@ type MultiviewSettingsProps = {
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
   portDuplicateError: boolean;
+  streamIdDuplicateError: boolean;
   newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
 };
@@ -21,6 +22,7 @@ export default function MultiviewSettingsConfig({
   multiview,
   handleUpdateMultiview,
   portDuplicateError,
+  streamIdDuplicateError,
   newMultiviewLayout,
   productionId
 }: MultiviewSettingsProps) {
@@ -225,6 +227,7 @@ export default function MultiviewSettingsConfig({
         />
         <Input
           label={t('preset.srt_stream_id')}
+          inputError={streamIdDuplicateError}
           value={currentValue?.output.srt_stream_id || ''}
           update={(value) => handleChange('srtStreamId', value)}
         />
