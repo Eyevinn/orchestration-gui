@@ -112,6 +112,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
           break;
         case 'ip':
           newStream.local_ip = value;
+          newStream.remote_ip = value;
           break;
         case 'srtPassphrase':
           newStream.srt_passphrase = value;

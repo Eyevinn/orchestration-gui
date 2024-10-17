@@ -281,7 +281,7 @@ function buildOutputStreamSettings(
       audio_format: s.audio_format,
       audio_kilobit_rate: s.audio_kilobit_rate,
       format: s.format,
-      local_ip: s.local_ip,
+      local_ip: s.srt_mode === 'caller' ? '0.0.0.0' : s.local_ip,
       local_port: s.srt_mode === 'caller' ? 0 : s.local_port,
       remote_ip: s.remote_ip, // only used in caller mode
       remote_port: s.remote_port,

@@ -119,6 +119,7 @@ export async function createMultiviewForPipeline(
             srt_mode: multiview.output.srt_mode,
             srt_latency_ms: multiview.output.srt_latency_ms,
             srt_passphrase: multiview.output.srt_passphrase,
+            srt_stream_id: multiview.output.srt_stream_id,
             video_format: multiview.output.video_format,
             video_kilobit_rate: multiview.output.video_kilobit_rate
           }

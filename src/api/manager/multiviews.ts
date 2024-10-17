@@ -23,8 +23,10 @@ export async function putMultiviewLayout(
   const db = await getDatabase();
   const collection = db.collection('multiviews');
   const editLayout = await collection.findOne({
+    _id: new ObjectId(newMultiviewLayout._id),
     name: newMultiviewLayout.name
   });
+
   const newMultiviewLayoutWithoutID = { ...newMultiviewLayout };
   delete newMultiviewLayoutWithoutID._id;
 
