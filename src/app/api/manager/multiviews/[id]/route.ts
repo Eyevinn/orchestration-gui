@@ -73,7 +73,7 @@ export async function DELETE(
   } catch (error) {
     console.log(error);
     return new NextResponse(
-      `Error occurred while posting to DB! Error: ${error}`,
+      `Error occurred while deleting from DB! Error: ${error}`,
       {
         status: 500
       }
