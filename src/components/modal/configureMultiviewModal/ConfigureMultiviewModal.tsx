@@ -144,7 +144,7 @@ export function ConfigureMultiviewModal({
     });
 
     streamIds.forEach((streamId, index) => {
-      if (streamId === '') {
+      if (streamId === '' || !streamId) {
         return;
       }
 
