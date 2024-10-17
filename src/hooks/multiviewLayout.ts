@@ -75,6 +75,19 @@ export function usePutMultiviewLayout() {
   };
 }
 
+export function useDeleteMultiviewLayout() {
+  return async (id: string): Promise<void> => {
+    const response = await fetch(`/api/manager/multiviews/${id}`, {
+      method: 'DELETE',
+      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
+    });
+    if (response.ok) {
+      return;
+    }
+    throw await response.text();
+  };
+}
+
 export function useDeleteMultiviewLayouts() {
   return async (id: string): Promise<void> => {
     const response = await fetch(`/api/manager/multiviews`, {
