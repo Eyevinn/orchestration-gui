@@ -85,6 +85,11 @@ export function ConfigureMultiviewModal({
       return;
     }
 
+    if (streamIdDuplicateIndexes.length > 0) {
+      toast.error(t('preset.unique_stream_id'));
+      return;
+    }
+
     presetToUpdate.pipelines[0].multiviews = multiviews.map(
       (singleMultiview) => {
         return { ...singleMultiview };
@@ -140,6 +145,10 @@ export function ConfigureMultiviewModal({
     });
 
     streamIds.forEach((streamId, index) => {
+      if (streamId === '') {
+        return;
+      }
+      
       if (seenIds.has(streamId)) {
         duplicateStreamIdIndices.push(index);
 

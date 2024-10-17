@@ -678,6 +678,7 @@ export const en = {
     no_multiview_selected: 'No multiview selected',
     no_multiview_found: 'No multiview found',
     no_port_selected: 'Unique port needed',
+    unique_stream_id: 'Unique stream ID needed',
     layout_already_exist:
       'Layout {{layoutNameAlreadyExist}} will be replaced on save',
     remove_multiview: 'Remove multiview',
