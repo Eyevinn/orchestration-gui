@@ -5,7 +5,6 @@ import { TMultiviewLayout } from '../../../interfaces/preset';
 import Input from '../configureOutputModal/Input';
 import Options from '../configureOutputModal/Options';
 import toast from 'react-hot-toast';
-import { IconSettings } from '@tabler/icons-react';
 import { useMultiviewLayouts } from '../../../hooks/multiviewLayout';
 
 type MultiviewSettingsProps = {
@@ -13,7 +12,6 @@ type MultiviewSettingsProps = {
   multiview?: MultiviewSettings;
   handleUpdateMultiview: (multiview: MultiviewSettings) => void;
   portDuplicateError: boolean;
-  openConfigModal: () => void;
   newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
 };
@@ -23,7 +21,6 @@ export default function MultiviewSettingsConfig({
   multiview,
   handleUpdateMultiview,
   portDuplicateError,
-  openConfigModal,
   newMultiviewLayout,
   productionId
 }: MultiviewSettingsProps) {
@@ -157,6 +154,17 @@ export default function MultiviewSettingsConfig({
       };
       handleUpdateMultiview(updatedMultiview);
     }
+    if (key === 'srtStreamId') {
+      const updatedMultiview = {
+        ...multiview,
+        output: {
+          ...multiview.output,
+          srt_stream_id: value
+        },
+        for_pipeline_idx: 0
+      };
+      handleUpdateMultiview(updatedMultiview);
+    }
     if (key === 'srtPassphrase') {
       const updatedMultiview = {
         ...multiview,
@@ -214,6 +222,11 @@ export default function MultiviewSettingsConfig({
           label={t('preset.ip')}
           value={currentValue?.output.local_ip || '0.0.0.0'}
           update={(value) => handleChange('ip', value)}
+        />
+        <Input
+          label={t('preset.srt_stream_id')}
+          value={currentValue?.output.srt_stream_id || ''}
+          update={(value) => handleChange('srtStreamId', value)}
         />
         <Input
           label={t('preset.srt_passphrase')}

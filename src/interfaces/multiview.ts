@@ -25,6 +25,7 @@ export interface MultiviewOutputSettings {
   srt_mode: string;
   srt_latency_ms: number;
   srt_passphrase: string;
+  srt_stream_id: string;
   video_format: string;
   video_kilobit_rate: number;
 }

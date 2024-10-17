@@ -187,7 +187,6 @@ export function ConfigureMultiviewModal({
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
                       productionId={production?._id}
-                      openConfigModal={() => setLayoutModalOpen(true)}
                       newMultiviewLayout={newMultiviewLayout}
                       lastItem={multiviews.length === index + 1}
                       multiview={singleItem}
