@@ -120,6 +120,10 @@ export default function MultiviewLayoutSettings({
         break;
       case 'preset':
         if (addBasePreset) {
+          if (multiviewPresets) {
+            setNewPresetName('');
+            setSelectedMultiviewPreset(multiviewPresets[0]);
+          }
           setSelectedMultiviewPreset(addBasePreset);
         }
         break;
