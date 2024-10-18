@@ -38,11 +38,20 @@ export function ConfigureMultiviewModal({
     number[]
   >([]);
   const [layoutModalOpen, setLayoutModalOpen] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
   const t = useTranslate();
+
+  useEffect(() => {
+    if (open) {
+      setRefresh(true);
+    } else {
+      setRefresh(false);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (preset.pipelines[0].multiviews) {
@@ -100,7 +109,7 @@ export function ConfigureMultiviewModal({
     onClose();
   };
 
-  const onUpdateLayoutPreset = () => {
+  const onUpdateLayoutPreset = async () => {
     const noLayoutName = newMultiviewLayout?.name === '';
     const defaultLayout = newMultiviewLayout?.name.includes('Default');
     if (!newMultiviewLayout || noLayoutName || defaultLayout) {
@@ -108,12 +117,14 @@ export function ConfigureMultiviewModal({
       return;
     }
 
-    addNewLayout(newMultiviewLayout);
+    await addNewLayout(newMultiviewLayout);
     setLayoutModalOpen(false);
+    setRefresh(true);
   };
 
   const closeLayoutModal = () => {
     setLayoutModalOpen(false);
+    setRefresh(true);
   };
 
   const findDuplicateValues = (mvs: MultiviewSettings[]) => {
@@ -245,6 +256,7 @@ export function ConfigureMultiviewModal({
                           ? streamIdDuplicateIndexes.includes(index)
                           : false
                       }
+                      refresh={refresh}
                     />
                     <div
                       className={`w-full flex ${
@@ -289,6 +301,7 @@ export function ConfigureMultiviewModal({
         <MultiviewLayoutSettings
           production={production}
           setNewMultiviewPreset={setNewMultiviewLayout}
+          layoutModalOpen={layoutModalOpen}
         />
       )}
       <div className="flex flex-col">
@@ -296,7 +309,10 @@ export function ConfigureMultiviewModal({
           <Button
             className="flex self-center hover:bg-green-400 min-w-fit max-w-fit mt-10"
             type="button"
-            onClick={() => setLayoutModalOpen(true)}
+            onClick={() => {
+              setRefresh(false);
+              setLayoutModalOpen(true);
+            }}
           >
             {t('preset.configure_layouts')}
             <IconSettings className="text-p inline ml-2" />

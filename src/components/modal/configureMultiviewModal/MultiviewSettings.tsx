@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { TMultiviewLayout } from '../../../interfaces/preset';
@@ -15,6 +15,7 @@ type MultiviewSettingsProps = {
   streamIdDuplicateError: boolean;
   newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
+  refresh: boolean;
 };
 
 export default function MultiviewSettingsConfig({
@@ -24,20 +25,32 @@ export default function MultiviewSettingsConfig({
   portDuplicateError,
   streamIdDuplicateError,
   newMultiviewLayout,
-  productionId
+  productionId,
+  refresh
 }: MultiviewSettingsProps) {
   const t = useTranslate();
-  const [multiviewLayouts] = useMultiviewLayouts(true);
   const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
     TMultiviewLayout | undefined
   >();
+  const [multiviewLayouts] = useMultiviewLayouts(refresh);
+
   const currentValue = multiview || selectedMultiviewLayout;
   const avaliableMultiviewLayouts = multiviewLayouts?.filter(
     (layout) => layout.productionId === productionId || !layout.productionId
   );
-
   const multiviewLayoutNames =
     avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+
+  useEffect(() => {
+    if (
+      refresh &&
+      multiview &&
+      multiviewLayouts &&
+      multiviewLayouts.length > 0
+    ) {
+      handleSetSelectedMultiviewLayout(multiview.name);
+    }
+  }, [refresh, multiviewLayouts]);
 
   useEffect(() => {
     if (multiview) {
