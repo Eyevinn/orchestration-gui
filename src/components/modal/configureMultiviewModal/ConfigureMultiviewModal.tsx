@@ -103,7 +103,7 @@ export function ConfigureMultiviewModal({
   const onUpdateLayoutPreset = () => {
     const noLayoutName = newMultiviewLayout?.name === '';
     const defaultLayout = newMultiviewLayout?.name.includes('Default');
-    if ( noLayoutName) {
+    if (noLayoutName) {
       toast.error(t('preset.layout_name_missing'));
       return;
     }

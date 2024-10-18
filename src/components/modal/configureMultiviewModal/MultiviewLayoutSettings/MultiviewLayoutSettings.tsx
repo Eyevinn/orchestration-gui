@@ -33,8 +33,7 @@ export default function MultiviewLayoutSettings({
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
-  const [presetName, setPresetName] =
-    useState('');
+  const [presetName, setPresetName] = useState('');
   const [refresh, setRefresh] = useState(true);
   const [changedLayout, setChangedLayout] = useState<ChangeLayout | null>(null);
   const [newPresetName, setNewPresetName] = useState<string | null>(null);
@@ -97,7 +96,10 @@ export default function MultiviewLayoutSettings({
       setSelectedMultiviewPreset(multiviewLayout);
       setNewMultiviewPreset({
         ...multiviewLayout,
-        name: multiviewLayout.name !== presetName && newPresetName !== '' ? multiviewLayout.name : ''
+        name:
+          multiviewLayout.name !== presetName && newPresetName !== ''
+            ? multiviewLayout.name
+            : ''
       });
     } else {
       setSelectedMultiviewPreset(null);
@@ -189,9 +191,7 @@ export default function MultiviewLayoutSettings({
                 options={multiviewLayoutNames.map((singleItem) => ({
                   label: singleItem
                 }))}
-                value={
-                  selectedMultiviewPreset?.name || ''
-                }
+                value={selectedMultiviewPreset?.name || ''}
                 update={(value) => handleLayoutUpdate(value, 'layout')}
               />
               {!production?.isActive && (
