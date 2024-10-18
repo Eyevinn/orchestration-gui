@@ -677,6 +677,7 @@ export const sv = {
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
     no_updated_layout: 'Ingen uppdaterad komposition',
+    layout_name_missing: 'Namn på komposition saknas',
     new_preset_name: 'Min komposition',
     muliview_view: 'Ingång',
     select_option: 'Välj',
