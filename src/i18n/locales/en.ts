@@ -671,6 +671,7 @@ export const en = {
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',
+    layout_name_missing: 'Layout name is missing',
     muliview_view: 'Input',
     select_option: 'Select',
     select_multiview_preset: 'Preset',
