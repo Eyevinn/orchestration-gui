@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { TMultiviewLayout } from '../../../interfaces/preset';
