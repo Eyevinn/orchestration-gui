@@ -2,6 +2,7 @@ import { Db, ObjectId, UpdateResult } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
 import { Production, ProductionWithId } from '../../interfaces/production';
 import { Log } from '../logger';
+import { SourceReference } from '../../interfaces/Source';
 
 export async function getProductions(): Promise<Production[]> {
   const db = await getDatabase();
@@ -36,14 +37,37 @@ export async function putProduction(
 
   const sources = production.sources
     ? production.sources.flatMap((singleSource) => {
-        return singleSource._id
-          ? singleSource
-          : {
-              _id: newSourceId,
-              type: singleSource.type,
-              label: singleSource.label,
-              input_slot: singleSource.input_slot
-            };
+        let newSource: SourceReference;
+
+        if (singleSource.html_data && singleSource.type === 'html') {
+          newSource = {
+            _id: newSourceId,
+            type: singleSource.type,
+            label: singleSource.label,
+            input_slot: singleSource.input_slot,
+            html_data: singleSource.html_data
+          };
+        } else if (
+          singleSource.media_data &&
+          singleSource.type === 'mediaplayer'
+        ) {
+          newSource = {
+            _id: newSourceId,
+            type: singleSource.type,
+            label: singleSource.label,
+            input_slot: singleSource.input_slot,
+            media_data: singleSource.media_data
+          };
+        } else {
+          newSource = {
+            _id: newSourceId,
+            type: singleSource.type,
+            label: singleSource.label,
+            input_slot: singleSource.input_slot
+          };
+        }
+
+        return singleSource._id ? singleSource : newSource;
       })
     : [];
 

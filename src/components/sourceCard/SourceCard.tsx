@@ -1,11 +1,5 @@
 'use client';
-import React, {
-  ChangeEvent,
-  KeyboardEvent,
-  useContext,
-  useRef,
-  useState
-} from 'react';
+import React, { ChangeEvent, KeyboardEvent, useContext, useState } from 'react';
 import { IconTrash, IconSettings } from '@tabler/icons-react';
 import { SourceReference } from '../../interfaces/Source';
 import { useTranslate } from '../../i18n/useTranslate';
@@ -15,7 +9,8 @@ import { getSourceThumbnail } from '../../utils/source';
 import { GlobalContext } from '../../contexts/GlobalContext';
 import { ConfigureAlignmentLatencyModal } from '../modal/ConfigureAlignmentLatencyModal';
 import { Production } from '../../interfaces/production';
-import { useUpdateStream } from '../../hooks/streams';
+import { useDeleteHtmlSource } from '../../hooks/renderingEngine/useDeleteHtmlSource';
+import { useDeleteMediaSource } from '../../hooks/renderingEngine/useDeleteMediaSource';
 
 type SourceCardProps = {
   source?: ISource;
@@ -55,6 +50,9 @@ export default function SourceCard({
   const [isAlignmentModalOpen, setIsAlignmentModalOpen] = useState(false);
 
   const t = useTranslate();
+  const [deleteHtmlSource, deleteHtmlLoading] = useDeleteHtmlSource();
+  const [deleteMediaSource, deleteMediaLoading] = useDeleteMediaSource();
+
   const { locked } = useContext(GlobalContext);
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
@@ -145,28 +143,11 @@ export default function SourceCard({
           <IconSettings className="text-p w-4 h-4" />
         </button>
       )}
-      {(source || sourceRef) && (
+      {sourceRef && (
         <button
           disabled={locked}
           className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg z-20"
-          onClick={() => {
-            if (source) {
-              onSourceRemoval({
-                _id: source._id.toString(),
-                type: 'ingest_source',
-                label: sourceLabel || source.name,
-                input_slot: source.input_slot,
-                stream_uuids: source.stream_uuids
-              });
-            } else if (sourceRef && !source) {
-              onSourceRemoval({
-                _id: sourceRef._id,
-                type: sourceRef.type,
-                label: sourceRef.label,
-                input_slot: sourceRef.input_slot
-              });
-            }
-          }}
+          onClick={() => onSourceRemoval(sourceRef)}
         >
           <IconTrash className="text-p w-4 h-4" />
         </button>

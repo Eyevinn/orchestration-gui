@@ -29,15 +29,13 @@ export const en = {
     sync: 'Synchronize database',
     start: 'Initialize',
     monitoring: 'Start runtime monitoring',
-    unexpected: 'Unexpected error',
-    websocket: 'Websocket connection'
+    unexpected: 'Unexpected error'
   },
   stop_production_status: {
     disconnect_connections: 'Disconnect connections',
     remove_pipeline_streams: 'Remove streams',
     remove_pipeline_multiviews: 'Remove multiviews',
-    unexpected: 'Unexpected error',
-    websocket: 'Stop websocket'
+    unexpected: 'Unexpected error'
   },
   source: {
     type: 'Type: {{type}}',
@@ -60,6 +58,34 @@ export const en = {
     add_stream: 'Add stream',
     update_multiview: 'Update multiview',
     unexpected: 'Unexpected error'
+  },
+  rendering_engine: {
+    media: {
+      create: {
+        create_media: 'Create media',
+        filename: 'Filename',
+        create: 'Create',
+        filename_error: 'Enter a filename',
+        abort: 'Cancel'
+      },
+      delete: {
+        delete_media: 'Delete media',
+        delete: 'Delete'
+      }
+    },
+    html: {
+      create: {
+        create_html: 'Create HTML',
+        width: 'Browser canvas width',
+        height: 'Browser canvas height',
+        url: 'URL to load',
+        create: 'Create',
+        width_error: 'Width must be between 20 and 8192',
+        height_error: 'Height must be between 20 and 8192',
+        url_error: 'Enter a URL',
+        abort: 'Cancel'
+      }
+    }
   },
   empty_slot: {
     input_slot: 'Input slot'

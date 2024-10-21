@@ -31,15 +31,13 @@ export const sv = {
     sync: 'Synkronisera databasen',
     monitoring: 'Starta monitorering',
     start: 'Påbörja',
-    unexpected: 'Oväntat fel',
-    websocket: 'Websocket anslutning'
+    unexpected: 'Oväntat fel'
   },
   stop_production_status: {
     disconnect_connections: 'Frånkoppla anslutningar',
     remove_pipeline_streams: 'Ta bort strömmar',
     remove_pipeline_multiviews: 'Ta bort multiviews',
-    unexpected: 'Oväntat fel',
-    websocket: 'Stoppa websocket'
+    unexpected: 'Oväntat fel'
   },
   source: {
     type: 'Typ: {{type}}',
@@ -62,6 +60,34 @@ export const sv = {
     add_stream: 'Lägg till ström',
     update_multiview: 'Uppdatera multiview',
     unexpected: 'Oväntat fel'
+  },
+  rendering_engine: {
+    media: {
+      create: {
+        create_media: 'Skapa media',
+        filename: 'Filnamn',
+        create: 'Skapa',
+        filename_error: 'Ange ett filnamn',
+        abort: 'Avbryt'
+      },
+      delete: {
+        delete_media: 'Ta bort media',
+        delete: 'Ta bort'
+      }
+    },
+    html: {
+      create: {
+        create_html: 'Skapa HTML',
+        width: 'Bredd på browser canvas',
+        height: 'Höjd på browser canvas',
+        url: 'URL att ladda in',
+        create: 'Skapa',
+        width_error: 'Bredden måste vara mellan 20 och 8192',
+        height_error: 'Höjden måste vara mellan 20 och 8192',
+        url_error: 'Ange en URL',
+        abort: 'Avbryt'
+      }
+    }
   },
   empty_slot: {
     input_slot: 'Ingång'

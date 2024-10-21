@@ -17,7 +17,9 @@ export function addSetupItem(
         type: source.type,
         label: source.label,
         stream_uuids: source.stream_uuids,
-        input_slot: source.input_slot
+        input_slot: source.input_slot,
+        html_data: source.html_data,
+        media_data: source.media_data
       }
     ].sort((a, b) => a.input_slot - b.input_slot)
   };
@@ -30,7 +32,9 @@ export function addSetupItem(
         type: source.type,
         label: source.label,
         stream_uuids: source.stream_uuids,
-        input_slot: source.input_slot
+        input_slot: source.input_slot,
+        html_data: source.html_data,
+        media_data: source.media_data
       }
     ].sort((a, b) => a.input_slot - b.input_slot)
   };

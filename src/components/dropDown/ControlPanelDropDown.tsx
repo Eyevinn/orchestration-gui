@@ -33,7 +33,7 @@ export default function ControlPanelDropDown({
     } else {
       setSelected(initial);
     }
-  }, [initial]);
+  }, []);
 
   const handleAddSelectedControlPanel = (option: string) => {
     setSelected((prevState) => {

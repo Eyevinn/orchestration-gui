@@ -11,10 +11,10 @@ import { AddInput } from '../../../components/addInput/AddInput';
 import { useSources } from '../../../hooks/sources/useSources';
 import {
   AddSourceStatus,
+  DeleteRenderingEngineSourceStatus,
   DeleteSourceStatus,
   SourceReference,
-  SourceWithId,
-  Type
+  SourceWithId
 } from '../../../interfaces/Source';
 import { useGetProduction, usePutProduction } from '../../../hooks/productions';
 import { Production } from '../../../interfaces/production';
@@ -48,7 +48,6 @@ import { GlobalContext } from '../../../contexts/GlobalContext';
 import { Select } from '../../../components/select/Select';
 import { useAddSource } from '../../../hooks/sources/useAddSource';
 import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
-import { useWebsocket } from '../../../hooks/useWebsocket';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
 import { useCheckProductionPipelines } from '../../../hooks/useCheckProductionPipelines';
@@ -63,6 +62,13 @@ import {
   useUpdateMultiviewersOnRunningProduction
 } from '../../../hooks/workflow';
 import { MultiviewSettings } from '../../../interfaces/multiview';
+import { CreateHtmlModal } from '../../../components/modal/renderingEngineModals/CreateHtmlModal';
+import { CreateMediaModal } from '../../../components/modal/renderingEngineModals/CreateMediaModal';
+import { useDeleteHtmlSource } from '../../../hooks/renderingEngine/useDeleteHtmlSource';
+import { useDeleteMediaSource } from '../../../hooks/renderingEngine/useDeleteMediaSource';
+import { useCreateHtmlSource } from '../../../hooks/renderingEngine/useCreateHtmlSource';
+import { useCreateMediaSource } from '../../../hooks/renderingEngine/useCreateMediaSource';
+import { useRenderingEngine } from '../../../hooks/renderingEngine/useRenderingEngine';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -118,13 +124,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [addSourceStatus, setAddSourceStatus] = useState<AddSourceStatus>();
   const [deleteSourceStatus, setDeleteSourceStatus] =
     useState<DeleteSourceStatus>();
+  const [isHtmlModalOpen, setIsHtmlModalOpen] = useState<boolean>(false);
+  const [isMediaModalOpen, setIsMediaModalOpen] = useState<boolean>(false);
 
   // Create source
   const [firstEmptySlot] = useGetFirstEmptySlot();
   const [addSource] = useAddSource();
-
-  // Websocket
-  const [closeWebsocket] = useWebsocket();
 
   const [updateStream, loading] = useUpdateStream();
   const [getIngestSourceId, ingestSourceIdLoading] = useIngestSourceId();
@@ -134,35 +139,24 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   const [checkProductionPipelines] = useCheckProductionPipelines();
 
+  // Rendering engine
+  const [deleteHtmlSource, deleteHtmlLoading] = useDeleteHtmlSource();
+  const [deleteMediaSource, deleteMediaLoading] = useDeleteMediaSource();
+  const [createHtmlSource, createHtmlLoading] = useCreateHtmlSource();
+  const [createMediaSource, createMediaLoading] = useCreateMediaSource();
+  const [getRenderingEngine, renderingEngineLoading] = useRenderingEngine();
+
   const { locked } = useContext(GlobalContext);
 
   const memoizedProduction = useMemo(() => productionSetup, [productionSetup]);
 
   const isAddButtonDisabled =
-    selectedValue !== 'HTML' && selectedValue !== 'Media Player';
+    (selectedValue !== 'HTML' && selectedValue !== 'Media Player') || locked;
 
   useEffect(() => {
     refreshPipelines();
     refreshControlPanels();
   }, [productionSetup?.isActive]);
-
-  const addSourceToProduction = (type: Type) => {
-    const input: SourceReference = {
-      type: type,
-      label: type === 'html' ? 'HTML Input' : 'Media Player Source',
-      input_slot: firstEmptySlot(productionSetup)
-    };
-
-    if (!productionSetup) return;
-    addSource(input, productionSetup).then((updatedSetup) => {
-      if (!updatedSetup) return;
-      setProductionSetup(updatedSetup);
-      refreshProduction();
-      setAddSourceModal(false);
-      setSelectedSource(undefined);
-    });
-    setAddSourceStatus(undefined);
-  };
 
   useEffect(() => {
     if (updateMuliviewLayouts && productionSetup) {
@@ -545,8 +539,74 @@ export default function ProductionConfiguration({ params }: PageProps) {
     }
   };
 
+  const addHtmlSource = (height: number, width: number, url: string) => {
+    if (productionSetup) {
+      const sourceToAdd: SourceReference = {
+        type: 'html',
+        label: `HTML ${firstEmptySlot(productionSetup)}`,
+        input_slot: firstEmptySlot(productionSetup),
+        html_data: {
+          height: height,
+          url: url,
+          width: width
+        }
+      };
+      const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
+      if (!updatedSetup) return;
+      setProductionSetup(updatedSetup);
+      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
+        refreshProduction();
+      });
+
+      if (productionSetup?.isActive && sourceToAdd.html_data) {
+        createHtmlSource(
+          productionSetup,
+          sourceToAdd.input_slot,
+          sourceToAdd.html_data,
+          sourceToAdd
+        );
+      }
+    }
+  };
+
+  const addMediaSource = (filename: string) => {
+    if (productionSetup) {
+      const sourceToAdd: SourceReference = {
+        type: 'mediaplayer',
+        label: `Media Player ${firstEmptySlot(productionSetup)}`,
+        input_slot: firstEmptySlot(productionSetup),
+        media_data: {
+          filename: filename
+        }
+      };
+      const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
+      if (!updatedSetup) return;
+      setProductionSetup(updatedSetup);
+      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
+        refreshProduction();
+      });
+
+      if (productionSetup?.isActive && sourceToAdd.media_data) {
+        createMediaSource(
+          productionSetup,
+          sourceToAdd.input_slot,
+          sourceToAdd.media_data,
+          sourceToAdd
+        );
+      }
+    }
+  };
+
   const isDisabledFunction = (source: SourceWithId): boolean => {
     return selectedProductionItems?.includes(source._id.toString());
+  };
+
+  const handleOpenModal = (type: 'html' | 'media') => {
+    if (type === 'html') {
+      setIsHtmlModalOpen(true);
+    } else if (type === 'media') {
+      setIsMediaModalOpen(true);
+    }
   };
 
   const handleAddSource = async () => {
@@ -615,7 +675,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         if (!result.value) {
           setAddSourceStatus({
             success: false,
-            steps: [{ step: 'unexpected', success: false }]
+            steps: [{ step: 'add_stream', success: false }]
           });
         } else {
           setAddSourceStatus({
@@ -662,7 +722,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
         )
       );
 
-      if (selectedSourceRef.stream_uuids) {
+      if (
+        selectedSourceRef.stream_uuids &&
+        selectedSourceRef.stream_uuids.length > 0
+      ) {
         if (!viewToUpdate) {
           if (!productionSetup.production_settings.pipelines[0].pipeline_id)
             return;
@@ -753,16 +816,30 @@ export default function ProductionConfiguration({ params }: PageProps) {
         selectedSourceRef.type === 'html' ||
         selectedSourceRef.type === 'mediaplayer'
       ) {
-        // Action specifies what websocket method to call
-        const action =
-          selectedSourceRef.type === 'html' ? 'closeHtml' : 'closeMediaplayer';
-        const inputSlot = productionSetup.sources.find(
-          (source) => source._id === selectedSourceRef._id
-        )?.input_slot;
-
-        if (!inputSlot) return;
-
-        closeWebsocket(action, inputSlot);
+        for (
+          let i = 0;
+          i < productionSetup.production_settings.pipelines.length;
+          i++
+        ) {
+          const pipelineId =
+            productionSetup.production_settings.pipelines[i].pipeline_id;
+          if (pipelineId) {
+            const renderingEngine = getRenderingEngine(pipelineId);
+            if (selectedSourceRef.type === 'html') {
+              await deleteHtmlSource(
+                pipelineId,
+                selectedSourceRef.input_slot,
+                productionSetup
+              );
+            } else if (selectedSourceRef.type === 'mediaplayer') {
+              await deleteMediaSource(
+                pipelineId,
+                selectedSourceRef.input_slot,
+                productionSetup
+              );
+            }
+          }
+        }
       }
 
       const updatedSetup = removeSetupItem(selectedSourceRef, productionSetup);
@@ -874,9 +951,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
             isDisabledFunc={isDisabledFunction}
             locked={locked}
           />
-          {addSourceModal && selectedSource && (
+          {addSourceModal && (selectedSource || selectedSourceRef) && (
             <AddSourceModal
-              name={selectedSource.name}
+              name={selectedSource?.name || selectedSourceRef?.label || ''}
               open={addSourceModal}
               onAbort={handleAbortAddSource}
               onConfirm={handleAddSource}
@@ -940,7 +1017,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
                     onAbort={handleAbortRemoveSource}
                     onConfirm={handleRemoveSource}
                     status={deleteSourceStatus}
-                    loading={loadingDeleteStream}
+                    loading={
+                      loadingDeleteStream ||
+                      deleteHtmlLoading ||
+                      deleteMediaLoading
+                    }
                   />
                 )}
               </DndProvider>
@@ -958,7 +1039,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   classNames="w-full"
                   disabled={
                     productionSetup?.production_settings === undefined ||
-                    productionSetup.production_settings === null
+                    productionSetup.production_settings === null ||
+                    locked
                   }
                   options={[
                     t('production.add_other_source_type'),
@@ -977,9 +1059,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       : 'bg-zinc-500 text-white'
                   }`}
                   onClick={() =>
-                    addSourceToProduction(
-                      selectedValue === 'HTML' ? 'html' : 'mediaplayer'
-                    )
+                    handleOpenModal(selectedValue === 'HTML' ? 'html' : 'media')
                   }
                   disabled={isAddButtonDisabled}
                 >
@@ -1033,6 +1113,18 @@ export default function ProductionConfiguration({ params }: PageProps) {
             </div>
           )}
         </div>
+        <CreateHtmlModal
+          open={isHtmlModalOpen}
+          onAbort={() => setIsHtmlModalOpen(false)}
+          onConfirm={addHtmlSource}
+          loading={createHtmlLoading}
+        />
+        <CreateMediaModal
+          open={isMediaModalOpen}
+          onAbort={() => setIsMediaModalOpen(false)}
+          onConfirm={addMediaSource}
+          loading={createMediaLoading}
+        />
       </div>
     </>
   );

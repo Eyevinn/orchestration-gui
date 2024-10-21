@@ -1,4 +1,5 @@
 import { ObjectId, WithId } from 'mongodb';
+import { HTMLSource, MediaSource } from './renderingEngine';
 export type SourceType = 'camera' | 'graphics' | 'microphone';
 export type SourceStatus = 'ready' | 'new' | 'gone' | 'purge';
 export type Type = 'ingest_source' | 'html' | 'mediaplayer';
@@ -40,6 +41,8 @@ export interface SourceReference {
   label: string;
   stream_uuids?: string[];
   input_slot: number;
+  html_data?: HTMLSource;
+  media_data?: MediaSource;
 }
 
 export type SourceWithId = WithId<Source>;
@@ -56,9 +59,20 @@ export interface DeleteSourceStep {
   message?: string;
 }
 
+export interface DeleteRenderingEngineSourceStep {
+  step: 'delete_html' | 'delete_media' | 'update_multiview';
+  success: boolean;
+  message?: string;
+}
+
 export interface DeleteSourceStatus {
   success: boolean;
   steps: DeleteSourceStep[];
+}
+
+export interface DeleteRenderingEngineSourceStatus {
+  success: boolean;
+  steps: DeleteRenderingEngineSourceStep[];
 }
 
 export interface AddSourceStep {
@@ -73,6 +87,17 @@ export interface AddSourceStatus {
 }
 
 export type AddSourceResult =
+  | {
+      success: true;
+      streams: SourceToPipelineStream[];
+      steps: AddSourceStep[];
+    }
+  | {
+      success: false;
+      steps: AddSourceStep[];
+    };
+
+export type AddRenderingEngineSourceResult =
   | {
       success: true;
       streams: SourceToPipelineStream[];

@@ -39,7 +39,6 @@ export interface StartProductionStep {
   step:
     | 'streams'
     | 'control_panels'
-    | 'websocket'
     | 'pipeline_outputs'
     | 'multiviews'
     | 'sync'
@@ -60,7 +59,6 @@ export interface StopProductionStep {
     | 'disconnect_connections'
     | 'remove_pipeline_streams'
     | 'remove_pipeline_multiviews'
-    | 'websocket'
     | 'unexpected';
   success: boolean;
   message?: string;

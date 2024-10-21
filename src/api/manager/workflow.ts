@@ -52,9 +52,15 @@ import { Result } from '../../interfaces/result';
 import { Monitoring } from '../../interfaces/monitoring';
 import { getDatabase } from '../mongoClient/dbClient';
 import { updatedMonitoringForProduction } from './job/syncMonitoring';
-import { createControlPanelWebSocket } from '../ateliereLive/websocket';
 import { ObjectId } from 'mongodb';
 import { MultiviewSettings } from '../../interfaces/multiview';
+import {
+  getPipelineRenderingEngine,
+  createPipelineHtmlSource,
+  createPipelineMediaSource,
+  deleteHtmlFromPipeline,
+  deleteMediaFromPipeline
+} from '../ateliereLive/pipelines/renderingengine/renderingengine';
 
 const isUsed = (pipeline: ResourcesPipelineResponse) => {
   const hasStreams = pipeline.streams.length > 0;
@@ -328,46 +334,36 @@ export async function stopProduction(
     (p) => p.pipeline_id
   );
 
-  const htmlSources = production.sources.filter(
-    (source) => source.type === 'html'
-  );
-  const mediaPlayerSources = production.sources.filter(
-    (source) => source.type === 'mediaplayer'
-  );
-
-  if (htmlSources.length > 0 || mediaPlayerSources.length > 0) {
-    let controlPanelWS;
-    try {
-      controlPanelWS = await createControlPanelWebSocket();
-
-      for (const source of htmlSources) {
-        controlPanelWS.closeHtml(source.input_slot);
-      }
-
-      for (const source of mediaPlayerSources) {
-        controlPanelWS.closeMediaplayer(source.input_slot);
-      }
-    } catch (error) {
-      Log().error(
-        'Failed to create WebSocket or perform operations during stopProduction'
+  for (const pipeline of production.production_settings.pipelines) {
+    const pipelineId = pipeline.pipeline_id;
+    if (pipelineId) {
+      const pipelineRenderingEngine = await getPipelineRenderingEngine(
+        pipelineId
       );
-      Log().error(error);
-      return {
-        ok: false,
-        value: [
-          {
-            step: 'websocket',
-            success: false,
-            message:
-              'Failed to create WebSocket or perform operations during stopProduction'
+
+      const htmlSources = pipelineRenderingEngine.html;
+      const mediaSources = pipelineRenderingEngine.media;
+
+      if (htmlSources.length > 0 && htmlSources) {
+        for (const pipeline of production.production_settings.pipelines) {
+          for (const htmlSource of htmlSources) {
+            const pipelineId = pipeline.pipeline_id;
+            if (pipelineId !== undefined) {
+              await deleteHtmlFromPipeline(pipelineId, htmlSource.input_slot);
+            }
           }
-        ],
-        error:
-          'Failed to create WebSocket or perform operations during stopProduction'
-      };
-    } finally {
-      if (controlPanelWS) {
-        controlPanelWS.close();
+        }
+      }
+
+      if (mediaSources.length > 0 && mediaSources) {
+        for (const pipeline of production.production_settings.pipelines) {
+          for (const mediaSource of mediaSources) {
+            const pipelineId = pipeline.pipeline_id;
+            if (pipelineId !== undefined) {
+              await deleteMediaFromPipeline(pipelineId, mediaSource.input_slot);
+            }
+          }
+        }
       }
     }
   }
@@ -686,47 +682,6 @@ export async function startProduction(
     };
   } // Try to connect control panels and pipeline-to-pipeline connections end
 
-  const htmlSources = production.sources.filter(
-    (source) => source.type === 'html'
-  );
-  const mediaPlayerSources = production.sources.filter(
-    (source) => source.type === 'mediaplayer'
-  );
-
-  if (htmlSources.length > 0 || mediaPlayerSources.length > 0) {
-    let controlPanelWS;
-    try {
-      controlPanelWS = await createControlPanelWebSocket();
-
-      for (const source of htmlSources) {
-        controlPanelWS.createHtml(source.input_slot);
-      }
-
-      for (const source of mediaPlayerSources) {
-        controlPanelWS.createMediaplayer(source.input_slot);
-      }
-    } catch (error) {
-      Log().error('Failed to create WebSocket');
-      Log().error(error);
-      return {
-        ok: false,
-        value: [
-          { step: 'start', success: true },
-          { step: 'streams', success: true },
-          {
-            step: 'websocket',
-            success: false,
-            message: `Failed to create websocket: ${error}`
-          }
-        ],
-        error: 'Failed to create WebSocket'
-      };
-    } finally {
-      if (controlPanelWS) {
-        controlPanelWS.close();
-      }
-    }
-  }
   // Try to setup pipeline outputs start
   try {
     for (const pipeline of production_settings.pipelines) {
@@ -763,7 +718,9 @@ export async function startProduction(
       ],
       error: e
     };
-  } // Try to setup pipeline outputs end
+  }
+
+  // Try to setup pipeline outputs end
   // Try to setup multiviews start
   try {
     if (!production.production_settings.pipelines[0].multiviews) {
@@ -828,6 +785,48 @@ export async function startProduction(
       error: e
     };
   } // Try to setup multiviews end
+
+  // Create HTML and Media sources on each pipeline
+  const htmlSources = production.sources.filter(
+    (source) => source.type === 'html'
+  );
+  const mediaSources = production.sources.filter(
+    (source) => source.type === 'mediaplayer'
+  );
+
+  if (htmlSources.length > 0) {
+    for (const htmlSource of htmlSources) {
+      if (htmlSource.html_data) {
+        const htmlData = {
+          url: htmlSource.html_data?.url || '',
+          input_slot: htmlSource.input_slot,
+          height: htmlSource.html_data?.height,
+          width: htmlSource.html_data?.width
+        };
+        await createPipelineHtmlSource(
+          production,
+          htmlSource.input_slot,
+          htmlData,
+          htmlSource
+        );
+      }
+    }
+  }
+
+  if (mediaSources.length > 0) {
+    for (const mediaSource of mediaSources) {
+      const mediaData = {
+        filename: mediaSource.media_data?.filename || '',
+        input_slot: mediaSource.input_slot
+      };
+      await createPipelineMediaSource(
+        production,
+        mediaSource.input_slot,
+        mediaData,
+        mediaSource
+      );
+    }
+  }
 
   try {
     const sourceIds = production.sources

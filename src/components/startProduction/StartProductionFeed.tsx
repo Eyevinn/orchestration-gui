@@ -18,8 +18,7 @@ export default function StartProductionFeed({
     sync: t('start_production_status.sync'),
     monitoring: t('start_production_status.monitoring'),
     start: t('start_production_status.start'),
-    unexpected: t('start_production_status.unexpected'),
-    websocket: t('start_production_status.websocket')
+    unexpected: t('start_production_status.unexpected')
   };
   return (
     <div className="flex flex-col mb-4 w-96">
