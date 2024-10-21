@@ -19,11 +19,9 @@ export function CreateHtmlModal({
   onAbort,
   onConfirm
 }: CreateHtmlModalProps) {
-  const [height, setHeight] = useState<number>(1080);
-  const [width, setWidth] = useState<number>(1920);
-  const [url, setUrl] = useState<string>(
-    'http://192.168.2.7:3000/html_input?input=1'
-  );
+  const [height, setHeight] = useState<number>(0);
+  const [width, setWidth] = useState<number>(0);
+  const [url, setUrl] = useState<string>('');
   const [heightError, setHeightError] = useState<boolean>(false);
   const [widthError, setWidthError] = useState<boolean>(false);
 

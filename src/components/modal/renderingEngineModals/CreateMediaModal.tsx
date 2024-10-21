@@ -19,9 +19,7 @@ export function CreateMediaModal({
   onAbort,
   onConfirm
 }: CreateMediaModalProps) {
-  const [filename, setFilename] = useState<string>(
-    '/media/media_placeholder.mp4'
-  );
+  const [filename, setFilename] = useState<string>('');
 
   const t = useTranslate();
 
