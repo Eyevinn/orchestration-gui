@@ -145,6 +145,7 @@ export async function teardown(
   // STEP 5
   // DELETE PIPELINE CONNECTIONS
   try {
+    const disconnectedReceiverIDs: string[] = [];
     for (const pipeline of pipelines) {
       const connections: ResourcesConnectionUUIDResponse[] = [
         ...(pipeline.control_receiver?.incoming_connections || []),
@@ -152,9 +153,15 @@ export async function teardown(
       ];
 
       for (const connection of connections) {
-        await disconnectReceiver(connection.connection_uuid).catch(() => {
-          throw `Failed to disconnect connection ${connection.connection_uuid} in pipeline ${pipeline.name}`;
-        });
+        if (!disconnectedReceiverIDs.includes(connection.connection_uuid)) {
+          await disconnectReceiver(connection.connection_uuid)
+            .then(() =>
+              disconnectedReceiverIDs.push(connection.connection_uuid)
+            )
+            .catch(() => {
+              throw `Failed to disconnect connection ${connection.connection_uuid} in pipeline ${pipeline.name}`;
+            });
+        }
       }
     }
     addStep('pipeline_control_connections', true);
