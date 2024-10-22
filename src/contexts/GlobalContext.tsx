@@ -5,15 +5,15 @@ import { createContext, useState, PropsWithChildren } from 'react';
 
 interface IGlobalContext {
   locked: boolean;
-  imageRefetchIndex: number;
-  incrementImageRefetchIndex: () => void;
+  imageRefetchKey: number;
+  refetchImages: () => void;
   toggleLocked: () => void;
 }
 
 export const GlobalContext = createContext<IGlobalContext>({
   locked: false,
-  imageRefetchIndex: 0,
-  incrementImageRefetchIndex: () => {
+  imageRefetchKey: 0,
+  refetchImages: () => {
     // outsmarting lint
   },
   toggleLocked: () => {
@@ -24,10 +24,12 @@ export const GlobalContext = createContext<IGlobalContext>({
 export const GlobalContextProvider = (props: PropsWithChildren) => {
   const { children } = props;
   const [locked, setLocked] = useState<boolean>(true);
-  const [imageRefetchIndex, setImageRefetchIndex] = useState<number>(0);
+  const [imageRefetchKey, setImageRefetchKey] = useState<number>(
+    new Date().getTime()
+  );
 
-  const incrementImageRefetchIndex = () => {
-    setImageRefetchIndex(imageRefetchIndex + 1);
+  const refetchImages = () => {
+    setImageRefetchKey(new Date().getTime());
   };
 
   const toggleLocked = () => {
@@ -39,8 +41,8 @@ export const GlobalContextProvider = (props: PropsWithChildren) => {
       <GlobalContext.Provider
         value={{
           locked,
-          imageRefetchIndex,
-          incrementImageRefetchIndex,
+          imageRefetchKey,
+          refetchImages,
           toggleLocked
         }}
       >

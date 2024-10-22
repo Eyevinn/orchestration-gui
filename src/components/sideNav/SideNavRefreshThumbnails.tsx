@@ -11,14 +11,14 @@ const SideNavRefreshThumbnails = (props: SideNavItemBaseProps) => {
   const { open } = props;
   const t = useTranslate();
 
-  const { incrementImageRefetchIndex } = useContext(GlobalContext);
+  const { refetchImages } = useContext(GlobalContext);
 
   // TODO This button might be changed to a toggle for automatic image refetching.
   return (
     <div className="relative group">
       <div
         className="flex items-center pl-4 py-4 overflow-hidden rounded-xl hover:bg-light hover:cursor-pointer"
-        onClick={incrementImageRefetchIndex}
+        onClick={refetchImages}
       >
         <Icons name="IconRefresh" className="min-w-8 min-h-8 mr-4" />
         <div className="whitespace-nowrap">{t('refresh_images')}</div>

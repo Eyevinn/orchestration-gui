@@ -1,3 +1,5 @@
+'use client';
+
 import {
   PropsWithChildren,
   SyntheticEvent,
@@ -20,7 +22,7 @@ interface ImageComponentProps extends PropsWithChildren {
 
 const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   const { src, alt = 'Image', children, type } = props;
-  const { imageRefetchIndex } = useContext(GlobalContext);
+  const { imageRefetchKey } = useContext(GlobalContext);
   const [imgSrc, setImgSrc] = useState<string>();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -28,7 +30,7 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
   const refetchImage = () => {
-    setImgSrc(`${src}?refetch=${imageRefetchIndex}}`);
+    setImgSrc(`${src}?${imageRefetchKey}`);
     setError(undefined);
     setLoading(true);
     clearTimeout(timeout.current);
@@ -37,11 +39,11 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
 
   useEffect(() => {
     refetchImage();
-  }, [imageRefetchIndex]);
+  }, [imageRefetchKey]);
 
   useEffect(() => {
     setError(undefined);
-    setImgSrc(`${src}?refetch=${imageRefetchIndex}}`);
+    setImgSrc(`${src}?${imageRefetchKey}`);
   }, [src]);
 
   useEffect(() => {

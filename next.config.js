@@ -9,5 +9,8 @@ module.exports = {
     locales: ['en', 'sv'],
     defaultLocale: 'en',
     localeDetection: false
+  },
+  images: {
+    minimumCacheTTL: 0
   }
 };
