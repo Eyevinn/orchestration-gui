@@ -37,37 +37,21 @@ export async function putProduction(
 
   const sources = production.sources
     ? production.sources.flatMap((singleSource) => {
-        let newSource: SourceReference;
-
-        if (singleSource.html_data && singleSource.type === 'html') {
-          newSource = {
-            _id: newSourceId,
-            type: singleSource.type,
-            label: singleSource.label,
-            input_slot: singleSource.input_slot,
-            html_data: singleSource.html_data
-          };
-        } else if (
-          singleSource.media_data &&
-          singleSource.type === 'mediaplayer'
-        ) {
-          newSource = {
-            _id: newSourceId,
-            type: singleSource.type,
-            label: singleSource.label,
-            input_slot: singleSource.input_slot,
-            media_data: singleSource.media_data
-          };
-        } else {
-          newSource = {
-            _id: newSourceId,
-            type: singleSource.type,
-            label: singleSource.label,
-            input_slot: singleSource.input_slot
-          };
-        }
-
-        return singleSource._id ? singleSource : newSource;
+        return singleSource._id
+          ? singleSource
+          : {
+              _id: newSourceId,
+              type: singleSource.type,
+              label: singleSource.label,
+              input_slot: singleSource.input_slot,
+              html_data:
+                (singleSource.type === 'html' && singleSource.html_data) ||
+                undefined,
+              media_data:
+                (singleSource.type === 'mediaplayer' &&
+                  singleSource.media_data) ||
+                undefined
+            };
       })
     : [];
 

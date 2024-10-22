@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../../api/manager/auth';
 import { getPipelineRenderingEngine } from '../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
+import { Log } from '../../../../../../api/logger';
 
 type Params = {
   id: string;
@@ -27,7 +28,7 @@ export async function GET(
       }
     );
   } catch (error) {
-    console.log(error);
+    Log().error(error);
     return new NextResponse(
       `Error getting rendering engine for pipeline! Error: ${error}`,
       {

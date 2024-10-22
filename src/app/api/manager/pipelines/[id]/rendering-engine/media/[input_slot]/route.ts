@@ -44,21 +44,6 @@ export async function DELETE(
       );
     }
   } catch (e) {
-    if (typeof e !== 'string') {
-      return new NextResponse(
-        JSON.stringify({
-          ok: false,
-          value: [
-            {
-              step: 'delete_media',
-              success: false,
-              message: `Failed to delete media`
-            }
-          ],
-          error: 'Delete media failed'
-        } satisfies Result<DeleteRenderingEngineSourceStep[]>)
-      );
-    }
     return new NextResponse(
       JSON.stringify({
         ok: false,
@@ -66,10 +51,10 @@ export async function DELETE(
           {
             step: 'delete_media',
             success: false,
-            message: `Failed to delete media: ${params.id}: ${e}`
+            message: `Failed to delete media`
           }
         ],
-        error: e
+        error: typeof e === 'string' ? e : 'Failed to delete media'
       } satisfies Result<DeleteRenderingEngineSourceStep[]>)
     );
   }
@@ -105,25 +90,6 @@ export async function DELETE(
       } satisfies Result<DeleteRenderingEngineSourceStep[]>)
     );
   } catch (e) {
-    if (typeof e !== 'string') {
-      return new NextResponse(
-        JSON.stringify({
-          ok: false,
-          value: [
-            {
-              step: 'delete_media',
-              success: true
-            },
-            {
-              step: 'update_multiview',
-              success: false,
-              message: `Failed to update multiview: ${e}`
-            }
-          ],
-          error: 'Failed to update multiview'
-        } satisfies Result<DeleteRenderingEngineSourceStep[]>)
-      );
-    }
     return new NextResponse(
       JSON.stringify({
         ok: false,
@@ -138,7 +104,7 @@ export async function DELETE(
             message: `Failed to update multiview: ${e}`
           }
         ],
-        error: e
+        error: typeof e === 'string' ? e : 'Failed to update multiview'
       } satisfies Result<DeleteRenderingEngineSourceStep[]>)
     );
   }
