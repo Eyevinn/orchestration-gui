@@ -34,7 +34,7 @@ export function CreateMediaModal({
       setFilename('');
     }
     onConfirm(filename);
-    onAbort();
+    handleCancel();
   };
 
   return (

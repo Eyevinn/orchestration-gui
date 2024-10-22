@@ -68,7 +68,7 @@ export function CreateHtmlModal({
     }
 
     onConfirm(height, width, url);
-    onAbort();
+    handleCancel();
   };
 
   const handleInputChange = (
