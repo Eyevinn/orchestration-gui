@@ -70,11 +70,6 @@ export interface DeleteSourceStatus {
   steps: DeleteSourceStep[];
 }
 
-export interface DeleteRenderingEngineSourceStatus {
-  success: boolean;
-  steps: DeleteRenderingEngineSourceStep[];
-}
-
 export interface AddSourceStep {
   step: 'add_stream' | 'update_multiview' | 'unexpected';
   success: boolean;

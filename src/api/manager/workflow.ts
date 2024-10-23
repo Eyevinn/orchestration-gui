@@ -798,10 +798,9 @@ export async function startProduction(
     for (const htmlSource of htmlSources) {
       if (htmlSource.html_data) {
         const htmlData = {
+          ...htmlSource.html_data,
           url: htmlSource.html_data?.url || '',
-          input_slot: htmlSource.input_slot,
-          height: htmlSource.html_data?.height,
-          width: htmlSource.html_data?.width
+          input_slot: htmlSource.input_slot
         };
         await createPipelineHtmlSource(
           production,

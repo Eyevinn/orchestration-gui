@@ -78,8 +78,8 @@ export const sv = {
     html: {
       create: {
         create_html: 'Skapa HTML',
-        width: 'Bredd på browser canvas',
-        height: 'Höjd på browser canvas',
+        width: 'Bredd på grafik',
+        height: 'Höjd på grafik',
         url: 'URL att ladda in',
         create: 'Skapa',
         width_error: 'Bredden måste vara mellan 20 och 8192',

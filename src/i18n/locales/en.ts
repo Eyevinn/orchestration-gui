@@ -76,8 +76,8 @@ export const en = {
     html: {
       create: {
         create_html: 'Create HTML',
-        width: 'Browser canvas width',
-        height: 'Browser canvas height',
+        width: 'HTML graphics width',
+        height: 'HTML graphics height',
         url: 'URL to load',
         create: 'Create',
         width_error: 'Width must be between 20 and 8192',
