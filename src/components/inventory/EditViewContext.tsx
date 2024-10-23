@@ -17,6 +17,7 @@ import {
 } from '../../interfaces/Source';
 import { API_SECRET_KEY } from '../../utils/constants';
 import { zeroBased } from './editView/AudioChannels/utils';
+import { ResourcesSrt } from '../../../types/ateliere-live';
 
 export interface IInput {
   name: string;
@@ -39,6 +40,7 @@ interface IContext {
   videoStream: VideoStream;
   audioStream: AudioStream;
   sourceMetadata: IReadOnlyMetadata;
+  srtMetaData?: ResourcesSrt;
 }
 
 export const EditViewContext = createContext<IContext>({
@@ -51,7 +53,8 @@ export const EditViewContext = createContext<IContext>({
   isSame: true,
   videoStream: {},
   audioStream: {},
-  sourceMetadata: {}
+  sourceMetadata: {},
+  srtMetaData: undefined
 });
 
 export default function Context({
@@ -139,6 +142,7 @@ export default function Context({
     ingestServer: source.ingest_name,
     originalName: source.ingest_source_name
   };
+  const srtMetaData = source.srt;
 
   return (
     <EditViewContext.Provider
@@ -149,7 +153,8 @@ export default function Context({
         loading,
         videoStream,
         audioStream,
-        sourceMetadata
+        sourceMetadata,
+        srtMetaData
       }}
     >
       <form

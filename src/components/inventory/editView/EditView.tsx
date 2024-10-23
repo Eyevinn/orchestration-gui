@@ -5,8 +5,6 @@ import { SourceWithId } from '../../../interfaces/Source';
 import UpdateButtons from './UpdateButtons';
 import AudioChannels from './AudioChannels/AudioChannels';
 import ImageComponent from '../../image/ImageComponent';
-import { useContext } from 'react';
-import { GlobalContext } from '../../../contexts/GlobalContext';
 
 export default function EditView({
   source,
@@ -25,7 +23,7 @@ export default function EditView({
 }) {
   return (
     <EditViewContext source={source} updateSource={updateSource}>
-      <div className="flex flex-row mb-10 h-[22rem]">
+      <div className="flex flex-row mb-10">
         <div className="relative w-[34rem]">
           <ImageComponent src={getSourceThumbnail(source)} />
         </div>

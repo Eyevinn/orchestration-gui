@@ -16,7 +16,8 @@ export default function GeneralSettings({ locked }: GeneralSettingsProps) {
     saved: [saved, setSaved],
     videoStream,
     audioStream,
-    sourceMetadata
+    sourceMetadata,
+    srtMetaData
   } = useContext(EditViewContext);
 
   const t = useTranslate();
@@ -31,6 +32,12 @@ export default function GeneralSettings({ locked }: GeneralSettingsProps) {
       ...state,
       [key]: value
     }));
+  };
+
+  const getValueWithBackup = (value?: string | number) => {
+    const backedUpValue = value || 'undefined';
+    const classNameString = value ? '' : 'italic text-light';
+    return <h2 className={classNameString}>{backedUpValue}</h2>;
   };
 
   const { height, width, frame_rate: frameRate } = videoStream;
@@ -90,18 +97,66 @@ export default function GeneralSettings({ locked }: GeneralSettingsProps) {
         </div>
       </div>
 
-      {height && width && (
+      {height !== undefined && width !== undefined && (
         <div className="flex mb-5">
           <h2 className="flex w-[100px] items-center">{t('video')}</h2>
           <h2>{videoSettings(width, height, frameRate)}</h2>
         </div>
       )}
 
-      {sampleRate && (
+      {sampleRate !== undefined && (
         <div className="flex mb-5">
           <h2 className="flex w-[100px] items-center">{t('audio')}</h2>
           <h2>{getHertz(sampleRate)}</h2>
         </div>
+      )}
+
+      {srtMetaData && (
+        <>
+          <h1 className="w-1/2 mb-2 mt-8 font-bold border-b-2">
+            {t('inventory_list.srt_metadata')}
+          </h1>
+          <div className="flex mb-5">
+            <h2 className="flex w-[100px] items-center">{t('preset.mode')}</h2>
+            {getValueWithBackup(srtMetaData.srt_mode)}
+          </div>
+          <div className="flex mb-5">
+            <h2 className="flex w-[100px] items-center">
+              {t('preset.video_format')}
+            </h2>
+            {getValueWithBackup(srtMetaData.video_format)}
+          </div>
+          <div className="flex mb-5">
+            <h2 className="flex w-[100px] items-center">
+              {t('inventory_list.latency')}
+            </h2>
+            {getValueWithBackup(srtMetaData.latency_ms)}
+          </div>
+          <div className="flex mb-5">
+            <h2 className="flex w-[100px] items-center">
+              {srtMetaData.srt_mode === 'listener'
+                ? t('inventory_list.local_ip')
+                : t('inventory_list.remote_ip')}
+            </h2>
+            {getValueWithBackup(
+              srtMetaData.srt_mode === 'listener'
+                ? srtMetaData.local_ip
+                : srtMetaData.remote_ip
+            )}
+          </div>
+          <div className="flex mb-5">
+            <h2 className="flex w-[100px] items-center">
+              {srtMetaData.srt_mode === 'listener'
+                ? t('inventory_list.local_port')
+                : t('inventory_list.remote_port')}
+            </h2>
+            {getValueWithBackup(
+              srtMetaData.srt_mode === 'listener'
+                ? srtMetaData.local_port
+                : srtMetaData.remote_port
+            )}
+          </div>
+        </>
       )}
     </div>
   );

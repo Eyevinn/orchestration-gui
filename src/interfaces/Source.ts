@@ -1,5 +1,6 @@
 import { ObjectId, WithId } from 'mongodb';
 import { HTMLSource, MediaSource } from './renderingEngine';
+import { ResourcesSrt } from '../../types/ateliere-live';
 export type SourceType = 'camera' | 'graphics' | 'microphone';
 export type SourceStatus = 'ready' | 'new' | 'gone' | 'purge';
 export type Type = 'ingest_source' | 'html' | 'mediaplayer';
@@ -33,6 +34,7 @@ export interface Source {
   video_stream: VideoStream;
   audio_stream: AudioStream;
   lastConnected: Date;
+  srt?: ResourcesSrt;
 }
 
 export interface SourceReference {

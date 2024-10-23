@@ -560,6 +560,7 @@ export const en = {
     most_recent_connection: 'Most recent connection',
     create_srt: 'Create SRT',
     create_srt_source: 'Create SRT source',
+    srt_metadata: 'SRT Metadata',
     local_ip: 'Local IP',
     local_port: 'Local port',
     remote_ip: 'Remote IP',

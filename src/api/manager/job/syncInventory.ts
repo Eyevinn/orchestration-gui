@@ -19,31 +19,31 @@ async function getSourcesFromAPI(): Promise<SourceWithoutLastConnected[]> {
     .map((result) => result.value);
   const sources: SourceWithoutLastConnected[] = resolvedIngests.flatMap(
     (ingest) => {
-      return ingest.sources.map(
-        (source) =>
-          ({
-            status: source.active ? 'new' : 'gone',
-            name: source.name,
-            type: 'camera',
-            tags: {
-              location: 'Unknown'
-            },
-            ingest_name: ingest.name,
-            ingest_source_name: source.name,
-            ingest_type: source.type,
-            video_stream: {
-              width: source?.video_stream?.width,
-              height: source?.video_stream?.height,
-              frame_rate:
-                source?.video_stream?.frame_rate_n /
-                source?.video_stream?.frame_rate_d
-            },
-            audio_stream: {
-              number_of_channels: source?.audio_stream?.number_of_channels,
-              sample_rate: source?.audio_stream?.sample_rate
-            }
-          } satisfies SourceWithoutLastConnected)
-      );
+      return ingest.sources.map((source) => {
+        return {
+          status: source.active ? 'new' : 'gone',
+          name: source.name,
+          type: 'camera',
+          tags: {
+            location: 'Unknown'
+          },
+          ingest_name: ingest.name,
+          ingest_source_name: source.name,
+          ingest_type: source.type,
+          video_stream: {
+            width: source?.video_stream?.width,
+            height: source?.video_stream?.height,
+            frame_rate:
+              source?.video_stream?.frame_rate_n /
+              source?.video_stream?.frame_rate_d
+          },
+          audio_stream: {
+            number_of_channels: source?.audio_stream?.number_of_channels,
+            sample_rate: source?.audio_stream?.sample_rate
+          },
+          srt: source.srt
+        } satisfies SourceWithoutLastConnected;
+      });
     }
   );
   return sources;
@@ -101,7 +101,9 @@ export async function runSyncInventory() {
     return {
       ...inventorySource,
       status: statusUpdateCheck(inventorySource, apiSource, lastConnected),
-      lastConnected: lastConnected
+      lastConnected: lastConnected,
+      // Add srt metadata if missing from SRT sources
+      srt: (apiSource.ingest_type === 'SRT' && apiSource.srt) || undefined
     } satisfies WithId<Source>;
   });
 

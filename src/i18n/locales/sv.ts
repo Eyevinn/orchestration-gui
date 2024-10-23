@@ -562,6 +562,7 @@ export const sv = {
     most_recent_connection: 'Senast anslutning',
     create_srt: 'Skapa SRT',
     create_srt_source: 'Skapa SRT källa',
+    srt_metadata: 'SRT Metadata',
     local_ip: 'Lokal IP',
     local_port: 'Lokal port',
     remote_ip: 'Remote IP',
