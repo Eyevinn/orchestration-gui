@@ -584,6 +584,7 @@ export const sv = {
   apply: 'Applicera',
   save: 'Spara',
   saved: 'Sparat!',
+  missing: 'Saknas',
   name: 'Namn',
   location: 'Plats',
   type: 'Typ',

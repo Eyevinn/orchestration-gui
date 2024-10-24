@@ -582,6 +582,7 @@ export const en = {
   apply: 'Apply',
   save: 'Save',
   saved: 'Saved!',
+  missing: 'Missing',
   name: 'Name',
   location: 'Location',
   type: 'Type',

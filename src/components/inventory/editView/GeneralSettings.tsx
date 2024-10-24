@@ -35,7 +35,7 @@ export default function GeneralSettings({ locked }: GeneralSettingsProps) {
   };
 
   const getValueWithBackup = (value?: string | number) => {
-    const backedUpValue = value || 'undefined';
+    const backedUpValue = value || t('missing');
     const classNameString = value ? '' : 'italic text-light';
     return <h2 className={classNameString}>{backedUpValue}</h2>;
   };
