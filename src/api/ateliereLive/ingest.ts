@@ -160,15 +160,28 @@ export async function createSrtSource(
   ingestUuid: string,
   srtPayload: SrtSource
 ) {
-  const payload = {
-    srt_source: {
-      ...srtPayload,
-      local_port: Number(srtPayload.local_port),
-      latency_ms: Number(srtPayload.latency_ms),
-      remote_port: Number(srtPayload.remote_port)
-    }
-  };
+  let payload;
 
+  // Making sure remote_port is only passed if mode is 'caller'
+  if (srtPayload.mode === 'caller') {
+    payload = {
+      srt_source: {
+        ...srtPayload,
+        local_port: Number(srtPayload.local_port),
+        latency_ms: Number(srtPayload.latency_ms),
+        remote_port: Number(srtPayload.remote_port)
+      }
+    };
+  } else {
+    payload = {
+      srt_source: {
+        ...srtPayload,
+        local_port: Number(srtPayload.local_port),
+        latency_ms: Number(srtPayload.latency_ms)
+      }
+    }
+  }
+  
   const response = await fetch(
     new URL(
       LIVE_BASE_API_PATH + `/ingests/${ingestUuid}/sources`,

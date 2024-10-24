@@ -548,6 +548,7 @@ export const en = {
   },
   inventory: 'Inventory',
   inventory_list: {
+    refresh_inventory: 'Refresh inventory',
     search: 'Search',
     filter: 'Filter on {{type}}',
     types: 'Type',
@@ -575,6 +576,8 @@ export const en = {
     no_local_port: 'You need to enter a local port',
     no_remote_ip: 'You need to enter a remote IP',
     no_remote_port: 'You need to enter a remote port',
+    port_already_in_use_error:
+      'There is already a SRT source with this port. Choose a different port.',
     cancel: 'Cancel'
   },
   clear: 'Clear',

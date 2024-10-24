@@ -550,6 +550,7 @@ export const sv = {
   },
   inventory: 'Källhantering',
   inventory_list: {
+    refresh_inventory: 'Uppdatera källor',
     search: 'Sök',
     filter: 'Filtrera på {{type}}',
     types: 'Typ',
@@ -577,6 +578,8 @@ export const sv = {
     no_local_port: 'Du behöver fylla i en lokal port',
     no_remote_ip: 'Du behöver fylla i en remote IP',
     no_remote_port: 'Du behöver fylla i en remote port',
+    port_already_in_use_error:
+      'Den här porten används redan av en annan SRT källa. Välj en annan port.',
     cancel: 'Avbryt'
   },
   clear: 'Rensa',
