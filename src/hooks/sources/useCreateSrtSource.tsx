@@ -4,23 +4,25 @@ import { CallbackHook } from '../types';
 import { API_SECRET_KEY } from '../../utils/constants';
 
 export function useCreateSrtSource(): CallbackHook<
-  (uuid: string, srtPayload: SrtSource) => void
+  (uuid: string, srtPayload: SrtSource) => Promise<Response | undefined>
 > {
-  const [createSourceLoading, setCreateSourceLoading] = useState(false);
+  const [reloadList, setReloadList] = useState(false);
+
   const createSrtSource = async (uuid: string, srtPayload: SrtSource) => {
-    setCreateSourceLoading(true);
+    setReloadList(false);
     return fetch(`/api/manager/ingests/${uuid}/srt/`, {
       method: 'POST',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({ srtPayload })
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          return response;
-        }
-        throw await response.text();
-      })
-      .finally(() => setCreateSourceLoading(false));
+    }).then(async (response) => {
+      if (response.ok) {
+        setTimeout(() => {
+          setReloadList(true);
+        }, 1500);
+        return response;
+      }
+      throw await response.text();
+    });
   };
-  return [createSrtSource, createSourceLoading];
+  return [createSrtSource, reloadList];
 }

@@ -27,7 +27,7 @@ export async function POST(
       Log().error(error);
       const errorResponse = {
         ok: false,
-        error: 'unexpected'
+        error: error.message
       };
       return new NextResponse(JSON.stringify(errorResponse), { status: 500 });
     });

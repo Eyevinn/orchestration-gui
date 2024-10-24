@@ -1,8 +1,9 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { API_SECRET_KEY } from '../utils/constants';
 import {
   ResourcesIngestResponse,
-  ResourcesIngestStreamResponse
+  ResourcesIngestStreamResponse,
+  ResourcesSourceResponse
 } from '../../types/ateliere-live';
 import { CallbackHook } from './types';
 
@@ -83,4 +84,35 @@ export function useIngestSourceId(): CallbackHook<
     }
   };
   return [getIngestSourceId, loading];
+}
+
+export function useIngestSources(): CallbackHook<
+  (ingestName: string) => Promise<ResourcesSourceResponse[]>
+> {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const getIngestSources = async (
+    ingestName: string
+  ): Promise<ResourcesSourceResponse[]> => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `/api/manager/ingests/sources/${ingestName}`,
+        {
+          method: 'GET',
+          headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
+        }
+      );
+      setLoading(false);
+      if (response.ok) {
+        return await response.json();
+      } else {
+        throw new Error(await response.text());
+      }
+    } catch (error) {
+      console.error(`Error fetching ingest sources: ${error}`);
+      throw error;
+    }
+  };
+  return [getIngestSources, loading];
 }
