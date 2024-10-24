@@ -172,25 +172,22 @@ export function AddSrtModal({
   };
 
   const fetchIngestSources = async (): Promise<ResourcesSourceResponse[]> => {
-    if (ingests && ingests.length > 0) {
-      const sources = [];
-      for (const ingest of ingests) {
-        try {
-          const res = await getIngestSources(ingest.name);
-          sources.push(...res);
-        } catch (error) {
-          console.error(
-            `Failed to fetch ingest sources for ${ingest.name}:`,
-            error
-          );
-        }
-      }
-      const srtSources = sources.filter((source) => source.type === 'SRT');
-      setIngestSrtSources(srtSources);
-
-      return srtSources;
+    if (!ingestName || ingests.length === 0) {
+      return [];
     }
-    return [];
+
+    const sources = [];
+    try {
+      const res = await getIngestSources(ingestName);
+      sources.push(...res);
+    } catch (error) {
+      console.error(`Failed to fetch ingest sources for ${ingestName}:`, error);
+    }
+
+    const srtSources = sources.filter((source) => source.type === 'SRT');
+    setIngestSrtSources(srtSources);
+
+    return srtSources;
   };
 
   const handleCreateSrtSource = async () => {
