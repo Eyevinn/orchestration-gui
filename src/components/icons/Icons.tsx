@@ -30,7 +30,8 @@ import {
   IconBiohazard,
   IconAlertTriangle,
   IconRouteOff,
-  IconAlertOctagon
+  IconAlertOctagon,
+  IconPencil
 } from '@tabler/icons-react';
 
 interface IClassName {
@@ -119,6 +120,9 @@ const pickIcon = {
   ),
   IconAlertOctagon: ({ className }: IClassName) => (
     <IconAlertOctagon className={className} />
+  ),
+  IconPencil: ({ className }: IClassName) => (
+    <IconPencil className={className} />
   )
 };
 

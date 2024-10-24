@@ -1,10 +1,7 @@
-'use client';
-
-import { useState, KeyboardEvent, useContext } from 'react';
+import { KeyboardEvent, useContext } from 'react';
 import HeaderNavigation from '../../headerNavigation/HeaderNavigation';
 import { ConfigureMultiviewButton } from '../../modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { ConfigureOutputButton } from '../../startProduction/ConfigureOutputButton';
-import { PresetDropdown } from '../../startProduction/presetDropdown';
 import { StartProductionButton } from '../../startProduction/StartProductionButton';
 import { GlobalContext } from '../../../contexts/GlobalContext';
 import { Production } from '../../../interfaces/production';
@@ -48,8 +45,6 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = (props) => {
     configurationName,
     setConfigurationName
   } = props;
-
-  const [isPresetDropdownHidden, setIsPresetDropdownHidden] = useState(true);
   const { locked } = useContext(GlobalContext);
   const [addMultiviewersOnRunningProduction] =
     useAddMultiviewersOnRunningProduction();
@@ -85,28 +80,6 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = (props) => {
     return allPipesHaveName;
   };
 
-  function addPresetComponent(preset: Preset, index: number) {
-    const id = `${preset.name}-${index}-id`;
-    return (
-      <li
-        key={preset.name + index}
-        className="flex w-40 px-1 mb-1 hover:bg-gray-600"
-        onClick={() => {
-          updateSelectedPreset(preset);
-        }}
-      >
-        <div className="flex items-center w-full p-2 rounded hover:bg-gray-600">
-          <label
-            htmlFor={id}
-            className="w-full text-sm text-center font-medium"
-          >
-            {preset.name}
-          </label>
-        </div>
-      </li>
-    );
-  }
-
   async function updateSelectedPreset(preset?: Preset) {
     if (!preset && productionSetup?._id) {
       getPresets().then((presets: any) => {
@@ -130,7 +103,6 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = (props) => {
       name: defaultMultiview.name,
       for_pipeline_idx: 0
     };
-    setIsPresetDropdownHidden(true);
     let controlPanelName: string[] = [];
     if (
       productionSetup?.production_settings &&
@@ -262,22 +234,6 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = (props) => {
         key={'StartProductionButtonKey'}
         id="presetDropdownDefaultCheckbox"
       >
-        <PresetDropdown
-          disabled={
-            (productionSetup ? productionSetup.isActive : false) || locked
-          }
-          isHidden={isPresetDropdownHidden}
-          setHidden={setIsPresetDropdownHidden}
-          selectedPreset={selectedPreset}
-          onSelectPreset={() => {
-            updateSelectedPreset(undefined);
-          }}
-        >
-          {presets &&
-            presets.map((item: any, index: number) => {
-              return addPresetComponent(item, index);
-            })}
-        </PresetDropdown>
         <ConfigureOutputButton
           disabled={
             productionSetup?.isActive || locked || !hasSelectedPipelines()

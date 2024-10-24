@@ -7,8 +7,9 @@ export interface Production {
   _id: string;
   isActive: boolean;
   name: string;
+  preset_id: string;
   sources: SourceReference[];
-  production_settings: ProductionSettings;
+  production_settings?: ProductionSettings;
 }
 
 export interface ProductionWithId extends WithId<Document> {

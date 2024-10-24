@@ -1,7 +1,7 @@
-import ProductionPage from '../../../components/production/ProductionPage';
+import NewProductionPage from '../../../components/production/NewProductionPage';
 
 export default function Page({ params }: { params: { id: string } }) {
   const { id } = params;
 
-  return <ProductionPage id={id} />;
+  return <NewProductionPage id={id} />;
 }

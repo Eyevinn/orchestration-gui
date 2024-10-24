@@ -61,7 +61,8 @@ export async function putProduction(
       name: production.name,
       isActive: production.isActive,
       sources: sources,
-      production_settings: production.production_settings
+      production_settings: production.production_settings,
+      preset_id: production.preset_id
     }
   );
 
@@ -74,7 +75,8 @@ export async function putProduction(
     name: production.name,
     isActive: production.isActive,
     sources: sources,
-    production_settings: production.production_settings
+    production_settings: production.production_settings,
+    preset_id: production.preset_id
   };
 }
 

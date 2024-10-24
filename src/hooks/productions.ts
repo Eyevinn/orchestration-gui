@@ -3,14 +3,15 @@ import { Production } from '../interfaces/production';
 import { API_SECRET_KEY } from '../utils/constants';
 
 export function usePostProduction() {
-  return async (name: string): Promise<ObjectId> => {
+  return async (name: string, selectedPreset: string): Promise<ObjectId> => {
     const response = await fetch('/api/manager/productions', {
       method: 'POST',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({
         isActive: false,
         name,
-        sources: []
+        sources: [],
+        preset_id: selectedPreset
       })
     });
     if (response.ok) {

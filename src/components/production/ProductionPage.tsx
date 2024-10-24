@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslate } from '../../i18n/useTranslate';
 import ProductionHeader from './header/ProductionHeader';

@@ -2,12 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { Button } from '../button/Button';
-import { LegacyRef, useCallback, useRef, useState, KeyboardEvent } from 'react';
+import { LegacyRef, useCallback, useRef, useState } from 'react';
 import { IconServerCog, IconPlus } from '@tabler/icons-react';
-import Link from 'next/link';
 import { useTranslate } from '../../i18n/useTranslate';
 import { usePostProduction } from '../../hooks/productions';
 import { refresh } from '../../utils/refresh';
+import { PresetDropdown } from '../startProduction/presetDropdown';
 
 export function CreateProduction() {
   const router = useRouter();
@@ -15,24 +15,19 @@ export function CreateProduction() {
 
   const inputRef: LegacyRef<HTMLInputElement> = useRef<HTMLInputElement>(null);
   const [showing, setShowing] = useState<boolean>(false);
+  const [selectedPreset, setSelectedPreset] = useState<string>('');
 
   const t = useTranslate();
 
   const handleCreateNew = useCallback(async () => {
     const name = inputRef.current?.value;
-    if (!name) {
+    if (!name || !selectedPreset) {
       return;
     }
-    const insertedId = await postProduction(name);
+    const insertedId = await postProduction(name, selectedPreset);
     refresh('/');
     router.push(`/production/${insertedId}`);
   }, [router, postProduction]);
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleCreateNew();
-    }
-  };
 
   const handleOpen = useCallback(
     () => setShowing((showing: boolean) => !showing),
@@ -84,10 +79,14 @@ export function CreateProduction() {
                     }
                   }}
                   required
-                  onKeyDown={handleKeyDown}
                 />
               </p>
             </div>
+            <PresetDropdown
+              disabled={false}
+              value={selectedPreset}
+              onChange={setSelectedPreset}
+            />
             <div className="rounded">
               <Button
                 className="hover:bg-button-hover-bg bg-button-bg"
