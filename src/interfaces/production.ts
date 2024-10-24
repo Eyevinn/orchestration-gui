@@ -8,7 +8,12 @@ export interface Production {
   isActive: boolean;
   name: string;
   sources: SourceReference[];
-  production_settings: ProductionSettings;
+  preset_name: string;
+  pipelines: PipelineSettings[];
+  control_connection: ProductionControlConnection;
+  default_multiview_reference: string;
+  //////
+  production_settings?: ProductionSettings;
 }
 
 export interface ProductionWithId extends WithId<Document> {

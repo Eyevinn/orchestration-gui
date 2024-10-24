@@ -114,11 +114,11 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
   };
   const isConfigured = (production: Production) => {
     if (!production.production_settings) return false;
-    const hasSetPipelines = production.production_settings.pipelines.every(
+    const hasSetPipelines = production.production_settings.pipelines?.every(
       (p) => p.pipeline_name
     );
     const hasSetControlPanels =
-      production.production_settings.control_connection.control_panel_name;
+      production.production_settings.control_connection?.control_panel_name;
     return hasSetPipelines && hasSetControlPanels;
   };
   return (

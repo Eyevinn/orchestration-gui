@@ -1,16 +1,21 @@
 import { ObjectId } from 'mongodb';
 import { Production } from '../interfaces/production';
 import { API_SECRET_KEY } from '../utils/constants';
+import { PresetWithId } from '../interfaces/preset';
 
 export function usePostProduction() {
-  return async (name: string): Promise<ObjectId> => {
+  return async (name: string, preset: PresetWithId): Promise<ObjectId> => {
     const response = await fetch('/api/manager/productions', {
       method: 'POST',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({
         isActive: false,
         name,
-        sources: []
+        sources: [],
+        preset_name: preset.name,
+        pipelines: preset.pipelines,
+        default_multiview_reference: preset.default_multiview_reference,
+        control_connection: preset.control_connection
       })
     });
     if (response.ok) {

@@ -61,7 +61,11 @@ export async function putProduction(
       name: production.name,
       isActive: production.isActive,
       sources: sources,
-      production_settings: production.production_settings
+      production_settings: production.production_settings,
+      preset_name: production.preset_name,
+      pipelines: production.pipelines,
+      control_connection: production.control_connection,
+      default_multiview_reference: production.default_multiview_reference
     }
   );
 
@@ -74,7 +78,11 @@ export async function putProduction(
     name: production.name,
     isActive: production.isActive,
     sources: sources,
-    production_settings: production.production_settings
+    production_settings: production.production_settings,
+    preset_name: production.preset_name,
+    pipelines: production.pipelines,
+    control_connection: production.control_connection,
+    default_multiview_reference: production.default_multiview_reference
   };
 }
 
