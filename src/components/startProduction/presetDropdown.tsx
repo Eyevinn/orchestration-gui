@@ -1,41 +1,36 @@
 import { ClickAwayListener } from '@mui/base';
-import { Preset, PresetWithId } from '../../interfaces/preset';
-import React, { ReactNode, useEffect, useState } from 'react';
+import { PresetWithId } from '../../interfaces/preset';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../button/Button';
 import { useTranslate } from '../../i18n/useTranslate';
 import { useGetPresets } from '../../hooks/presets';
 
 type presetDropdownProps = {
   disabled?: boolean;
-  value: string;
-  onChange: (val: string) => void;
+  preset?: PresetWithId;
+  onChange: (preset?: PresetWithId) => void;
 };
 
 export const PresetDropdown = ({
   disabled = false,
-  value,
+  preset,
   onChange
 }: presetDropdownProps) => {
   const t = useTranslate();
   const [hidden, setHidden] = useState<boolean>(true);
   const [presets, setPresets] = useState<PresetWithId[]>([]);
-  const [selectedPreset, setSelectedPreset] = useState<PresetWithId>();
 
   const getPresets = useGetPresets();
 
   useEffect(() => {
     getPresets().then((presets) => {
       const foundPreset = presets.find(
-        (preset) => preset._id.toString() === value
+        (p) => p._id.toString() === preset?._id.toString()
       );
-      if (foundPreset) setSelectedPreset(foundPreset);
+      if (foundPreset) onChange(foundPreset);
       setPresets(presets);
     });
   }, []);
-
-  useEffect(() => {
-    onChange(selectedPreset?._id.toString() || '');
-  }, [selectedPreset]);
 
   const handleSetPresetHiddenState = (shouldHide: boolean) => {
     if (!disabled) {
@@ -50,7 +45,7 @@ export const PresetDropdown = ({
         key={preset.name + index}
         className="flex w-40 px-1 mb-1 hover:bg-gray-600 hover:cursor-pointer"
         onClick={() => {
-          setSelectedPreset(preset);
+          onChange(preset);
         }}
       >
         <div className="flex items-center w-full p-2 rounded hover:bg-gray-600 hover:cursor-pointer">
@@ -81,7 +76,7 @@ export const PresetDropdown = ({
             disabled && 'cursor-default'
           }`}
         >
-          {selectedPreset ? selectedPreset.name : t('production.select_preset')}
+          {preset ? preset.name : t('production.select_preset')}
         </Button>
 
         <div
@@ -94,10 +89,10 @@ export const PresetDropdown = ({
             id="preset-checkbox-container"
             aria-labelledby="dropdownCheckboxButton"
           >
-            {selectedPreset && (
+            {preset && (
               <li
                 className="flex w-40 px-1 mt-1 hover:bg-gray-600 hover:cursor-pointer"
-                onClick={() => setSelectedPreset(undefined)}
+                onClick={() => onChange(undefined)}
               >
                 <div className="flex items-center w-full p-2 rounded hover:bg-gray-600 hover:cursor-pointer">
                   <label className="w-full text-sm text-center font-medium hover:cursor-pointer">

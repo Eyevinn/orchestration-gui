@@ -8,6 +8,7 @@ import { useTranslate } from '../../i18n/useTranslate';
 import { usePostProduction } from '../../hooks/productions';
 import { refresh } from '../../utils/refresh';
 import { PresetDropdown } from '../startProduction/presetDropdown';
+import { Preset, PresetWithId } from '../../interfaces/preset';
 
 export function CreateProduction() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function CreateProduction() {
 
   const inputRef: LegacyRef<HTMLInputElement> = useRef<HTMLInputElement>(null);
   const [showing, setShowing] = useState<boolean>(false);
-  const [selectedPreset, setSelectedPreset] = useState<string>('');
+  const [selectedPreset, setSelectedPreset] = useState<PresetWithId>();
 
   const t = useTranslate();
 
@@ -84,7 +85,7 @@ export function CreateProduction() {
             </div>
             <PresetDropdown
               disabled={false}
-              value={selectedPreset}
+              preset={selectedPreset}
               onChange={setSelectedPreset}
             />
             <div className="rounded">

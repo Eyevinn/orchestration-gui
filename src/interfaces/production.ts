@@ -7,8 +7,12 @@ export interface Production {
   _id: string;
   isActive: boolean;
   name: string;
-  preset_id: string;
   sources: SourceReference[];
+  preset_name: string;
+  pipelines: PipelineSettings[];
+  control_connection: ProductionControlConnection;
+  default_multiview_reference: string;
+  //////
   production_settings?: ProductionSettings;
 }
 

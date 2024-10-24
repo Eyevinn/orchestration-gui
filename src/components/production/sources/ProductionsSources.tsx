@@ -540,7 +540,7 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
     (selectedValue !== 'HTML' && selectedValue !== 'Media Player') || locked;
 
   return (
-    <div className="flex flex-row h-[70%] ">
+    <div className="flex flex-row h-[70%]">
       <div
         className={`overflow-hidden transition-[min-width] w-0 min-w-0 ${
           inventoryVisible ? 'min-w-[35%] ml-2 max-h-[70vh]' : ''
