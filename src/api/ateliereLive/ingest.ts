@@ -179,9 +179,9 @@ export async function createSrtSource(
         local_port: Number(srtPayload.local_port),
         latency_ms: Number(srtPayload.latency_ms)
       }
-    }
+    };
   }
-  
+
   const response = await fetch(
     new URL(
       LIVE_BASE_API_PATH + `/ingests/${ingestUuid}/sources`,

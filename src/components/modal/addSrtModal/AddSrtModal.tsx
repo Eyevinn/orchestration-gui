@@ -383,7 +383,7 @@ export function AddSrtModal({
               </p>
             )}
             {mode === 'Listener' && isPortAlreadyInUseError && (
-              <p className="text-center text-xs text-button-delete mt-2">
+              <p className="text-center text-sm text-button-delete mt-2">
                 {t('inventory_list.port_already_in_use_error')}
               </p>
             )}

@@ -24,7 +24,11 @@ export async function DELETE(
 
   const ingestUuid = await getUuidFromIngestName(params.ingest_name, false);
   const sourceId = ingestUuid
-    ? await getSourceIdFromSourceName(ingestUuid, params.ingest_source_name, false)
+    ? await getSourceIdFromSourceName(
+        ingestUuid,
+        params.ingest_source_name,
+        false
+      )
     : 0;
   return await deleteSrtSource(ingestUuid || '', sourceId || 0)
     .then((response) => {
