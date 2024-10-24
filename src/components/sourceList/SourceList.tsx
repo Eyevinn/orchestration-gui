@@ -57,7 +57,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
         <div
           className={
             inventoryVisible
-              ? `${styles.no_scrollbar}  min-w-fit overflow-hidden max-w-2xl transition-[width] ml-2 mt-2 w-[50%]`
+              ? `${styles.no_scrollbar} min-w-fit overflow-hidden max-w-2xl transition-[width] ml-2 mt-2 w-[50%]`
               : 'hidden'
           }
         >
@@ -78,7 +78,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
               )}
             </div>
             <ul
-              className={`flex flex-col border-t border-gray-600 overflow-scroll h-full ${styles.no_scrollbar}`}
+              className={`flex flex-col border-t border-gray-600 overflow-y-auto h-[calc(100vh-14rem)] ${styles.no_scrollbar}`}
             >
               {getSourcesToDisplay(filteredSources)}
             </ul>

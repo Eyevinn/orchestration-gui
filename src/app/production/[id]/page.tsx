@@ -67,7 +67,6 @@ import { useDeleteHtmlSource } from '../../../hooks/renderingEngine/useDeleteHtm
 import { useDeleteMediaSource } from '../../../hooks/renderingEngine/useDeleteMediaSource';
 import { useCreateHtmlSource } from '../../../hooks/renderingEngine/useCreateHtmlSource';
 import { useCreateMediaSource } from '../../../hooks/renderingEngine/useCreateMediaSource';
-import { useRenderingEngine } from '../../../hooks/renderingEngine/useRenderingEngine';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -143,7 +142,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [deleteMediaSource, deleteMediaLoading] = useDeleteMediaSource();
   const [createHtmlSource, createHtmlLoading] = useCreateHtmlSource();
   const [createMediaSource, createMediaLoading] = useCreateMediaSource();
-  const [getRenderingEngine, renderingEngineLoading] = useRenderingEngine();
 
   const { locked } = useContext(GlobalContext);
 
@@ -823,7 +821,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
           const pipelineId =
             productionSetup.production_settings.pipelines[i].pipeline_id;
           if (pipelineId) {
-            const renderingEngine = getRenderingEngine(pipelineId);
             if (selectedSourceRef.type === 'html') {
               await deleteHtmlSource(
                 pipelineId,
@@ -936,10 +933,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
           />
         </div>
       </HeaderNavigation>
-      <div className="flex h-[95%] flex-row">
+      <div className="flex h-[95%] flex-row space-x-20">
         <div
-          className={`overflow-hidden transition-[min-width] w-0 min-w-0 ${
-            inventoryVisible ? 'min-w-[35%] ml-2 mt-2 max-h-[89vh]' : ''
+          className={`transition-[min-width] flex-shrink-0 ${
+            inventoryVisible
+              ? 'w-[35%] ml-2 mt-2 max-h-[89vh]'
+              : 'overflow-hidden'
           }`}
         >
           <SourceList
