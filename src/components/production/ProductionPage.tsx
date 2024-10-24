@@ -46,10 +46,11 @@ const ProductionPage: React.FC<ProductionPageProps> = (props) => {
 
   const memoizedProduction = useMemo(() => productionSetup, [productionSetup]);
 
-  useEffect(() => {
-    refreshPipelines();
-    refreshControlPanels();
-  }, [productionSetup?.isActive]);
+  // useEffect(() => {
+  //   console.log('NUUU');
+  //   refreshPipelines();
+  //   refreshControlPanels();
+  // }, [productionSetup?.isActive]);
 
   useEffect(() => {
     if (updateMuliviewLayouts && productionSetup) {
