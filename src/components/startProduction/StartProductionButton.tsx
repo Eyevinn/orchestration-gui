@@ -40,7 +40,7 @@ export function StartProductionButton({
   const putProduction = usePutProduction();
   const [stopProduction, loadingStopProduction] = useStopProduction();
   const [deleteMonitoring] = useDeleteMonitoring();
-  const [updateSourceInputSlotOnMultiviewLayouts, updateLading] =
+  const [updateSourceInputSlotOnMultiviewLayouts, updateLoading] =
     useUpdateSourceInputSlotOnMultiviewLayouts();
   const [modalOpen, setModalOpen] = useState(false);
   const [stopModalOpen, setStopModalOpen] = useState(false);
@@ -263,7 +263,7 @@ export function StartProductionButton({
         onAbort={onAbort}
         onConfirm={onConfirm}
         open={modalOpen}
-        loading={loading || updateLading}
+        loading={loading || updateLoading}
         startStatus={startProductionStatus}
       />
     </>

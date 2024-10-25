@@ -16,7 +16,7 @@ import Input from '../../configureOutputModal/Input';
 import MultiviewLayout from './MultiviewLayout';
 import toast from 'react-hot-toast';
 import RemoveLayoutButton from './RemoveLayoutButton';
-import { useCleanedDefaultPreset } from '../../../../hooks/useCleanedDefaultPreset';
+import { useMultiviewDefaultPresets } from '../../../../hooks/useMultiviewDefaultPresets';
 import Checkbox from './Checkbox';
 
 type ChangeLayout = {
@@ -44,7 +44,7 @@ export default function MultiviewLayoutSettings({
   const { inputList } = useCreateInputArray(production);
   const [multiviewLayouts] = useMultiviewLayouts(refresh);
   const sourceList = production ? production.sources : [];
-  const { cleanedDefaultPresets } = useCleanedDefaultPreset({
+  const { multiviewDefaultPresets } = useMultiviewDefaultPresets({
     sourceList,
     isChecked
   });
@@ -63,10 +63,10 @@ export default function MultiviewLayoutSettings({
   const deleteLayout = useDeleteMultiviewLayout();
   const t = useTranslate();
 
-  const multiviewPresetNames = cleanedDefaultPresets?.map(
+  const multiviewPresetNames = multiviewDefaultPresets?.map(
     (preset) => preset.name
   )
-    ? cleanedDefaultPresets?.map((preset) => preset.name)
+    ? multiviewDefaultPresets?.map((preset) => preset.name)
     : [];
 
   const availableMultiviewLayouts =
@@ -86,7 +86,7 @@ export default function MultiviewLayoutSettings({
     const selectedLayout = multiviewLayouts?.find((layout) => {
       return layout.name === selectedMultiviewPreset?.name;
     });
-    const loadedPreset = cleanedDefaultPresets?.find((preset) => {
+    const loadedPreset = multiviewDefaultPresets?.find((preset) => {
       return preset.name === selectedMultiviewPreset?.name;
     });
 
@@ -94,11 +94,11 @@ export default function MultiviewLayoutSettings({
       setSelectedMultiviewPreset(selectedLayout);
     } else if (loadedPreset && !selectedLayout) {
       setSelectedMultiviewPreset(loadedPreset);
-    } else if (cleanedDefaultPresets && cleanedDefaultPresets[0]) {
-      setPresetName(cleanedDefaultPresets[0].name);
-      setSelectedMultiviewPreset(cleanedDefaultPresets[0]);
+    } else if (multiviewDefaultPresets && multiviewDefaultPresets[0]) {
+      setPresetName(multiviewDefaultPresets[0].name);
+      setSelectedMultiviewPreset(multiviewDefaultPresets[0]);
     }
-  }, [cleanedDefaultPresets, multiviewLayouts]);
+  }, [multiviewDefaultPresets, multiviewLayouts]);
 
   // Refresh the layout list when a layout is deleted
   useEffect(() => {
@@ -110,7 +110,7 @@ export default function MultiviewLayoutSettings({
   }, [layoutModalOpen]);
 
   useEffect(() => {
-      setRefresh(layoutModalOpen);
+    setRefresh(layoutModalOpen);
   }, [layoutModalOpen]);
 
   useEffect(() => {
@@ -139,7 +139,7 @@ export default function MultiviewLayoutSettings({
     const chosenLayout = availableMultiviewLayouts?.find(
       (singleLayout) => singleLayout.name === name
     );
-    const addBasePreset = cleanedDefaultPresets?.find(
+    const addBasePreset = multiviewDefaultPresets?.find(
       (singlePreset) => singlePreset.name === name
     );
 
@@ -193,8 +193,8 @@ export default function MultiviewLayoutSettings({
     if (layoutToRemove && layoutToRemove._id) {
       deleteLayout(layoutToRemove._id.toString()).then(() => {
         setRefresh(true);
-        if (cleanedDefaultPresets && cleanedDefaultPresets[0]) {
-          setSelectedMultiviewPreset(cleanedDefaultPresets[0]);
+        if (multiviewDefaultPresets?.[0]) {
+          setSelectedMultiviewPreset(multiviewDefaultPresets[0]);
         }
         setNewPresetName('');
         toast.success(t('preset.layout_deleted'));

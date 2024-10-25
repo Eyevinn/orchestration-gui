@@ -1,5 +1,4 @@
 import { IconTrash } from '@tabler/icons-react';
-import { hi } from 'date-fns/locale';
 
 type RemoveLayoutButtonProps = {
   removeMultiviewLayout: () => void;

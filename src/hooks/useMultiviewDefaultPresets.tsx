@@ -3,23 +3,23 @@ import { useMultiviewPresets } from './multiviewPreset';
 import { MultiviewPreset } from '../interfaces/preset';
 import { SourceReference } from '../interfaces/Source';
 
-export function useCleanedDefaultPreset({
+export function useMultiviewDefaultPresets({
   sourceList,
   isChecked
 }: {
   sourceList: SourceReference[] | undefined;
   isChecked: boolean;
 }) {
-  const [cleanedDefaultPresets, setCleanedDefaultPresets] = useState<
+  const [updatedMultiviewPresets, setUpdatedMultiviewPresets] = useState<
     MultiviewPreset[]
   >([]);
-  const [dirtyMultiviewPresets] = useMultiviewPresets();
+  const [databaseMultiviewPresets] = useMultiviewPresets();
 
   useEffect(() => {
-    if (dirtyMultiviewPresets) {
+    if (databaseMultiviewPresets) {
       const sourceListLength = sourceList ? sourceList.length : 0;
 
-      const cleanedPresets = dirtyMultiviewPresets.map((preset) => {
+      const updatedPresets = databaseMultiviewPresets.map((preset) => {
         return {
           ...preset,
           layout: {
@@ -49,9 +49,9 @@ export function useCleanedDefaultPreset({
           }
         };
       });
-      setCleanedDefaultPresets(cleanedPresets);
+      setUpdatedMultiviewPresets(updatedPresets);
     }
-  }, [dirtyMultiviewPresets, sourceList, isChecked]);
+  }, [databaseMultiviewPresets, sourceList, isChecked]);
 
-  return { cleanedDefaultPresets };
+  return { multiviewDefaultPresets: updatedMultiviewPresets };
 }

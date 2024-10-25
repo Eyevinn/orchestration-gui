@@ -20,7 +20,7 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
     setLoading(true);
     const layouts = await multiviewLayouts();
     if (layouts) {
-      const asd = layouts.map(async (singleLayout) => {
+      const updatedLayouts = layouts.map(async (singleLayout) => {
         if (production._id === singleLayout.productionId) {
           const updated = singleLayout.layout.views.map(
             (view: MultiviewViews, index) => {
@@ -88,7 +88,7 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
         }
       });
       const pipelines = production?.production_settings.pipelines;
-      const multiviewsArr = await Promise.all(asd);
+      const multiviewsArr = await Promise.all(updatedLayouts);
 
       const updatedMultiviews = pipelines[0].multiviews?.map((oldItem) => {
         const updatedItem = multiviewsArr.find(
