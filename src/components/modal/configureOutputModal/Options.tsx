@@ -8,6 +8,7 @@ interface IOptions {
   value: string;
   update: (value: string) => void;
   columnStyle?: boolean;
+  emptyFirstOption?: boolean;
 }
 
 export default function Options({
@@ -15,7 +16,8 @@ export default function Options({
   options,
   value,
   update,
-  columnStyle
+  columnStyle,
+  emptyFirstOption
 }: IOptions) {
   const t = useTranslate();
   return (
@@ -32,10 +34,12 @@ export default function Options({
         onChange={(e) => {
           update(e.target.value);
         }}
-        value={value === '' && columnStyle ? undefined : value}
+        value={value}
         className="cursor-pointer px-2 border justify-center text-sm rounded-lg w-6/12 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none"
       >
-        {columnStyle && <option value="">{t('preset.select_option')}</option>}
+        {emptyFirstOption && (
+          <option value="">{t('preset.select_option')}</option>
+        )}
         {options.map((option, i) => (
           <option
             value={option.id ? option.id.toString() : option.label}

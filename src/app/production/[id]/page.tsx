@@ -100,10 +100,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
     productionSetup?.sources.map((prod) => prod._id) || [];
 
   //MULTIVIEWS
-  const [updateMuliviewLayouts, setUpdateMuliviewLayouts] = useState(false);
   const getMultiviewLayout = useGetMultiviewLayout();
   const [updateMultiviewViews] = useMultiviews();
-  const [updateSourceInputSlotOnMultiviewLayouts] =
+  const [updateSourceInputSlotOnMultiviewLayouts, updateMultiviewViewsLoading] =
     useUpdateSourceInputSlotOnMultiviewLayouts();
   const [addMultiviewersOnRunningProduction] =
     useAddMultiviewersOnRunningProduction();
@@ -156,19 +155,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     refreshPipelines();
     refreshControlPanels();
   }, [productionSetup?.isActive]);
-
-  useEffect(() => {
-    if (updateMuliviewLayouts && productionSetup) {
-      updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
-        (updatedSetup) => {
-          if (!updatedSetup) return;
-          setProductionSetup(updatedSetup);
-          setUpdateMuliviewLayouts(false);
-          refreshProduction();
-        }
-      );
-    }
-  }, [productionSetup, updateMuliviewLayouts]);
 
   const setSelectedControlPanel = (controlPanel: string[]) => {
     setProductionSetup((prevState) => {
@@ -403,14 +389,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
     }
   };
 
-  const updateSource = (
+  const updateMultiview = (
     source: SourceReference,
-    productionSetup: Production
+    updatedSetup: Production
   ) => {
-    const updatedSetup = updateSetupItem(source, productionSetup);
-    setProductionSetup(updatedSetup);
-    setUpdateMuliviewLayouts(true);
-    putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
 
     pipeline.multiviews?.map((singleMultiview) => {
@@ -427,6 +409,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
         );
       }
     });
+  };
+
+  const updateSource = (
+    source: SourceReference,
+    productionSetup: Production
+  ) => {
+    const updatedSetup = updateSetupItem(source, productionSetup);
+    setProductionSetup(updatedSetup);
+    putProduction(updatedSetup._id.toString(), updatedSetup);
+    updateMultiview(source, updatedSetup);
   };
 
   const updateConfigName = (nameChange: string) => {
@@ -694,12 +686,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
           };
           const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
           if (!updatedSetup) return;
-          setProductionSetup(updatedSetup);
-          putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-            refreshProduction();
-            setAddSourceModal(false);
-            setSelectedSource(undefined);
-          });
+          updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+            (result) => {
+              if (!result) return;
+              setProductionSetup(result);
+              updateMultiview(sourceToAdd, result);
+              refreshProduction();
+              setAddSourceModal(false);
+              setSelectedSource(undefined);
+            }
+          );
           setAddSourceStatus(undefined);
         } else {
           setAddSourceStatus({ success: false, steps: result.value.steps });
@@ -752,9 +748,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   productionSetup
                 );
                 if (!updatedSetup) return;
-                setProductionSetup(updatedSetup);
-                putProduction(updatedSetup._id.toString(), updatedSetup).then(
-                  () => {
+                updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+                  (result) => {
+                    if (!result) return;
+                    setProductionSetup(updatedSetup);
+                    updateMultiview(selectedSourceRef, result);
                     setSelectedSourceRef(undefined);
                   }
                 );
@@ -771,11 +769,15 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
           if (!updatedSetup) return;
 
-          setProductionSetup(updatedSetup);
-          putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-            setRemoveSourceModal(false);
-            setSelectedSourceRef(undefined);
-          });
+          updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+            (result) => {
+              if (!result) return;
+              setProductionSetup(updatedSetup);
+              updateMultiview(selectedSourceRef, result);
+              setRemoveSourceModal(false);
+              setSelectedSourceRef(undefined);
+            }
+          );
           return;
         }
 
@@ -802,8 +804,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 productionSetup
               );
               if (!updatedSetup) return;
-              setProductionSetup(updatedSetup);
-              putProduction(updatedSetup._id.toString(), updatedSetup);
+              updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+                (result) => {
+                  if (!result) return;
+                  setProductionSetup(result);
+                  updateMultiview(selectedSourceRef, result);
+                }
+              );
               return;
             }
           }
@@ -823,7 +830,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           const pipelineId =
             productionSetup.production_settings.pipelines[i].pipeline_id;
           if (pipelineId) {
-            const renderingEngine = getRenderingEngine(pipelineId);
+            getRenderingEngine(pipelineId);
             if (selectedSourceRef.type === 'html') {
               await deleteHtmlSource(
                 pipelineId,
@@ -844,8 +851,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
       const updatedSetup = removeSetupItem(selectedSourceRef, productionSetup);
 
       if (!updatedSetup) return;
-      setProductionSetup(updatedSetup);
-      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
+      updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then((result) => {
+        if (!result) return;
+        setProductionSetup(result);
+        updateMultiview(selectedSourceRef, result);
         setRemoveSourceModal(false);
         setSelectedSourceRef(undefined);
       });
@@ -957,7 +966,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               onAbort={handleAbortAddSource}
               onConfirm={handleAddSource}
               status={addSourceStatus}
-              loading={loadingCreateStream}
+              loading={loadingCreateStream || updateMultiviewViewsLoading}
               locked={locked}
             />
           )}
@@ -975,11 +984,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   locked={locked}
                   updateProduction={(updated) => {
                     updateProduction(productionSetup._id, updated);
-                    setUpdateMuliviewLayouts(true);
                   }}
                   onSourceUpdate={(source: SourceReference) => {
                     updateSource(source, productionSetup);
-                    setUpdateMuliviewLayouts(true);
                   }}
                   onSourceRemoval={(source: SourceReference) => {
                     if (productionSetup && productionSetup.isActive) {
@@ -997,7 +1004,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       );
                       if (!updatedSetup) return;
                       setProductionSetup(updatedSetup);
-                      setUpdateMuliviewLayouts(true);
                       putProduction(
                         updatedSetup._id.toString(),
                         updatedSetup
@@ -1019,7 +1025,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                     loading={
                       loadingDeleteStream ||
                       deleteHtmlLoading ||
-                      deleteMediaLoading
+                      deleteMediaLoading ||
+                      updateMultiviewViewsLoading
                     }
                   />
                 )}

@@ -13,7 +13,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const { production } = await request.json();
   return stopProduction(production)
     .then((result) => {
-      console.log(result);
       return new NextResponse(JSON.stringify(result));
     })
     .catch((error) => {

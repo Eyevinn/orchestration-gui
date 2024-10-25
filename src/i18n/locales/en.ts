@@ -710,8 +710,8 @@ export const en = {
       'Layout {{layoutNameAlreadyExist}} will be replaced on save',
     remove_multiview: 'Remove multiview',
     remove_layout: 'Remove layout',
+    clear_layout: 'Clear layout',
     add_another_multiview: 'Add another multiview',
-    not_possible_delete_global_layout: 'Global layout can not be deleted',
     could_not_delete_layout: 'Could not delete layout',
     layout_deleted: 'Layout deleted',
     confirm_update_multiviewers:
