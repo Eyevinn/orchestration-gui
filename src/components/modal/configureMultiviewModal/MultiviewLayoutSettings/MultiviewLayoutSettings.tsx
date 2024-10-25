@@ -110,11 +110,7 @@ export default function MultiviewLayoutSettings({
   }, [layoutModalOpen]);
 
   useEffect(() => {
-    if (layoutModalOpen) {
-      setRefresh(true);
-    } else {
-      setRefresh(false);
-    }
+      setRefresh(layoutModalOpen);
   }, [layoutModalOpen]);
 
   useEffect(() => {
