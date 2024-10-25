@@ -12,6 +12,7 @@ import cloneDeep from 'lodash.clonedeep';
 import NewProductionPipelines from './pipelines/NewProductionPipelines';
 import { PipelineSettings } from '../../interfaces/pipeline';
 import ProductionControlConnections from './controlConnections/ProductionControlConnections';
+import { ControlConnection } from '../../interfaces/controlConnections';
 
 interface ProductionPageProps {
   id: string;
@@ -95,7 +96,7 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
     }
   };
 
-  const onControlConnectionChange = (cc: any) => {
+  const onControlConnectionChange = (cc: ControlConnection) => {
     if (production) {
       const newProduction = cloneDeep(production);
       newProduction.control_connection = cc;
@@ -117,7 +118,10 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             pipelines={production.pipelines}
             onChange={onPipelinesChange}
           />
-          <ProductionControlConnections onChange={onControlConnectionChange} />
+          <ProductionControlConnections
+            controlConnection={production.control_connection}
+            onChange={onControlConnectionChange}
+          />
           <ProductionMonitoring productionSetup={productionSetup} />
           <ProductionSources
             setProductionSetup={setProductionSetup}

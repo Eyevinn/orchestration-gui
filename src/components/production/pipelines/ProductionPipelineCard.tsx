@@ -11,7 +11,7 @@ interface PipelineCardInfoProps {
   value: string | number | boolean;
 }
 
-const PipelineCardInfo: React.FC<PipelineCardInfoProps> = (props) => {
+export const PipelineCardInfo: React.FC<PipelineCardInfoProps> = (props) => {
   const { label, value } = props;
 
   return (

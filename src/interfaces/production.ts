@@ -31,8 +31,8 @@ export interface ProductionSettings {
   name: string;
 }
 
-interface ProductionControlConnection extends ControlConnection {
-  control_panel_name?: string[];
+export interface ProductionControlConnection extends ControlConnection {
+  control_panel_ids?: string[];
 }
 
 export interface StartProductionStatus {
