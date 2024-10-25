@@ -114,6 +114,12 @@ export function AddSrtModal({
   }, [isNameError]);
 
   useEffect(() => {
+    if (mode === 'Caller' && isPortAlreadyInUseError) {
+      setIsPortAlreadyInUseError(false);
+    }
+  }, [mode, isPortAlreadyInUseError]);
+
+  useEffect(() => {
     if (localIp) {
       setIsLocalIpError(false);
     }
