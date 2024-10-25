@@ -53,9 +53,9 @@ export default function UpdateButtons({
         <Button
           type="button"
           state="warning"
-          disabled={source.status !== 'gone'}
+          disabled={source.status !== 'gone' || locked}
           className={`${
-            source.status !== 'gone'
+            source.status !== 'gone' || locked
               ? 'bg-button-delete/50 pointer-events-none'
               : 'bg-button-delete'
           } mr-5 relative flex`}

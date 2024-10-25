@@ -242,11 +242,11 @@ export function AddSrtModal({
         setIsPortAlreadyInUseError(false);
 
         onConfirm(ingestUuid, srtPayload, () => fetchIngestSources());
-        onAbort();
+        handleCancel();
       }
     } else {
       onConfirm(ingestUuid, srtPayload, () => fetchIngestSources());
-      onAbort();
+      handleCancel();
     }
   };
 

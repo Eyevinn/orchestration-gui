@@ -1037,7 +1037,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 onClickSource={() => setInventoryVisible(true)}
                 disabled={
                   productionSetup?.production_settings === undefined ||
-                  productionSetup.production_settings === null
+                  productionSetup.production_settings === null ||
+                  locked
                 }
               />
               <div className="flex flex-row">
