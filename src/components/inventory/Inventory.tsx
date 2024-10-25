@@ -14,25 +14,24 @@ import { IconReload } from '@tabler/icons-react';
 import { Loader } from '../loader/Loader';
 
 export default function Inventory({ locked }: { locked: boolean }) {
-  const [purgeInventorySource, reloadList] = useSetSourceToPurge();
-  const [removeInventorySourceItem, reloadInventoryList] =
-    useRemoveInventorySourceItem();
-  const [createSrtSource, reloadSourceList] = useCreateSrtSource();
-
+  const [showSrtModal, setShowSrtModal] = useState<boolean>(false);
   const [updatedSource, setUpdatedSource] = useState<
     SourceWithId | undefined
   >();
   const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
+
+  const [purgeInventorySource, reloadList] = useSetSourceToPurge();
+  const [removeInventorySourceItem, reloadInventoryList] =
+    useRemoveInventorySourceItem();
+  const [createSrtSource, reloadSourceList] = useCreateSrtSource();
   const [sources, loadingSources] = useSources(
     reloadList || reloadInventoryList || reloadSourceList || !!refreshKey,
     updatedSource,
     refreshKey
   );
-
   const [updateSources, updateSourcesLoading] = useUpdateSources();
-  const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
   const t = useTranslate();
-  const [showSrtModal, setShowSrtModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (updatedSource && typeof updatedSource !== 'boolean') {

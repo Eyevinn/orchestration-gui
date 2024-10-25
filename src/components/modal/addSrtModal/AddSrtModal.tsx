@@ -50,9 +50,7 @@ export function AddSrtModal({
   const [isLocalIpError, setIsLocalIpError] = useState<boolean>(false);
   const [isRemoteIpError, setIsRemoteIpError] = useState<boolean>(false);
   const [getIngestSources, ingestSourcesLoading] = useIngestSources();
-  const [ingestSrtSources, setIngestSrtSources] = useState<
-    ResourcesSourceResponse[]
-  >([]);
+
   const [isPortAlreadyInUseError, setIsPortAlreadyInUseError] =
     useState<boolean>(false);
   const [srtPayload, setSrtPayload] = useState<SrtSource>({
@@ -191,7 +189,6 @@ export function AddSrtModal({
     }
 
     const srtSources = sources.filter((source) => source.type === 'SRT');
-    setIngestSrtSources(srtSources);
 
     return srtSources;
   };
