@@ -702,6 +702,8 @@ export const sv = {
     stream_name: 'Ström',
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
+    no_ip_selected: 'Ingen IP-adress vald',
+    no_rate_selected: 'Ingen kilobit rate vald',
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
     configure_layouts: 'Justera kompositioner',

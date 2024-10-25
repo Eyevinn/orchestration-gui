@@ -703,6 +703,8 @@ export const en = {
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',
     layout_name_missing: 'Layout name is missing',
+    no_ip_selected: 'IP-adress is missing',
+    no_rate_selected: 'Kilobit rate is missing',
     muliview_view: 'Input',
     select_option: 'Select',
     select_multiview_preset: 'Preset',
