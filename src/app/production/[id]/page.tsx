@@ -933,10 +933,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
           />
         </div>
       </HeaderNavigation>
-      <div className="flex h-[95%] flex-row space-x-20">
+      <div className="flex h-[95%] flex-row space-x-10">
         <div
-          className={`transition-[min-width] flex-shrink-0 ${
-            inventoryVisible ? 'w-[35%] ml-2 mt-2 max-h-[89vh]' : 'hidden'
+          className={`transition-[min-width] flex-shrink ${
+            inventoryVisible ? 'w-[30%] ml-2 mt-2 max-h-[89vh]' : 'hidden'
           }`}
         >
           <SourceList
