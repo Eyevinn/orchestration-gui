@@ -10,9 +10,10 @@ import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../hooks/useUpdat
 import NewProductionHeader from './header/NewProductionHeader';
 import cloneDeep from 'lodash.clonedeep';
 import NewProductionPipelines from './pipelines/NewProductionPipelines';
-import { PipelineSettings } from '../../interfaces/pipeline';
+import { PipelineOutput, PipelineSettings } from '../../interfaces/pipeline';
 import ProductionControlConnections from './controlConnections/ProductionControlConnections';
 import { ControlConnection } from '../../interfaces/controlConnections';
+import ProductionOutputs from './outputs/ProductionOutputs';
 
 interface ProductionPageProps {
   id: string;
@@ -104,6 +105,14 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
     }
   };
 
+  const onOutputsChange = (outputs: PipelineOutput[][]) => {
+    if (production) {
+      const newProduction = cloneDeep(production);
+      newProduction.outputs = outputs;
+      setProduction(newProduction);
+    }
+  };
+
   return (
     <div className="flex h-[95%] flex-col">
       {production && (
@@ -117,6 +126,11 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
           <NewProductionPipelines
             pipelines={production.pipelines}
             onChange={onPipelinesChange}
+          />
+          <ProductionOutputs
+            outputs={production.outputs}
+            onOuputsChange={onOutputsChange}
+            pipelines={production.pipelines}
           />
           <ProductionControlConnections
             controlConnection={production.control_connection}

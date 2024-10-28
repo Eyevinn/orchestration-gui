@@ -33,7 +33,7 @@ export default function Input({
         onChange={(e) => update(e.target.value)}
         className={`cursor-pointer border text-sm rounded-lg ${
           size === 'small' ? 'w-6/12' : 'w-7/12'
-        } pl-2 pt-1 pb-1 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none ${
+        } pl-2 pt-1 pb-1 bg-gray-500 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none ${
           inputError ? errorCss : ''
         }`}
         placeholder={placeholder ? placeholder : ''}

@@ -62,26 +62,28 @@ const ProductionControlConnections: React.FC<
               Pipeline Control Connections
             </div>
             <div className="flex flex-row">
-              {controlConnection.pipeline_control_connections.map((pcc) => (
-                <div className="mr-8">
-                  <div className="flex flex-row py-2">
-                    <div className="mr-4">{'Port:'}</div>
-                    <div className="italic text-gray-300">{pcc.port}</div>
-                  </div>
-                  <div className="flex flex-row py-2">
-                    <div className="mr-4">{'From Pipeline:'}</div>
-                    <div className="italic text-gray-300">
-                      {pcc.fromPipelineIdx}
+              {controlConnection.pipeline_control_connections.map(
+                (pcc, index) => (
+                  <div className="mr-8" key={'pcc-' + index}>
+                    <div className="flex flex-row py-2">
+                      <div className="mr-4">{'Port:'}</div>
+                      <div className="italic text-gray-300">{pcc.port}</div>
+                    </div>
+                    <div className="flex flex-row py-2">
+                      <div className="mr-4">{'From Pipeline:'}</div>
+                      <div className="italic text-gray-300">
+                        {pcc.fromPipelineIdx}
+                      </div>
+                    </div>
+                    <div className="flex flex-row py-2">
+                      <div className="mr-4">{'To Pipeline:'}</div>
+                      <div className="italic text-gray-300">
+                        {pcc.toPipelineIdx}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-row py-2">
-                    <div className="mr-4">{'To Pipeline:'}</div>
-                    <div className="italic text-gray-300">
-                      {pcc.toPipelineIdx}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </div>
         </div>

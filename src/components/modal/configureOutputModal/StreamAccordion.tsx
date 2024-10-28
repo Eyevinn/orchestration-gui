@@ -30,7 +30,9 @@ export default function StreamAccordion({
   return (
     <div className="relative flex flex-col border border-gray-600 rounded w-full shadow-sm mb-2">
       <button
-        className={`flex space-x-4 p-2 bg-container items-center rounded`}
+        className={`flex space-x-4 p-2 bg-zinc-700 items-center rounded-t-xl ${
+          active ? '' : 'rounded-b-xl'
+        }`}
         onClick={toggleAccordion}
       >
         <div className="flex flex-1 space-x-4 items-center">
@@ -55,7 +57,7 @@ export default function StreamAccordion({
       </button>
 
       <div className={`${active ? 'block' : 'hidden'} w-full`}>
-        <div className="bg-container rounded text-p">
+        <div className="bg-zinc-700 p-2 rounded-b-xl text-p">
           <Input
             label={t('preset.srt_stream_id')}
             value={stream.srt_stream_id}

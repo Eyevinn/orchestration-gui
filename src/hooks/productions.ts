@@ -15,7 +15,8 @@ export function usePostProduction() {
         preset_name: preset.name,
         pipelines: preset.pipelines,
         default_multiview_reference: preset.default_multiview_reference,
-        control_connection: preset.control_connection
+        control_connection: preset.control_connection,
+        outputs: []
       })
     });
     if (response.ok) {
