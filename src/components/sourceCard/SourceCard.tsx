@@ -110,7 +110,12 @@ export default function SourceCard({
           disabled={locked}
         />
       </div>
-      {source && <ImageComponent src={getSourceThumbnail(source)} isStatusGone={source.status === 'gone'} />}
+      {source && (
+        <ImageComponent
+          src={getSourceThumbnail(source)}
+          isStatusGone={source.status === 'gone'}
+        />
+      )}
       {!source && sourceRef && <ImageComponent type={sourceRef.type} />}
       {(source || sourceRef) && (
         <h2

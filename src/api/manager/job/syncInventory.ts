@@ -92,7 +92,10 @@ export async function runSyncInventory() {
     });
     if (!apiSource) {
       // If source was not found in response from API, check if status is purge otherwise mark it as gone
-      return { ...inventorySource, status: inventorySource.status === 'purge' ? 'purge' : 'gone' } satisfies WithId<Source>;
+      return {
+        ...inventorySource,
+        status: inventorySource.status === 'purge' ? 'purge' : 'gone'
+      } satisfies WithId<Source>;
     }
     const lastConnected =
       apiSource.status !== 'gone' ? new Date() : inventorySource.lastConnected;
