@@ -35,6 +35,7 @@ export async function GET(
     }
     return new NextResponse(Buffer.from(base64Image, 'base64'));
   } catch (e) {
+    console.error('Error fetching thumbnail:', e);
     return new NextResponse(e?.toString(), { status: 404 });
   }
 }

@@ -38,16 +38,18 @@ const SourceList: React.FC<SourceListProps> = (props) => {
     return Array.from(
       filteredSources.size >= 0 ? filteredSources.values() : sources.values()
     ).map((source, index) => {
-      return (
-        <SourceListItem
-          actionText={actionText}
-          key={`${source.ingest_source_name}-${index}`}
-          source={source}
-          disabled={isDisabledFunc?.(source)}
-          action={action}
-          locked={locked}
-        />
-      );
+      if (source.status !== 'purge') {
+        return (
+          <SourceListItem
+            actionText={actionText}
+            key={`${source.ingest_source_name}-${index}`}
+            source={source}
+            disabled={isDisabledFunc?.(source)}
+            action={action}
+            locked={locked}
+          />
+        );
+      }
     });
   }
 

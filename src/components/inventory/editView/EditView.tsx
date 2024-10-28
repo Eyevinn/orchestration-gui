@@ -25,7 +25,7 @@ export default function EditView({
     <EditViewContext source={source} updateSource={updateSource}>
       <div className="flex flex-row mb-10">
         <div className="relative w-[34rem]">
-          <ImageComponent src={getSourceThumbnail(source)} />
+          <ImageComponent src={getSourceThumbnail(source)} isStatusGone={source.status === 'gone'} />
         </div>
         <GeneralSettings locked={locked} />
       </div>

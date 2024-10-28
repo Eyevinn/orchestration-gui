@@ -2,7 +2,6 @@
 
 import {
   PropsWithChildren,
-  SyntheticEvent,
   useContext,
   useEffect,
   useRef,
@@ -18,20 +17,19 @@ interface ImageComponentProps extends PropsWithChildren {
   src?: string;
   alt?: string;
   type?: Type;
+  isStatusGone?: boolean;
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = (props) => {
-  const { src, alt = 'Image', children, type } = props;
+  const { src, alt = 'Image', children, type, isStatusGone } = props;
   const { imageRefetchKey } = useContext(GlobalContext);
   const [imgSrc, setImgSrc] = useState<string>();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<SyntheticEvent<HTMLImageElement, Event>>();
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
   const refetchImage = () => {
     setImgSrc(`${src}?${imageRefetchKey}`);
-    setError(undefined);
     setLoading(true);
     clearTimeout(timeout.current);
     timeout.current = setTimeout(() => setLoading(false), 500);
@@ -42,7 +40,13 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   }, [imageRefetchKey]);
 
   useEffect(() => {
-    setError(undefined);
+    if (isStatusGone) {
+      setLoading(false);
+      setLoaded(true);
+    }
+  }, [isStatusGone]);
+
+  useEffect(() => {
     setImgSrc(`${src}?${imageRefetchKey}`);
   }, [src]);
 
@@ -56,7 +60,7 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
     <>
       {(!type || type === 'ingest_source') && src && (
         <div className="relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
-          {((!imgSrc || error) && (
+          {((!imgSrc || isStatusGone) && (
             <IconExclamationCircle className="text-error fill-white w-full h-full" />
           )) || (
             <>
@@ -67,14 +71,10 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
                 }`}
                 src={imgSrc!}
                 onLoad={() => {
-                  setError(undefined);
-                  setLoaded(false);
+                  isStatusGone ? '' : setLoaded(false);
                 }}
                 onLoadingComplete={() => {
-                  setLoaded(true);
-                }}
-                onError={(err) => {
-                  setError(err);
+                  isStatusGone ? '' : setLoaded(true);
                 }}
                 placeholder="empty"
                 width={0}

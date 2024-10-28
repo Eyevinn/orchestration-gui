@@ -41,6 +41,7 @@ export const SourceListItemThumbnail = (props: SourceThumbnailProps) => {
       {/* TODO perhaps add alts to translations */}
       <ImageComponent
         src={getSourceThumbnail(source)}
+        isStatusGone={source.status === 'gone'}
         alt="Source List Thumbnail"
       >
         <div className="absolute top-4 left-4">{getIcon(source)}</div>
