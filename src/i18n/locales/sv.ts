@@ -606,7 +606,7 @@ export const sv = {
     outR: 'Ut H',
     maxError: 'Max värde är {{max}}',
     minError: 'Minsta värde är 1',
-    alreadyUsed: 'Värdet {{value}} är redan användt',
+    alreadyUsed: 'Värdet {{value}} är redan använt',
     emptyBetween: 'Du kan inte ha tomma kanaler mellan två nummer',
     title: 'Ljudmappning'
   },

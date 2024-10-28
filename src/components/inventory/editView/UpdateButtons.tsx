@@ -14,6 +14,7 @@ type UpdateButtonsProps = {
   removeInventorySourceItem: (id: string) => Promise<Response | undefined>;
   close: () => void;
   locked: boolean;
+  duplicateAudioValues: boolean;
 };
 
 export default function UpdateButtons({
@@ -21,7 +22,8 @@ export default function UpdateButtons({
   close,
   purgeInventorySource,
   removeInventorySourceItem,
-  locked
+  locked,
+  duplicateAudioValues
 }: UpdateButtonsProps) {
   const t = useTranslate();
   const {
@@ -74,12 +76,12 @@ export default function UpdateButtons({
         </Button>
         <Button
           className={`${
-            locked || isSame
+            locked || isSame || duplicateAudioValues
               ? 'bg-button-bg/50 text-button-text/50 pointer-events-none'
               : 'text-button-text bg-button-bg'
           } ml-5 relative flex`}
           type="submit"
-          disabled={isSame || locked}
+          disabled={isSame || locked || duplicateAudioValues}
         >
           {loading ? (
             <Loader className="w-10 h-5" />
