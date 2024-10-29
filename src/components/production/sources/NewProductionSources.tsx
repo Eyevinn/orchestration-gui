@@ -42,7 +42,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import ProductionSourceList from './ProductionSourceList';
 import Section from '../../section/Section';
 import { MultiviewSettings } from '../../../interfaces/multiview';
-import { pipeline } from 'stream';
 import { PipelineSettings } from '../../../interfaces/pipeline';
 
 interface ProductionSourcesProps {
@@ -205,31 +204,23 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   };
 
   const addMediaSource = (filename: string) => {
-    if (productionSetup) {
-      const sourceToAdd: SourceReference = {
-        type: 'mediaplayer',
-        label: `Media Player ${firstEmptySlot(productionSetup)}`,
-        input_slot: firstEmptySlot(productionSetup),
-        media_data: {
-          filename: filename
-        }
-      };
-      // MIGHT NEED TO REFRESH
-      const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
-      if (!updatedSetup) return;
-      setProductionSetup(updatedSetup);
-      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-        refreshProduction();
-      });
-
-      if (productionSetup?.isActive && sourceToAdd.media_data) {
-        createMediaSource(
-          productionSetup,
-          sourceToAdd.input_slot,
-          sourceToAdd.media_data,
-          sourceToAdd
-        );
+    const sourceToAdd: SourceReference = {
+      type: 'mediaplayer',
+      label: `Media Player ${firstEmptySlot(selectedSources)}`,
+      input_slot: firstEmptySlot(selectedSources),
+      media_data: {
+        filename: filename
       }
+    };
+    // MIGHT NEED TO REFRESH
+    addSource(sourceToAdd);
+    if (isProductionActive && sourceToAdd.media_data) {
+      createMediaSource(
+        productionSetup,
+        sourceToAdd.input_slot,
+        sourceToAdd.media_data,
+        sourceToAdd
+      );
     }
   };
 
@@ -248,25 +239,12 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   const handleAddSource = async () => {
     setAddSourceStatus(undefined);
     if (
-      productionSetup &&
-      productionSetup.isActive &&
+      isProductionActive &&
       selectedSource &&
-      (Array.isArray(
-        productionSetup?.production_settings.pipelines[0].multiviews
-      )
-        ? productionSetup.production_settings.pipelines[0].multiviews.some(
-            (singleMultiview: any) => singleMultiview?.layout?.views
-          )
-        : false)
+      multiviews.some((singleMultiview: any) => singleMultiview?.layout?.views)
     ) {
-      let updatedSetup = productionSetup;
-
-      for (
-        let i = 0;
-        i < productionSetup.production_settings.pipelines.length;
-        i++
-      ) {
-        const pipeline = productionSetup.production_settings.pipelines[i];
+      for (let i = 0; i < pipelines.length; i++) {
+        const pipeline = pipelines[i];
 
         if (!pipeline.sources) {
           pipeline.sources = [];
@@ -305,7 +283,7 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
       const result = await createStream(
         selectedSource,
         updatedSetup,
-        firstEmptySlot(productionSetup)
+        firstEmptySlot(selectedSources)
       );
       if (!result.ok) {
         if (!result.value) {
