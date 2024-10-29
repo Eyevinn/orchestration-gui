@@ -32,24 +32,6 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
   const getProduction = useGetProduction();
   const [productionSetup, setProductionSetup] = useState<Production>();
 
-  //MULTIVIEWS
-  const [updateMuliviewLayouts, setUpdateMuliviewLayouts] = useState(false);
-  const [updateSourceInputSlotOnMultiviewLayouts] =
-    useUpdateSourceInputSlotOnMultiviewLayouts();
-
-  useEffect(() => {
-    if (updateMuliviewLayouts && productionSetup) {
-      updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
-        (updatedSetup) => {
-          if (!updatedSetup) return;
-          setProductionSetup(updatedSetup);
-          setUpdateMuliviewLayouts(false);
-          refreshProduction();
-        }
-      );
-    }
-  }, [productionSetup, updateMuliviewLayouts]);
-
   // useEffect(() => {
   //   console.log('NUUU');
   //   refreshPipelines();
@@ -148,7 +130,6 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             putProduction={putProduction}
             productionSetup={productionSetup}
             refreshProduction={refreshProduction}
-            setUpdateMuliviewLayouts={setUpdateMuliviewLayouts}
           />
           <NewProductionPipelines
             pipelines={production.pipelines}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import { useSources } from '../../../hooks/sources/useSources';
 import {
   AddSourceStatus,
@@ -41,23 +41,36 @@ import { ISource } from '../../../hooks/useDragableItems';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ProductionSourceList from './ProductionSourceList';
 import Section from '../../section/Section';
+import { MultiviewSettings } from '../../../interfaces/multiview';
+import { pipeline } from 'stream';
+import { PipelineSettings } from '../../../interfaces/pipeline';
 
 interface ProductionSourcesProps {
-  productionSetup: any;
-  setProductionSetup: any;
-  setUpdateMuliviewLayouts: any;
-  putProduction: any;
-  refreshProduction: any;
+  sources: SourceReference[];
+  updateSources: (sources: SourceReference[]) => void;
+  multiviewPipelineId?: string;
+  multiviews: MultiviewSettings[];
+  isProductionActive: Boolean;
+  pipelines: PipelineSettings[];
 }
 
 const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   const {
-    productionSetup,
-    setProductionSetup,
-    setUpdateMuliviewLayouts,
-    putProduction,
-    refreshProduction
+    sources: sourcesProp,
+    updateSources,
+    multiviewPipelineId,
+    multiviews,
+    isProductionActive,
+    pipelines
   } = props;
+
+  const [apiSources] = useSources();
+  const [selectedSources, setSelectedSources] =
+    useState<SourceReference[]>(sourcesProp);
+
+  useEffect(() => {
+    updateSources(selectedSources);
+  }, [selectedSources]);
 
   const t = useTranslate();
   const { locked } = useContext(GlobalContext);
@@ -72,12 +85,13 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   const [updateStream, loading] = useUpdateStream();
   const [getIngestSourceId, ingestSourceIdLoading] = useIngestSourceId();
   const [updateMultiviewViews] = useMultiviews();
-  const selectedProductionItems =
-    productionSetup?.sources.map((prod: any) => prod._id) || [];
+  const selectedProductionItems = useMemo(() => {
+    return selectedSources.map((prod: any) => prod._id) || [];
+  }, [selectedSources]);
   const [inventoryVisible, setInventoryVisible] = useState(false);
 
   //SOURCES
-  const [sources] = useSources();
+
   const [selectedValue, setSelectedValue] = useState<string>(
     t('production.add_other_source_type')
   );
@@ -94,7 +108,6 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
 
   // Create source
   const [firstEmptySlot] = useGetFirstEmptySlot();
-  const [addSource] = useAddSource();
 
   // Rendering engine
   const [deleteHtmlSource, deleteHtmlLoading] = useDeleteHtmlSource();
@@ -103,25 +116,32 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   const [createMediaSource, createMediaLoading] = useCreateMediaSource();
   const [getRenderingEngine, renderingEngineLoading] = useRenderingEngine();
 
-  const updateSource = (
-    source: SourceReference,
-    productionSetup: Production
-  ) => {
-    const updatedSetup = updateSetupItem(source, productionSetup);
-    setProductionSetup(updatedSetup);
-    setUpdateMuliviewLayouts(true);
-    putProduction(updatedSetup._id.toString(), updatedSetup);
-    const pipeline = updatedSetup.production_settings.pipelines[0];
+  //MULTIVIEWS
+  const [updateSourceInputSlotOnMultiviewLayouts] =
+    useUpdateSourceInputSlotOnMultiviewLayouts();
 
-    pipeline.multiviews?.map((singleMultiview) => {
-      if (
-        pipeline.pipeline_id &&
-        pipeline.multiviews &&
-        singleMultiview.multiview_id
-      ) {
+  // useEffect(() => {
+  //   if (updateMuliviewLayouts && productionSetup) {
+  //     updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
+  //       (updatedSetup) => {
+  //         if (!updatedSetup) return;
+  //         setProductionSetup(updatedSetup);
+  //         setUpdateMuliviewLayouts(false);
+  //         refreshProduction();
+  //       }
+  //     );
+  //   }
+  // }, [productionSetup, updateMuliviewLayouts]);
+
+  const updateMultiview = (
+    source: SourceReference,
+    productionSources: SourceReference[]
+  ) => {
+    multiviews?.map((singleMultiview) => {
+      if (multiviewPipelineId && multiviews && singleMultiview.multiview_id) {
         updateMultiviewViews(
-          pipeline.pipeline_id,
-          updatedSetup,
+          multiviewPipelineId,
+          productionSources,
           source,
           singleMultiview
         );
@@ -129,53 +149,58 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
     });
   };
 
+  const updateSource = (
+    source: SourceReference,
+    sources: SourceReference[]
+  ) => {
+    const updatedSources = updateSetupItem(source, sources);
+    setSelectedSources(updatedSources);
+    updateMultiview(source, updatedSources);
+  };
+
+  const addSource = (source: SourceReference) => {
+    const newSources = [...selectedSources, source];
+    setSelectedSources(newSources);
+    setAddSourceModal(false);
+    setSelectedSource(undefined);
+  };
+
   const addSourceAction = (source: SourceWithId) => {
-    if (productionSetup && productionSetup.isActive) {
+    if (isProductionActive) {
       setSelectedSource(source);
       setAddSourceModal(true);
-    } else if (productionSetup) {
+    } else {
       const input: SourceReference = {
         _id: source._id.toString(),
         type: 'ingest_source',
         label: source.ingest_source_name,
-        input_slot: firstEmptySlot(productionSetup)
+        input_slot: firstEmptySlot(selectedSources)
       };
-      addSource(input, productionSetup).then((updatedSetup) => {
-        if (!updatedSetup) return;
-        setProductionSetup(updatedSetup);
-        setAddSourceModal(false);
-        setSelectedSource(undefined);
-      });
+      addSource(input);
     }
   };
 
   const addHtmlSource = (height: number, width: number, url: string) => {
-    if (productionSetup) {
-      const sourceToAdd: SourceReference = {
-        type: 'html',
-        label: `HTML ${firstEmptySlot(productionSetup)}`,
-        input_slot: firstEmptySlot(productionSetup),
-        html_data: {
-          height: height,
-          url: url,
-          width: width
-        }
-      };
-      const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
-      if (!updatedSetup) return;
-      setProductionSetup(updatedSetup);
-      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-        refreshProduction();
-      });
-
-      if (productionSetup?.isActive && sourceToAdd.html_data) {
-        createHtmlSource(
-          productionSetup,
-          sourceToAdd.input_slot,
-          sourceToAdd.html_data,
-          sourceToAdd
-        );
+    const sourceToAdd: SourceReference = {
+      type: 'html',
+      label: `HTML ${firstEmptySlot(selectedSources)}`,
+      input_slot: firstEmptySlot(selectedSources),
+      html_data: {
+        height: height,
+        url: url,
+        width: width
       }
+    };
+    // MIGHT NEED TO REFRESH PRODUCTION @SANDRA
+    addSource(sourceToAdd);
+
+    if (isProductionActive && sourceToAdd.html_data) {
+      createHtmlSource(
+        productionSetup,
+        sourceToAdd.input_slot,
+        sourceToAdd.html_data,
+        sourceToAdd
+      );
     }
   };
 
@@ -189,6 +214,7 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
           filename: filename
         }
       };
+      // MIGHT NEED TO REFRESH
       const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
       if (!updatedSetup) return;
       setProductionSetup(updatedSetup);
@@ -548,7 +574,7 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
             id="prevCameras"
             className="grid p-3 my-2 bg-container grow rounded grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 h-fit"
           >
-            {productionSetup?.sources && sources.size > 0 && (
+            {productionSetup?.sources && apiSources.size > 0 && (
               <DndProvider backend={HTML5Backend}>
                 <SourceCards
                   onConfirm={handleSetPipelineSourceSettings}
@@ -660,7 +686,7 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
           }`}
         >
           <ProductionSourceList
-            sources={sources}
+            sources={apiSources}
             action={addSourceAction}
             actionText={t('inventory_list.add')}
             onClose={() => setInventoryVisible(false)}
