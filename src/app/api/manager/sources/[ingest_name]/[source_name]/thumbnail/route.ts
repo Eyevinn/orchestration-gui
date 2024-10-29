@@ -5,6 +5,7 @@ import {
   getUuidFromIngestName
 } from '../../../../../../../api/ateliereLive/ingest';
 import { isAuthenticated } from '../../../../../../../api/manager/auth';
+import { Log } from '../../../../../../../api/logger';
 
 type Params = {
   ingest_name: string;
@@ -35,7 +36,10 @@ export async function GET(
     }
     return new NextResponse(Buffer.from(base64Image, 'base64'));
   } catch (e) {
-    console.error('Error fetching thumbnail:', e);
+    Log().error(
+      `Error fetching thumbnail for '${params.source_name}' from ingest '${params.ingest_name}':`,
+      e
+    );
     return new NextResponse(e?.toString(), { status: 404 });
   }
 }
