@@ -98,7 +98,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
         <SourceList
           sources={sources}
           action={editSource}
-          actionText={t('inventory_list.edit')}
+          actionText={'edit'}
           locked={locked}
         />
         {currentSource ? (

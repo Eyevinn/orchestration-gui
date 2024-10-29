@@ -554,8 +554,6 @@ export const en = {
     types: 'Type',
     locations: 'Location',
     active_sources: 'Active Sources',
-    add: 'Add',
-    edit: 'Edit',
     sort_by: 'Sort by',
     no_sorting_applied: 'No sorting selected',
     most_recent_connection: 'Most recent connection',

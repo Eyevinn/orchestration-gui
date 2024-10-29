@@ -947,14 +947,14 @@ export default function ProductionConfiguration({ params }: PageProps) {
       </HeaderNavigation>
       <div className="flex h-[95%] flex-row">
         <div
-          className={`overflow-hidden transition-[min-width] w-0 min-w-0 ${
-            inventoryVisible ? 'min-w-[35%] ml-2 mt-2 max-h-[89vh]' : ''
+          className={`overflow-hidden transition-[min-width] w-0 ${
+            inventoryVisible ? 'min-w-fit ml-2 mt-2 max-h-[89vh]' : 'min-w-0'
           }`}
         >
           <SourceList
             sources={sources}
             action={addSourceAction}
-            actionText={t('inventory_list.add')}
+            actionText={'add'}
             onClose={() => setInventoryVisible(false)}
             isDisabledFunc={isDisabledFunction}
             locked={locked}
@@ -971,7 +971,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
             />
           )}
         </div>
-        <div className="flex flex-col h-fit w-full">
+        <div
+          className={`flex flex-col h-fit mt-2 ${
+            inventoryVisible ? 'w-fit' : 'w-full'
+          }`}
+        >
           <div
             id="prevCameras"
             className="grid p-3 m-2 bg-container grow rounded grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 h-fit"

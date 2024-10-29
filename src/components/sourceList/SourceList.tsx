@@ -14,7 +14,7 @@ interface SourceListProps {
   onClose?: () => void;
   isDisabledFunc?: (source: SourceWithId) => boolean;
   action?: (source: SourceWithId) => void;
-  actionText?: string;
+  actionText: string;
   locked: boolean;
 }
 

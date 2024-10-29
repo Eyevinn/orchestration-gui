@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SourceWithId } from '../../interfaces/Source';
 import videoSettings from '../../utils/videoSettings';
 import { getHertz } from '../../utils/stream';
@@ -14,7 +14,7 @@ import { SourceListItemThumbnail } from './SourceListItemThumbnail';
 type SourceListItemProps = {
   source: SourceWithId;
   action?: (source: SourceWithId) => void;
-  actionText?: string;
+  actionText: string;
   disabled: unknown;
   locked: boolean;
 };
@@ -28,30 +28,14 @@ function SourceListItem({
 }: SourceListItemProps) {
   const t = useTranslate();
 
-  const [previewVisible, setPreviewVisible] = useState<boolean>(false);
   const [outputRows, setOutputRows] = useState<
     { id: string; value: string }[][]
   >([]);
-
-  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const { video_stream: videoStream, audio_stream: audioStream } = source;
   const { width, height, frame_rate: frameRate } = videoStream || {};
   const { sample_rate: sampleRate, number_of_channels: numberOfChannels = 0 } =
     audioStream || {};
-
-  useEffect(() => {
-    return () => clearTimeout(timeoutRef.current);
-  }, []);
-
-  const onMouseEnter = useCallback(() => {
-    timeoutRef.current = setTimeout(() => setPreviewVisible(true), 1000);
-  }, []);
-
-  const onMouseLeave = useCallback(() => {
-    setPreviewVisible(false);
-    clearTimeout(timeoutRef.current);
-  }, []);
 
   const style = { textWrap: 'wrap' } as React.CSSProperties;
 
@@ -148,31 +132,25 @@ function SourceListItem({
             ) : null}
           </div>
         </div>
-        <div className="flex justify-center items-center	">
-          <div className="relative w-full mr-4">
-            <button
-              className={`flex flex-row min-w-full items-center justify-center m-1 p-1 rounded-lg ${
-                disabled || (locked && actionText === t('inventory_list.add'))
-                  ? 'text-unclickable-text pointer-events-none'
-                  : 'text-brand hover:bg-zinc-500 pointer-events-auto'
-              } bg-zinc-600`}
-              onClick={() => (disabled || !action ? '' : action(source))}
-            >
-              <div
-                className={`flex items-center overflow-hidden mr-6 ${
-                  disabled ? 'text-unclickable-text' : 'text-brand'
-                } text-xs`}
-              >
-                {actionText}
-              </div>
-              <Icons
-                name="IconArrowRight"
-                className={`absolute ${
-                  disabled ? 'text-unclickable-text' : 'text-brand'
-                } right-2 w-4`}
-              />
-            </button>
-          </div>
+        <div className="flex justify-center items-center relative">
+          {actionText === 'edit' && (
+            <Icons
+              name="IconPencil"
+              className={`absolute ${
+                disabled ? 'text-unclickable-text' : 'text-brand'
+              } r
+              top-4 right-2 w-6`}
+            />
+          )}
+          {actionText === 'add' && (
+            <Icons
+              name="IconPlus"
+              className={`absolute ${
+                disabled ? 'text-unclickable-text' : 'text-brand'
+              } r
+              top-4 right-2 w-6`}
+            />
+          )}
         </div>
       </div>
     </li>
