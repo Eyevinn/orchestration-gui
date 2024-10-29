@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useTranslate } from '../../i18n/useTranslate';
-import ProductionSources from './sources/ProductionsSources';
 import ProductionMonitoring from './monitoring/ProductionMonitoring';
 import { Production } from '../../interfaces/production';
 import { useGetProduction, usePutProduction } from '../../hooks/productions';
@@ -14,6 +13,8 @@ import { PipelineOutput, PipelineSettings } from '../../interfaces/pipeline';
 import ProductionControlConnections from './controlConnections/ProductionControlConnections';
 import { ControlConnection } from '../../interfaces/controlConnections';
 import ProductionOutputs from './outputs/ProductionOutputs';
+import NewProductionSources from './sources/NewProductionSources';
+import ProductionMultiviewers from './multiviewers/ProductionMultiviewers';
 
 interface ProductionPageProps {
   id: string;
@@ -114,7 +115,7 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
   };
 
   return (
-    <div className="flex h-[95%] flex-col">
+    <div className="flex pb-4 flex-col">
       {production && (
         <>
           <NewProductionHeader
@@ -122,6 +123,13 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             presetName={production.preset_name}
             refreshProduction={refreshProduction}
             onProductionNameChange={onProductionNameChange}
+          />
+          <NewProductionSources
+            setProductionSetup={setProductionSetup}
+            putProduction={putProduction}
+            productionSetup={productionSetup}
+            refreshProduction={refreshProduction}
+            setUpdateMuliviewLayouts={setUpdateMuliviewLayouts}
           />
           <NewProductionPipelines
             pipelines={production.pipelines}
@@ -136,14 +144,8 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             controlConnection={production.control_connection}
             onChange={onControlConnectionChange}
           />
+          <ProductionMultiviewers />
           <ProductionMonitoring productionSetup={productionSetup} />
-          <ProductionSources
-            setProductionSetup={setProductionSetup}
-            putProduction={putProduction}
-            productionSetup={productionSetup}
-            refreshProduction={refreshProduction}
-            setUpdateMuliviewLayouts={setUpdateMuliviewLayouts}
-          />
         </>
       )}
     </div>

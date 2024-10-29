@@ -74,7 +74,7 @@ function SourceListItem({
 
   return (
     <li
-      className={`relative w-full items-center border-b border-gray-600 ${
+      className={`relative w-[45%] items-center border-b border-gray-600 ${
         disabled ? 'bg-unclickable-bg' : 'hover:bg-zinc-700'
       } ${disabled || !action ? '' : 'hover:cursor-pointer'}`}
       onClick={() => (disabled || !action ? '' : action(source))}
