@@ -65,8 +65,8 @@ export async function putProduction(
       preset_name: production.preset_name,
       pipelines: production.pipelines,
       control_connection: production.control_connection,
-      default_multiview_reference: production.default_multiview_reference,
-      outputs: production.outputs
+      outputs: production.outputs,
+      multiviews: production.multiviews
     }
   );
 
@@ -83,8 +83,8 @@ export async function putProduction(
     preset_name: production.preset_name,
     pipelines: production.pipelines,
     control_connection: production.control_connection,
-    default_multiview_reference: production.default_multiview_reference,
-    outputs: production.outputs
+    outputs: production.outputs,
+    multiviews: production.multiviews
   };
 }
 

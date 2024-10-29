@@ -3,6 +3,7 @@ import { Production } from '../interfaces/production';
 import { ResourcesCompactPipelineResponse } from '../../types/ateliere-live';
 import { TListSource } from '../interfaces/multiview';
 import { API_SECRET_KEY } from '../utils/constants';
+import { SourceReference } from '../interfaces/Source';
 
 type ModifiedDataHook<DataType> = [DataType | undefined, boolean];
 
@@ -32,14 +33,14 @@ function GetPipelines(): [
   return [pipelines.sort((a, b) => a.name.localeCompare(b.name)), loading];
 }
 
-export function useCreateInputArray(production: Production | undefined) {
+export function useCreateInputArray(sources: SourceReference[]) {
   const [inputList, setInputList] = useState<TListSource[] | undefined>();
   const [pipelines] = GetPipelines();
 
   useEffect(() => {
-    if (production && pipelines) {
+    if (sources && pipelines) {
       const list: TListSource[] = [];
-      production.sources.map((source) => {
+      sources.map((source) => {
         list.push({
           id: source._id ? source._id : '',
           input_slot: source.input_slot,
@@ -66,7 +67,7 @@ export function useCreateInputArray(production: Production | undefined) {
       );
       return setInputList(uniqueList);
     }
-  }, [production, pipelines]);
+  }, [sources, pipelines]);
 
   return { inputList };
 }

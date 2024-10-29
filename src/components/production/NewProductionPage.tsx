@@ -14,7 +14,8 @@ import ProductionControlConnections from './controlConnections/ProductionControl
 import { ControlConnection } from '../../interfaces/controlConnections';
 import ProductionOutputs from './outputs/ProductionOutputs';
 import NewProductionSources from './sources/NewProductionSources';
-import ProductionMultiviewers from './multiviewers/ProductionMultiviewers';
+import ProductionMultiviews from './multiviews/ProductionMultiviews';
+import { MultiviewSettings } from '../../interfaces/multiview';
 
 interface ProductionPageProps {
   id: string;
@@ -114,6 +115,14 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
     }
   };
 
+  const onMultiviewsChange = (mvs: MultiviewSettings[]) => {
+    if (production) {
+      const newProduction = cloneDeep(production);
+      newProduction.multiviews = mvs;
+      setProduction(newProduction);
+    }
+  };
+
   return (
     <div className="flex pb-4 flex-col">
       {production && (
@@ -124,7 +133,17 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             refreshProduction={refreshProduction}
             onProductionNameChange={onProductionNameChange}
           />
+          <ProductionMultiviews
+            sources={production.sources}
+            productionId={production._id}
+            isProductionActive={production.isActive}
+            multiviews={production.multiviews || []}
+            updateMultiviews={onMultiviewsChange}
+          />
           <NewProductionSources
+            productionID
+            isProductionActive
+            pipelines
             setProductionSetup={setProductionSetup}
             putProduction={putProduction}
             productionSetup={productionSetup}
@@ -144,7 +163,6 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             controlConnection={production.control_connection}
             onChange={onControlConnectionChange}
           />
-          <ProductionMultiviewers sources={production.sources} />
           <ProductionMonitoring productionSetup={productionSetup} />
         </>
       )}

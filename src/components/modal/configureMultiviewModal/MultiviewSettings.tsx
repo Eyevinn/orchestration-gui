@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { TMultiviewLayout } from '../../../interfaces/preset';
@@ -35,11 +35,19 @@ export default function MultiviewSettingsConfig({
   const [multiviewLayouts] = useMultiviewLayouts(refresh);
 
   const currentValue = multiview || selectedMultiviewLayout;
-  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
-    (layout) => layout.productionId === productionId || !layout.productionId
-  );
-  const multiviewLayoutNames =
-    avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+  const avaliableMultiviewLayouts = useMemo(() => {
+    return multiviewLayouts?.filter(
+      (layout) => layout.productionId === productionId || !layout.productionId
+    );
+  }, [multiviewLayouts]);
+
+  const multiviewLayoutNames = useMemo(() => {
+    return avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+  }, [multiviewLayouts]);
+
+  useEffect(() => {
+    console.log(multiviewLayouts);
+  }, [multiviewLayouts]);
 
   useEffect(() => {
     if (

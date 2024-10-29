@@ -9,6 +9,8 @@ import { usePostProduction } from '../../hooks/productions';
 import { refresh } from '../../utils/refresh';
 import { PresetDropdown } from '../startProduction/presetDropdown';
 import { Preset, PresetWithId } from '../../interfaces/preset';
+import { useGetMultiviewLayout } from '../../hooks/multiviewLayout';
+import { MultiviewSettings } from '../../interfaces/multiview';
 
 export function CreateProduction() {
   const router = useRouter();
@@ -17,6 +19,7 @@ export function CreateProduction() {
   const inputRef: LegacyRef<HTMLInputElement> = useRef<HTMLInputElement>(null);
   const [showing, setShowing] = useState<boolean>(false);
   const [selectedPreset, setSelectedPreset] = useState<PresetWithId>();
+  const getMultiviewLayout = useGetMultiviewLayout();
 
   const t = useTranslate();
 
@@ -25,7 +28,23 @@ export function CreateProduction() {
     if (!name || !selectedPreset) {
       return;
     }
-    const insertedId = await postProduction(name, selectedPreset);
+    let defaultMultiview: MultiviewSettings | undefined;
+    if (selectedPreset.default_multiview_reference) {
+      const defaultMv = await getMultiviewLayout(
+        selectedPreset.default_multiview_reference
+      );
+      defaultMultiview = {
+        layout: defaultMv.layout,
+        output: defaultMv.output,
+        name: defaultMv.name,
+        for_pipeline_idx: 0
+      };
+    }
+    const insertedId = await postProduction(
+      name,
+      selectedPreset,
+      defaultMultiview
+    );
     refresh('/');
     router.push(`/production/${insertedId}`);
   }, [router, postProduction]);

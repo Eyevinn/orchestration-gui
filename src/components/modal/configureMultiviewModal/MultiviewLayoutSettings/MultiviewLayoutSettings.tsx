@@ -17,6 +17,7 @@ import Input from '../../configureOutputModal/Input';
 import MultiviewLayout from './MultiviewLayout';
 import toast from 'react-hot-toast';
 import RemoveLayoutButton from './RemoveLayoutButton';
+import { SourceReference } from '../../../../interfaces/Source';
 
 type ChangeLayout = {
   defaultLabel?: string;
@@ -25,13 +26,17 @@ type ChangeLayout = {
 };
 
 export default function MultiviewLayoutSettings({
-  production,
   setNewMultiviewPreset,
-  layoutModalOpen
+  layoutModalOpen,
+  productionId,
+  isProductionActive,
+  sources
 }: {
-  production: Production | undefined;
   setNewMultiviewPreset: (preset: TMultiviewLayout | null) => void;
   layoutModalOpen: boolean;
+  productionId: string;
+  isProductionActive: boolean;
+  sources: SourceReference[];
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
@@ -45,14 +50,14 @@ export default function MultiviewLayoutSettings({
     selectedMultiviewPreset
   );
   const { multiviewLayout } = useConfigureMultiviewLayout(
-    production?._id,
+    productionId,
     selectedMultiviewPreset,
     changedLayout?.defaultLabel,
     changedLayout?.source,
     changedLayout?.viewId,
     newPresetName
   );
-  const { inputList } = useCreateInputArray(production);
+  const { inputList } = useCreateInputArray(sources);
   const deleteLayout = useDeleteMultiviewLayout();
   const t = useTranslate();
 
@@ -62,7 +67,7 @@ export default function MultiviewLayoutSettings({
 
   const productionLayouts =
     multiviewLayouts?.filter(
-      (layout) => layout.productionId === production?._id
+      (layout) => layout.productionId === productionId
     ) || [];
   const globalMultiviewLayouts = multiviewLayouts?.filter(
     (layout) => !layout.productionId
@@ -204,7 +209,7 @@ export default function MultiviewLayoutSettings({
                 value={selectedMultiviewPreset?.name || ''}
                 update={(value) => handleLayoutUpdate(value, 'layout')}
               />
-              {!production?.isActive && (
+              {!isProductionActive && (
                 <RemoveLayoutButton
                   removeMultiviewLayout={removeMultiviewLayout}
                   deleteDisabled={deleteDisabled}

@@ -2,6 +2,7 @@ import { WithId, Document, ObjectId } from 'mongodb';
 import { SourceReference } from './Source';
 import { ControlConnection } from './controlConnections';
 import { PipelineOutput, PipelineSettings } from './pipeline';
+import { MultiviewSettings } from './multiview';
 
 export interface Production {
   _id: string;
@@ -11,8 +12,8 @@ export interface Production {
   preset_name: string;
   pipelines: PipelineSettings[];
   control_connection: ProductionControlConnection;
-  default_multiview_reference: string;
   outputs: PipelineOutput[][];
+  multiviews: MultiviewSettings[];
   //////
   production_settings?: ProductionSettings;
 }

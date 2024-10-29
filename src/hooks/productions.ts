@@ -1,10 +1,16 @@
+import { defaultMultiview } from './../api/mongoClient/defaults/preset';
 import { ObjectId } from 'mongodb';
 import { Production } from '../interfaces/production';
 import { API_SECRET_KEY } from '../utils/constants';
 import { PresetWithId } from '../interfaces/preset';
+import { MultiviewSettings } from '../interfaces/multiview';
 
 export function usePostProduction() {
-  return async (name: string, preset: PresetWithId): Promise<ObjectId> => {
+  return async (
+    name: string,
+    preset: PresetWithId,
+    defaultMultiview?: MultiviewSettings
+  ): Promise<ObjectId> => {
     const response = await fetch('/api/manager/productions', {
       method: 'POST',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
@@ -14,9 +20,9 @@ export function usePostProduction() {
         sources: [],
         preset_name: preset.name,
         pipelines: preset.pipelines,
-        default_multiview_reference: preset.default_multiview_reference,
         control_connection: preset.control_connection,
-        outputs: []
+        outputs: [],
+        multiviews: (defaultMultiview && [defaultMultiview]) || []
       })
     });
     if (response.ok) {
