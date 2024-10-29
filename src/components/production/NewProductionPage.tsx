@@ -36,12 +36,6 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
   const [updateSourceInputSlotOnMultiviewLayouts] =
     useUpdateSourceInputSlotOnMultiviewLayouts();
 
-  // useEffect(() => {
-  //   console.log('NUUU');
-  //   refreshPipelines();
-  //   refreshControlPanels();
-  // }, [productionSetup?.isActive]);
-
   useEffect(() => {
     if (updateMuliviewLayouts && productionSetup) {
       updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
@@ -54,6 +48,12 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
       );
     }
   }, [productionSetup, updateMuliviewLayouts]);
+
+  // useEffect(() => {
+  //   console.log('NUUU');
+  //   refreshPipelines();
+  //   refreshControlPanels();
+  // }, [productionSetup?.isActive]);
 
   const refreshProduction = () => {
     getProduction(id).then((config) => {});
@@ -144,7 +144,7 @@ const NewProductionPage: React.FC<ProductionPageProps> = (props) => {
             controlConnection={production.control_connection}
             onChange={onControlConnectionChange}
           />
-          <ProductionMultiviewers />
+          <ProductionMultiviewers sources={production.sources} />
           <ProductionMonitoring productionSetup={productionSetup} />
         </>
       )}
