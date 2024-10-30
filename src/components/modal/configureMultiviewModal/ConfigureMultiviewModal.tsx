@@ -138,11 +138,13 @@ export function ConfigureMultiviewModal({
     }
 
     await addNewLayout(newMultiviewLayout);
+    setNewMultiviewLayout(null);
     setLayoutModalOpen(false);
     setRefresh(true);
   };
 
   const closeLayoutModal = () => {
+    setNewMultiviewLayout(null);
     setLayoutModalOpen(false);
     setRefresh(true);
   };

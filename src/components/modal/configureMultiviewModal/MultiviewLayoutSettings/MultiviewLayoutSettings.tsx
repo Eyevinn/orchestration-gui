@@ -6,8 +6,8 @@ import {
   useDeleteMultiviewLayout,
   useMultiviewLayouts
 } from '../../../../hooks/multiviewLayout';
-import { Production } from '../../../../interfaces/production';
 import { useConfigureMultiviewLayout } from '../../../../hooks/useConfigureMultiviewLayout';
+import { Production } from '../../../../interfaces/production';
 import { TMultiviewLayout } from '../../../../interfaces/preset';
 import { useCreateInputArray } from '../../../../hooks/useCreateInputArray';
 import { TListSource } from '../../../../interfaces/multiview';
@@ -77,7 +77,7 @@ export default function MultiviewLayoutSettings({
   const multiviewLayoutNames =
     availableMultiviewLayouts?.map((layout) => layout.name) || [];
   const layoutNameAlreadyExist = availableMultiviewLayouts?.find(
-    (singlePreset) => singlePreset.name === multiviewLayout?.name
+    (singlePreset) => singlePreset.name === newPresetName
   )?.name;
 
   // This useEffect is used to set the drawn layout of the multiviewer on start,
@@ -102,14 +102,6 @@ export default function MultiviewLayoutSettings({
 
   // Refresh the layout list when a layout is deleted
   useEffect(() => {
-    if (layoutModalOpen) {
-      setRefresh(true);
-    } else {
-      setRefresh(false);
-    }
-  }, [layoutModalOpen]);
-
-  useEffect(() => {
     setRefresh(layoutModalOpen);
   }, [layoutModalOpen]);
 
@@ -120,18 +112,17 @@ export default function MultiviewLayoutSettings({
   }, [multiviewLayouts]);
 
   useEffect(() => {
+    if (newPresetName && selectedMultiviewPreset) {
+      setNewMultiviewPreset({
+        ...selectedMultiviewPreset,
+        name: newPresetName
+      });
+    }
+  }, [newPresetName, selectedMultiviewPreset, setNewMultiviewPreset]);
+
+  useEffect(() => {
     if (multiviewLayout) {
       setSelectedMultiviewPreset(multiviewLayout);
-      setNewMultiviewPreset({
-        ...multiviewLayout,
-        name:
-          multiviewLayout.name !== presetName && newPresetName !== ''
-            ? multiviewLayout.name
-            : ''
-      });
-    } else {
-      setSelectedMultiviewPreset(null);
-      setNewMultiviewPreset(null);
     }
   }, [multiviewLayout]);
 
