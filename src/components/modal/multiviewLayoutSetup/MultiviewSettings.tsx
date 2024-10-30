@@ -35,6 +35,7 @@ export default function MultiviewSettingsConfig({
   const [multiviewLayouts] = useMultiviewLayouts(refresh);
 
   const currentValue = multiview || selectedMultiviewLayout;
+
   const avaliableMultiviewLayouts = useMemo(() => {
     return multiviewLayouts?.filter(
       (layout) => layout.productionId === productionId || !layout.productionId
@@ -46,6 +47,7 @@ export default function MultiviewSettingsConfig({
   }, [multiviewLayouts]);
 
   useEffect(() => {
+    // !!!
     console.log(multiviewLayouts);
   }, [multiviewLayouts]);
 
@@ -109,10 +111,14 @@ export default function MultiviewSettingsConfig({
   };
 
   const getNumber = (val: string, prev: number) => {
-    if (Number.isNaN(parseInt(val))) {
+    if (
+      val === '' ||
+      (!isNaN(Number(val)) && Number.isInteger(parseFloat(val)))
+    ) {
+      return parseInt(val);
+    } else {
       return prev;
     }
-    return parseInt(val);
   };
 
   const handleChange = (key: string, value: string) => {
@@ -226,7 +232,8 @@ export default function MultiviewSettingsConfig({
         <Input
           type="number"
           label={t('preset.video_kilobit_rate')}
-          value={currentValue?.output.video_kilobit_rate || '5000'}
+          inputError={!currentValue?.output.video_kilobit_rate}
+          value={currentValue?.output.video_kilobit_rate || ''}
           update={(value) => handleChange('videoKiloBit', value)}
         />
         <Options
@@ -237,13 +244,17 @@ export default function MultiviewSettingsConfig({
         />
         <Input
           label={t('preset.port')}
-          inputError={portDuplicateError}
-          value={currentValue?.output.local_port || '1234'}
+          inputError={portDuplicateError || !currentValue?.output.local_port}
+          value={currentValue?.output.local_port || ''}
           update={(value) => handleChange('port', value)}
         />
         <Input
           label={t('preset.ip')}
-          value={currentValue?.output.local_ip || '0.0.0.0'}
+          inputError={
+            !currentValue?.output.local_ip ||
+            currentValue.output.local_ip === ''
+          }
+          value={currentValue?.output.local_ip || ''}
           update={(value) => handleChange('ip', value)}
         />
         <Input

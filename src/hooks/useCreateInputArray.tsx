@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Production } from '../interfaces/production';
 import { ResourcesCompactPipelineResponse } from '../../types/ateliere-live';
 import { TListSource } from '../interfaces/multiview';
 import { API_SECRET_KEY } from '../utils/constants';

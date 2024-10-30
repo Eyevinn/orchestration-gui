@@ -49,7 +49,7 @@ interface ProductionSourcesProps {
   updateSources: (sources: SourceReference[]) => void;
   multiviewPipelineId?: string;
   multiviews: MultiviewSettings[];
-  isProductionActive: Boolean;
+  isProductionActive: boolean;
   pipelines: PipelineSettings[];
 }
 
@@ -64,12 +64,13 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   } = props;
 
   const [apiSources] = useSources();
-  const [selectedSources, setSelectedSources] =
-    useState<SourceReference[]>(sourcesProp);
+  const [selectedSources, setSelectedSources] = useState<SourceReference[]>(
+    sourcesProp || []
+  );
 
-  useEffect(() => {
-    updateSources(selectedSources);
-  }, [selectedSources]);
+  // useEffect(() => {
+  //   updateSources(selectedSources);
+  // }, [selectedSources]);
 
   const t = useTranslate();
   const { locked } = useContext(GlobalContext);
@@ -115,9 +116,11 @@ const NewProductionSources: React.FC<ProductionSourcesProps> = (props) => {
   const [createMediaSource, createMediaLoading] = useCreateMediaSource();
   const [getRenderingEngine, renderingEngineLoading] = useRenderingEngine();
 
+  const productionSetup = undefined;
+
   //MULTIVIEWS
-  const [updateSourceInputSlotOnMultiviewLayouts] =
-    useUpdateSourceInputSlotOnMultiviewLayouts();
+  // const [updateSourceInputSlotOnMultiviewLayouts] =
+  //   useUpdateSourceInputSlotOnMultiviewLayouts();
 
   // useEffect(() => {
   //   if (updateMuliviewLayouts && productionSetup) {

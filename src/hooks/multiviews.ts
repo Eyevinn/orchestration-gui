@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { SourceReference } from '../interfaces/Source';
 import { CallbackHook } from './types';
-import { Production } from '../interfaces/production';
 import { MultiviewSettings } from '../interfaces/multiview';
 
 export function useMultiviews(): CallbackHook<
@@ -31,7 +30,7 @@ export function useMultiviews(): CallbackHook<
     const viewsToUpdate = singleMultiview.layout.views.filter(
       (v) => v.input_slot === source.input_slot
     );
-    console.log(viewsToUpdate);
+
     const updatedViewsWithLabels = viewsToUpdate.map((v) => {
       return {
         ...v,

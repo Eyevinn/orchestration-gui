@@ -1,4 +1,4 @@
-import { TMultiviewLayout, Preset } from '../../../interfaces/preset';
+import { TMultiviewLayout } from '../../../interfaces/preset';
 import { useEffect, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import toast from 'react-hot-toast';
@@ -11,11 +11,12 @@ import {
 import { IconSettings } from '@tabler/icons-react';
 import { Button } from '../../button/Button';
 import Section from '../../section/Section';
-import MultiviewSettingsConfig from '../../modal/configureMultiviewModal/MultiviewSettings';
-import MultiviewLayoutSettings from '../../modal/configureMultiviewModal/MultiviewLayoutSettings/MultiviewLayoutSettings';
+import MultiviewSettingsConfig from '../../modal/multiviewLayoutSetup/MultiviewSettings';
 import Decision from '../../modal/configureOutputModal/Decision';
 import { UpdateMultiviewersModal } from '../../modal/UpdateMultiviewersModal';
 import { SourceReference } from '../../../interfaces/Source';
+import MultiviewLayoutSetup from '../../modal/multiviewLayoutSetup/MultiviewLayoutSetup';
+import { MultiviewLayoutSetupButton } from '../../modal/multiviewLayoutSetup/MultiviewLayoutSetupButton';
 
 type ProductionMultiviewsProps = {
   productionId: string;
@@ -49,7 +50,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
   const t = useTranslate();
-  const getMultiviewLayout = useGetMultiviewLayout();
+  // const getMultiviewLayout = useGetMultiviewLayout();
 
   useEffect(() => {
     console.log(multiviews);
@@ -95,24 +96,18 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
     updateMultiviews(multiviewsToUpdate);
   };
 
-  const onUpdateLayoutPreset = async () => {
-    const noLayoutName = newMultiviewLayout?.name === '';
-    const defaultLayout = newMultiviewLayout?.name.includes('Default');
-    if (noLayoutName) {
+  const onUpdateLayoutPreset = async (newLayout: TMultiviewLayout | null) => {
+    if (newMultiviewLayout?.name === '') {
       toast.error(t('preset.layout_name_missing'));
       return;
     }
-    if (!newMultiviewLayout || defaultLayout) {
+
+    if (!newLayout) {
       toast.error(t('preset.no_updated_layout'));
       return;
     }
 
-    await addNewLayout(newMultiviewLayout);
-    setLayoutModalOpen(false);
-    setRefresh(true);
-  };
-
-  const closeLayoutModal = () => {
+    await addNewLayout(newLayout);
     setLayoutModalOpen(false);
     setRefresh(true);
   };
@@ -287,33 +282,17 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
             })) || <div>No Multiviews</div>}
         </div>
       )}
-      {layoutModalOpen && (
-        <MultiviewLayoutSettings
-          productionId={productionId}
-          isProductionActive={isProductionActive}
-          sources={sources}
-          setNewMultiviewPreset={setNewMultiviewLayout}
-          layoutModalOpen={layoutModalOpen}
-        />
-      )}
+      <MultiviewLayoutSetupButton
+        productionId={productionId}
+        isProductionActive={isProductionActive}
+        sourceList={sources}
+        onUpdateLayoutPreset={onUpdateLayoutPreset}
+      />
       <div className="flex flex-col">
-        {!layoutModalOpen && (
-          <Button
-            className="flex self-center hover:bg-green-400 min-w-fit max-w-fit mt-10"
-            type="button"
-            onClick={() => {
-              setRefresh(false);
-              setLayoutModalOpen(true);
-            }}
-          >
-            {t('preset.configure_layouts')}
-            <IconSettings className="text-p inline ml-2" />
-          </Button>
-        )}
         <Decision
           className="mt-6"
-          onClose={() => (layoutModalOpen ? closeLayoutModal() : clearInputs())}
-          onSave={() => (layoutModalOpen ? onUpdateLayoutPreset() : onSave())}
+          onClose={() => clearInputs()}
+          onSave={() => onSave()}
         />
       </div>
 

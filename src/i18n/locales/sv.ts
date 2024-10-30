@@ -697,6 +697,8 @@ export const sv = {
     stream_name: 'Ström',
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
+    no_ip_selected: 'Ingen IP-adress vald',
+    no_rate_selected: 'Ingen kilobit rate vald',
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
     configure_layouts: 'Justera kompositioner',
@@ -714,10 +716,9 @@ export const sv = {
       'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
     remove_multiview: 'Ta bort multiview',
     remove_layout: 'Ta bort komposition',
+    clear_layout: 'Rensa komposition',
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
-    not_possible_delete_global_layout:
-      'Det går inte att ta bort globala kompositioner',
     could_not_delete_layout: 'Kunde inte ta bort kompositionen',
     confirm_update_multiviewers:
       'Är du säker på att du vill uppdatera multiview för pågående produktion?',
