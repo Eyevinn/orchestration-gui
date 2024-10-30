@@ -46,11 +46,7 @@ export function ConfigureMultiviewModal({
   const t = useTranslate();
 
   useEffect(() => {
-    if (open) {
-      setRefresh(true);
-    } else {
-      setRefresh(false);
-    }
+    setRefresh(open);
   }, [open]);
 
   useEffect(() => {
@@ -78,18 +74,39 @@ export function ConfigureMultiviewModal({
       setConfirmUpdateModalOpen(true);
       return;
     }
+
     if (production?.isActive && confirmUpdateModalOpen) {
       setConfirmUpdateModalOpen(false);
     }
 
     const presetToUpdate = deepclone(preset);
+    const ipMissing = multiviews.some(
+      (multiview) =>
+        multiview.output.local_ip === '' || !multiview.output.local_ip
+    );
+    const portMissing = multiviews.some(
+      (multiview) => !multiview.output.local_port
+    );
+    const videoKilobitRateMissing = multiviews.some(
+      (multiview) => !multiview.output.video_kilobit_rate
+    );
 
     if (!multiviews) {
       toast.error(t('preset.no_multiview_selected'));
       return;
     }
 
-    if (portDuplicateIndexes.length > 0) {
+    if (ipMissing) {
+      toast.error(t('preset.no_ip_selected'));
+      return;
+    }
+
+    if (videoKilobitRateMissing) {
+      toast.error(t('preset.no_rate_selected'));
+      return;
+    }
+
+    if (portDuplicateIndexes.length > 0 || portMissing) {
       toast.error(t('preset.no_port_selected'));
       return;
     }
@@ -110,13 +127,12 @@ export function ConfigureMultiviewModal({
   };
 
   const onUpdateLayoutPreset = async () => {
-    const noLayoutName = newMultiviewLayout?.name === '';
-    const defaultLayout = newMultiviewLayout?.name.includes('Default');
-    if (noLayoutName) {
+    if (newMultiviewLayout?.name === '') {
       toast.error(t('preset.layout_name_missing'));
       return;
     }
-    if (!newMultiviewLayout || defaultLayout) {
+
+    if (!newMultiviewLayout) {
       toast.error(t('preset.no_updated_layout'));
       return;
     }

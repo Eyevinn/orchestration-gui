@@ -37,10 +37,11 @@ export const SourceListItemThumbnail = (props: SourceThumbnailProps) => {
   };
 
   return (
-    <div className="w-60 min-h-full flex flex-col items-center justify-around">
+    <div className="w-40 min-h-full flex flex-col items-center justify-around">
       {/* TODO perhaps add alts to translations */}
       <ImageComponent
         src={getSourceThumbnail(source)}
+        isStatusGone={source.status === 'gone'}
         alt="Source List Thumbnail"
       >
         <div className="absolute top-4 left-4">{getIcon(source)}</div>

@@ -1,7 +1,6 @@
 import {
   IconVideo,
   IconMicrophone2,
-  IconArrowRight,
   IconVideoOff,
   IconVector,
   IconVectorOff,
@@ -30,7 +29,9 @@ import {
   IconBiohazard,
   IconAlertTriangle,
   IconRouteOff,
-  IconAlertOctagon
+  IconAlertOctagon,
+  IconPencil,
+  IconPlus
 } from '@tabler/icons-react';
 
 interface IClassName {
@@ -53,9 +54,6 @@ const pickIcon = {
   ),
   IconVectorOff: ({ className }: IClassName) => (
     <IconVectorOff className={className} />
-  ),
-  IconArrowRight: ({ className }: IClassName) => (
-    <IconArrowRight className={className} />
   ),
   IconCopy: ({ className }: IClassName) => <IconCopy className={className} />,
   IconCopyOff: ({ className }: IClassName) => (
@@ -119,7 +117,11 @@ const pickIcon = {
   ),
   IconAlertOctagon: ({ className }: IClassName) => (
     <IconAlertOctagon className={className} />
-  )
+  ),
+  IconPencil: ({ className }: IClassName) => (
+    <IconPencil className={className} />
+  ),
+  IconPlus: ({ className }: IClassName) => <IconPlus className={className} />
 };
 
 export type PickIconNames = keyof typeof pickIcon;

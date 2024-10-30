@@ -550,13 +550,12 @@ export const sv = {
   },
   inventory: 'Källhantering',
   inventory_list: {
+    refresh_inventory: 'Uppdatera källor',
     search: 'Sök',
     filter: 'Filtrera på {{type}}',
     types: 'Typ',
     locations: 'Plats',
     active_sources: 'Aktiva källor',
-    add: 'Lägg till',
-    edit: 'Redigera',
     sort_by: 'Sortera på',
     no_sorting_applied: 'Ingen sortering vald',
     most_recent_connection: 'Senast anslutning',
@@ -578,6 +577,8 @@ export const sv = {
     no_local_port: 'Du behöver fylla i en lokal port',
     no_remote_ip: 'Du behöver fylla i en remote IP',
     no_remote_port: 'Du behöver fylla i en remote port',
+    port_already_in_use_error:
+      'Den här porten används redan av en annan SRT källa. Välj en annan port.',
     cancel: 'Avbryt'
   },
   clear: 'Rensa',
@@ -603,7 +604,7 @@ export const sv = {
     outR: 'Ut H',
     maxError: 'Max värde är {{max}}',
     minError: 'Minsta värde är 1',
-    alreadyUsed: 'Värdet {{value}} är redan användt',
+    alreadyUsed: 'Värdet {{value}} är redan använt',
     emptyBetween: 'Du kan inte ha tomma kanaler mellan två nummer',
     title: 'Ljudmappning'
   },
@@ -699,6 +700,8 @@ export const sv = {
     stream_name: 'Ström',
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
+    no_ip_selected: 'Ingen IP-adress vald',
+    no_rate_selected: 'Ingen kilobit rate vald',
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
     configure_layouts: 'Justera kompositioner',
@@ -716,10 +719,9 @@ export const sv = {
       'Konfigurationen {{layoutNameAlreadyExist}} skrivs över om du sparar',
     remove_multiview: 'Ta bort multiview',
     remove_layout: 'Ta bort komposition',
+    clear_layout: 'Rensa komposition',
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
-    not_possible_delete_global_layout:
-      'Det går inte att ta bort globala kompositioner',
     could_not_delete_layout: 'Kunde inte ta bort kompositionen',
     confirm_update_multiviewers:
       'Är du säker på att du vill uppdatera multiview för pågående produktion?',

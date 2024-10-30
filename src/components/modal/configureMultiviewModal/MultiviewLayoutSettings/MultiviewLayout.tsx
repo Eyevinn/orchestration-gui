@@ -24,6 +24,10 @@ export default function MultiviewLayout({
         const previewView = singleView.input_slot === 1002 && y === 0;
         const programView = singleView.input_slot === 1001 && y === 0;
 
+        const sourceId = inputList?.find(
+          (source) => source.label === label
+        )?.id;
+
         return (
           <div
             key={x + y}
@@ -45,9 +49,10 @@ export default function MultiviewLayout({
                   id: singleSource.id,
                   label: singleSource.label
                 }))}
-                value=""
+                value={sourceId ? sourceId : 'empty'}
                 update={(value) => handleChange(id || '', value)}
                 columnStyle
+                emptyFirstOption
               />
             )}
           </div>

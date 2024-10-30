@@ -31,7 +31,7 @@ export function useMultiviews(): CallbackHook<
     const viewsToUpdate = singleMultiview.layout.views.filter(
       (v) => v.input_slot === source.input_slot
     );
-    console.log(viewsToUpdate);
+
     const updatedViewsWithLabels = viewsToUpdate.map((v) => {
       return {
         ...v,

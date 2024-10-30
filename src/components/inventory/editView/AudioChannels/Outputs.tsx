@@ -31,6 +31,33 @@ export default function Outputs({
   locked,
   updateRows
 }: IOutput) {
+  const findDuplicateValues = () => {
+    const duplicateOutputIndices: number[] = [];
+    const seenOutputs = new Set();
+
+    contents.forEach((output, index) => {
+      if (seenOutputs.has(output.value) && output.value !== '') {
+        duplicateOutputIndices.push(index);
+
+        // Also include the first occurrence if it's not already included
+        const firstIndex = contents.findIndex(
+          (item) => item.value === output.value
+        );
+        if (!duplicateOutputIndices.includes(firstIndex)) {
+          duplicateOutputIndices.push(firstIndex);
+        }
+      } else if (output.value !== '') {
+        seenOutputs.add(output.value);
+      }
+    });
+
+    return {
+      duplicateOutputIndices
+    };
+  };
+
+  const { duplicateOutputIndices } = findDuplicateValues();
+
   return (
     <div className="flex">
       {contents.map(({ value, id }, index) => {
@@ -55,6 +82,7 @@ export default function Outputs({
               isDisabled={small || !isEnabled || locked}
               max={max}
               value={value}
+              duplicateError={duplicateOutputIndices.includes(index)}
               updateRows={(e: IEvent) =>
                 updateRows && updateRows(e, rowIndex, index, id)
               }

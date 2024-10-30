@@ -99,10 +99,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
     productionSetup?.sources.map((prod) => prod._id) || [];
 
   //MULTIVIEWS
-  const [updateMuliviewLayouts, setUpdateMuliviewLayouts] = useState(false);
   const getMultiviewLayout = useGetMultiviewLayout();
   const [updateMultiviewViews] = useMultiviews();
-  const [updateSourceInputSlotOnMultiviewLayouts] =
+  const [updateSourceInputSlotOnMultiviewLayouts, updateMultiviewViewsLoading] =
     useUpdateSourceInputSlotOnMultiviewLayouts();
   const [addMultiviewersOnRunningProduction] =
     useAddMultiviewersOnRunningProduction();
@@ -154,19 +153,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     refreshPipelines();
     refreshControlPanels();
   }, [productionSetup?.isActive]);
-
-  useEffect(() => {
-    if (updateMuliviewLayouts && productionSetup) {
-      updateSourceInputSlotOnMultiviewLayouts(productionSetup).then(
-        (updatedSetup) => {
-          if (!updatedSetup) return;
-          setProductionSetup(updatedSetup);
-          setUpdateMuliviewLayouts(false);
-          refreshProduction();
-        }
-      );
-    }
-  }, [productionSetup, updateMuliviewLayouts]);
 
   const setSelectedControlPanel = (controlPanel: string[]) => {
     setProductionSetup((prevState) => {
@@ -401,14 +387,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
     }
   };
 
-  const updateSource = (
+  const updateMultiview = (
     source: SourceReference,
-    productionSetup: Production
+    updatedSetup: Production
   ) => {
-    const updatedSetup = updateSetupItem(source, productionSetup);
-    setProductionSetup(updatedSetup);
-    setUpdateMuliviewLayouts(true);
-    putProduction(updatedSetup._id.toString(), updatedSetup);
     const pipeline = updatedSetup.production_settings.pipelines[0];
 
     pipeline.multiviews?.map((singleMultiview) => {
@@ -425,6 +407,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
         );
       }
     });
+  };
+
+  const updateSource = (
+    source: SourceReference,
+    productionSetup: Production
+  ) => {
+    const updatedSetup = updateSetupItem(source, productionSetup);
+    setProductionSetup(updatedSetup);
+    putProduction(updatedSetup._id.toString(), updatedSetup);
+    updateMultiview(source, updatedSetup);
   };
 
   const updateConfigName = (nameChange: string) => {
@@ -692,12 +684,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
           };
           const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
           if (!updatedSetup) return;
-          setProductionSetup(updatedSetup);
-          putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-            refreshProduction();
-            setAddSourceModal(false);
-            setSelectedSource(undefined);
-          });
+          updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+            (result) => {
+              if (!result) return;
+              setProductionSetup(result);
+              updateMultiview(sourceToAdd, result);
+              refreshProduction();
+              setAddSourceModal(false);
+              setSelectedSource(undefined);
+            }
+          );
           setAddSourceStatus(undefined);
         } else {
           setAddSourceStatus({ success: false, steps: result.value.steps });
@@ -750,9 +746,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   productionSetup
                 );
                 if (!updatedSetup) return;
-                setProductionSetup(updatedSetup);
-                putProduction(updatedSetup._id.toString(), updatedSetup).then(
-                  () => {
+                updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+                  (result) => {
+                    if (!result) return;
+                    setProductionSetup(updatedSetup);
+                    updateMultiview(selectedSourceRef, result);
                     setSelectedSourceRef(undefined);
                   }
                 );
@@ -769,11 +767,15 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
           if (!updatedSetup) return;
 
-          setProductionSetup(updatedSetup);
-          putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
-            setRemoveSourceModal(false);
-            setSelectedSourceRef(undefined);
-          });
+          updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+            (result) => {
+              if (!result) return;
+              setProductionSetup(updatedSetup);
+              updateMultiview(selectedSourceRef, result);
+              setRemoveSourceModal(false);
+              setSelectedSourceRef(undefined);
+            }
+          );
           return;
         }
 
@@ -800,8 +802,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 productionSetup
               );
               if (!updatedSetup) return;
-              setProductionSetup(updatedSetup);
-              putProduction(updatedSetup._id.toString(), updatedSetup);
+              updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
+                (result) => {
+                  if (!result) return;
+                  setProductionSetup(result);
+                  updateMultiview(selectedSourceRef, result);
+                }
+              );
               return;
             }
           }
@@ -841,8 +848,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
       const updatedSetup = removeSetupItem(selectedSourceRef, productionSetup);
 
       if (!updatedSetup) return;
-      setProductionSetup(updatedSetup);
-      putProduction(updatedSetup._id.toString(), updatedSetup).then(() => {
+      updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then((result) => {
+        if (!result) return;
+        setProductionSetup(result);
+        updateMultiview(selectedSourceRef, result);
         setRemoveSourceModal(false);
         setSelectedSourceRef(undefined);
       });
@@ -942,7 +951,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           <SourceList
             sources={sources}
             action={addSourceAction}
-            actionText={t('inventory_list.add')}
+            actionText={'add'}
             onClose={() => setInventoryVisible(false)}
             isDisabledFunc={isDisabledFunction}
             locked={locked}
@@ -954,12 +963,16 @@ export default function ProductionConfiguration({ params }: PageProps) {
               onAbort={handleAbortAddSource}
               onConfirm={handleAddSource}
               status={addSourceStatus}
-              loading={loadingCreateStream}
+              loading={loadingCreateStream || updateMultiviewViewsLoading}
               locked={locked}
             />
           )}
         </div>
-        <div className="flex flex-col h-fit w-full">
+        <div
+          className={`flex flex-col h-fit mt-2 ${
+            inventoryVisible ? 'w-fit' : 'w-full'
+          }`}
+        >
           <div
             id="prevCameras"
             className="grid p-3 m-2 bg-container grow rounded grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 h-fit"
@@ -972,11 +985,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   locked={locked}
                   updateProduction={(updated) => {
                     updateProduction(productionSetup._id, updated);
-                    setUpdateMuliviewLayouts(true);
                   }}
                   onSourceUpdate={(source: SourceReference) => {
                     updateSource(source, productionSetup);
-                    setUpdateMuliviewLayouts(true);
                   }}
                   onSourceRemoval={(source: SourceReference) => {
                     if (productionSetup && productionSetup.isActive) {
@@ -994,7 +1005,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       );
                       if (!updatedSetup) return;
                       setProductionSetup(updatedSetup);
-                      setUpdateMuliviewLayouts(true);
                       putProduction(
                         updatedSetup._id.toString(),
                         updatedSetup
@@ -1016,7 +1026,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                     loading={
                       loadingDeleteStream ||
                       deleteHtmlLoading ||
-                      deleteMediaLoading
+                      deleteMediaLoading ||
+                      updateMultiviewViewsLoading
                     }
                   />
                 )}
@@ -1027,7 +1038,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 onClickSource={() => setInventoryVisible(true)}
                 disabled={
                   productionSetup?.production_settings === undefined ||
-                  productionSetup.production_settings === null
+                  productionSetup.production_settings === null ||
+                  locked
                 }
               />
               <div className="flex flex-row">

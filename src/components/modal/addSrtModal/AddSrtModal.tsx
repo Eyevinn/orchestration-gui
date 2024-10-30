@@ -8,12 +8,18 @@ import { SrtSource } from '../../../interfaces/Source';
 import { Loader } from '../../loader/Loader';
 import { useIngests } from '../../../hooks/ingests';
 import Input from '../../input/Input';
+import { ResourcesSourceResponse } from '../../../../types/ateliere-live';
+import { useIngestSources } from '../../../hooks/ingests';
 
 type AddSrtModalProps = {
   open: boolean;
-  loading: boolean;
+  loading?: boolean;
   onAbort: () => void;
-  onConfirm: (ingestUuid: string, srtPayload: SrtSource) => void;
+  onConfirm: (
+    ingestUuid: string,
+    srtPayload: SrtSource,
+    callback: () => void
+  ) => void;
 };
 
 type SelectOptions = 'Caller' | 'Listener';
@@ -43,6 +49,10 @@ export function AddSrtModal({
   const [isRemotePortError, setIsRemotePortError] = useState<boolean>(false);
   const [isLocalIpError, setIsLocalIpError] = useState<boolean>(false);
   const [isRemoteIpError, setIsRemoteIpError] = useState<boolean>(false);
+  const [getIngestSources, ingestSourcesLoading] = useIngestSources();
+
+  const [isPortAlreadyInUseError, setIsPortAlreadyInUseError] =
+    useState<boolean>(false);
   const [srtPayload, setSrtPayload] = useState<SrtSource>({
     latency_ms: latency,
     local_ip: localIp,
@@ -66,6 +76,10 @@ export function AddSrtModal({
       }
     }
   }, [ingestName, ingests]);
+
+  useEffect(() => {
+    fetchIngestSources();
+  }, [ingests]);
 
   useEffect(() => {
     setSrtPayload({
@@ -98,6 +112,12 @@ export function AddSrtModal({
   }, [isNameError]);
 
   useEffect(() => {
+    if (mode === 'Caller' && isPortAlreadyInUseError) {
+      setIsPortAlreadyInUseError(false);
+    }
+  }, [mode, isPortAlreadyInUseError]);
+
+  useEffect(() => {
     if (localIp) {
       setIsLocalIpError(false);
     }
@@ -128,6 +148,7 @@ export function AddSrtModal({
     setIsLocalPortError(false);
     setIsRemoteIpError(false);
     setIsRemotePortError(false);
+    setIsPortAlreadyInUseError(false);
     onAbort();
   };
 
@@ -149,11 +170,30 @@ export function AddSrtModal({
     setIsLocalPortError(false);
     setIsRemoteIpError(false);
     setIsRemotePortError(false);
+    setIsPortAlreadyInUseError(false);
 
     onAbort();
   };
 
-  const handleCreateSrtSource = () => {
+  const fetchIngestSources = async (): Promise<ResourcesSourceResponse[]> => {
+    if (!ingestName || ingests.length === 0) {
+      return [];
+    }
+
+    const sources = [];
+    try {
+      const res = await getIngestSources(ingestName);
+      sources.push(...res);
+    } catch (error) {
+      console.error(`Failed to fetch ingest sources for ${ingestName}:`, error);
+    }
+
+    const srtSources = sources.filter((source) => source.type === 'SRT');
+
+    return srtSources;
+  };
+
+  const handleCreateSrtSource = async () => {
     let hasError = false;
 
     if (!name) {
@@ -168,7 +208,7 @@ export function AddSrtModal({
       setIsLocalIpError(true);
       hasError = true;
     }
-    if (!localPort) {
+    if (!localPort && mode === 'Listener') {
       setIsLocalPortError(true);
       hasError = true;
     }
@@ -182,11 +222,32 @@ export function AddSrtModal({
     }
 
     if (hasError) {
-      return false;
+      return;
     }
 
-    onConfirm(ingestUuid, srtPayload);
-    onAbort();
+    const srtSources = await fetchIngestSources();
+
+    if (srtSources.length > 0 && mode === 'Listener') {
+      const usedPorts: number[] = [];
+      srtSources.forEach((s) => {
+        if (s.srt?.local_port) {
+          usedPorts.push(s.srt.local_port);
+        }
+      });
+
+      if (usedPorts.includes(Number(localPort))) {
+        setIsPortAlreadyInUseError(true);
+        return;
+      } else {
+        setIsPortAlreadyInUseError(false);
+
+        onConfirm(ingestUuid, srtPayload, () => fetchIngestSources());
+        handleCancel();
+      }
+    } else {
+      onConfirm(ingestUuid, srtPayload, () => fetchIngestSources());
+      handleCancel();
+    }
   };
 
   const handleModeChange = () => {
@@ -206,12 +267,16 @@ export function AddSrtModal({
 
   const handleInputChange = (
     setter: React.Dispatch<React.SetStateAction<any>>,
-    errorSetter?: React.Dispatch<React.SetStateAction<boolean>>
+    errorSetter?: React.Dispatch<React.SetStateAction<boolean>>,
+    secondErrorSetter?: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       setter(e.target.value);
       if (errorSetter) {
         errorSetter(false);
+      }
+      if (secondErrorSetter) {
+        secondErrorSetter(false);
       }
     };
   };
@@ -305,12 +370,21 @@ export function AddSrtModal({
               className="w-full ml-2"
               type="number"
               value={localPort}
-              onChange={handleInputChange(setLocalPort)}
-              error={isLocalPortError}
+              onChange={handleInputChange(
+                setLocalPort,
+                setIsLocalPortError,
+                setIsPortAlreadyInUseError
+              )}
+              error={isLocalPortError || isPortAlreadyInUseError}
             />
             {isLocalPortError && (
               <p className="text-xs text-button-delete mt-2">
                 {t('inventory_list.no_local_port')}
+              </p>
+            )}
+            {mode === 'Listener' && isPortAlreadyInUseError && (
+              <p className="text-center text-sm text-button-delete mt-2">
+                {t('inventory_list.port_already_in_use_error')}
               </p>
             )}
           </span>
@@ -386,7 +460,10 @@ export function AddSrtModal({
       </div>
       <div className="flex justify-between px-8 mt-8">
         <>
-          <Button className="bg-button-abort" onClick={handleCancel}>
+          <Button
+            className="bg-button-abort hover:bg-button-abort-hover"
+            onClick={handleCancel}
+          >
             {t('inventory_list.cancel')}
           </Button>
           {loading ? (

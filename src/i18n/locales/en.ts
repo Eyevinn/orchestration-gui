@@ -548,13 +548,12 @@ export const en = {
   },
   inventory: 'Inventory',
   inventory_list: {
+    refresh_inventory: 'Refresh inventory',
     search: 'Search',
     filter: 'Filter on {{type}}',
     types: 'Type',
     locations: 'Location',
     active_sources: 'Active Sources',
-    add: 'Add',
-    edit: 'Edit',
     sort_by: 'Sort by',
     no_sorting_applied: 'No sorting selected',
     most_recent_connection: 'Most recent connection',
@@ -576,6 +575,8 @@ export const en = {
     no_local_port: 'You need to enter a local port',
     no_remote_ip: 'You need to enter a remote IP',
     no_remote_port: 'You need to enter a remote port',
+    port_already_in_use_error:
+      'There is already a SRT source with this port. Choose a different port.',
     cancel: 'Cancel'
   },
   clear: 'Clear',
@@ -700,6 +701,8 @@ export const en = {
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',
     layout_name_missing: 'Layout name is missing',
+    no_ip_selected: 'IP-adress is missing',
+    no_rate_selected: 'Kilobit rate is missing',
     muliview_view: 'Input',
     select_option: 'Select',
     select_multiview_preset: 'Preset',
@@ -712,8 +715,8 @@ export const en = {
       'Layout {{layoutNameAlreadyExist}} will be replaced on save',
     remove_multiview: 'Remove multiview',
     remove_layout: 'Remove layout',
+    clear_layout: 'Clear layout',
     add_another_multiview: 'Add another multiview',
-    not_possible_delete_global_layout: 'Global layout can not be deleted',
     could_not_delete_layout: 'Could not delete layout',
     layout_deleted: 'Layout deleted',
     confirm_update_multiviewers:

@@ -5,6 +5,7 @@ import { SourceWithId } from '../../../interfaces/Source';
 import UpdateButtons from './UpdateButtons';
 import AudioChannels from './AudioChannels/AudioChannels';
 import ImageComponent from '../../image/ImageComponent';
+import { useState } from 'react';
 
 export default function EditView({
   source,
@@ -21,17 +22,26 @@ export default function EditView({
   removeInventorySourceItem: (id: string) => Promise<Response | undefined>;
   locked: boolean;
 }) {
+  const [duplicateAudioValues, setDuplicateAudioValues] = useState(false);
+
   return (
     <EditViewContext source={source} updateSource={updateSource}>
       <div className="flex flex-row mb-10">
         <div className="relative w-[34rem]">
-          <ImageComponent src={getSourceThumbnail(source)} />
+          <ImageComponent
+            src={getSourceThumbnail(source)}
+            isStatusGone={source.status === 'gone'}
+          />
         </div>
         <GeneralSettings locked={locked} />
       </div>
 
       <div className="flex">
-        <AudioChannels source={source} locked={locked} />
+        <AudioChannels
+          source={source}
+          locked={locked}
+          setDuplicateAudioValues={setDuplicateAudioValues}
+        />
       </div>
       <UpdateButtons
         source={source}
@@ -39,6 +49,7 @@ export default function EditView({
         purgeInventorySource={purgeInventorySource}
         removeInventorySourceItem={removeInventorySourceItem}
         locked={locked}
+        duplicateAudioValues={duplicateAudioValues}
       />
     </EditViewContext>
   );

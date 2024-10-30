@@ -17,13 +17,13 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
   const putProduction = usePutProduction();
 
   const updateSourceInputSlot = async (production: Production) => {
+    setLoading(true);
     const layouts = await multiviewLayouts();
     if (layouts) {
-      for (const singleLayout of layouts) {
+      const updatedLayouts = layouts.map(async (singleLayout) => {
         if (production._id === singleLayout.productionId) {
           const updated = singleLayout.layout.views.map(
             (view: MultiviewViews, index) => {
-              const viewIndex = index - 2 + 1;
               const preview = index === 0;
               const program = index === 1;
               const isUpdatedInputSlot = production.sources.find((source) =>
@@ -56,12 +56,8 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
                 };
               } else {
                 return {
-                  input_slot: viewIndex,
-                  x: view.x,
-                  y: view.y,
-                  height: view.height,
-                  width: view.width,
-                  label: `Input ${viewIndex}`
+                  ...view,
+                  input_slot: 0
                 };
               }
             }
@@ -76,38 +72,58 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
             }
           });
 
-          const updatedPipelines = production?.production_settings.pipelines;
-          if (updatedPipelines && updatedPipelines[0]) {
-            const updatedFirstPipeline = {
-              ...updatedPipelines[0],
-              multiviews: updatedPipelines[0].multiviews?.map(
-                (singleMultiview) => ({
-                  ...singleMultiview,
-                  layout: {
-                    ...singleLayout.layout,
-                    views: updated
-                  }
-                })
-              )
-            };
-
-            // Replace the first pipeline with the updated one
-            const newPipelines = [
-              updatedFirstPipeline,
-              ...updatedPipelines.slice(1)
-            ];
-
-            // Update the db-production with the new layout-input slot
-            const res = await putProduction(production._id, {
-              ...production,
-              production_settings: {
-                ...production?.production_settings,
-                pipelines: newPipelines
-              }
-            });
-            return res;
-          }
+          return {
+            for_pipeline_idx: singleLayout.for_pipeline_idx || 0,
+            _id: singleLayout._id || '',
+            name: singleLayout.name,
+            output: singleLayout.output,
+            layout: {
+              ...singleLayout.layout,
+              views: updated.map((view) => ({
+                ...view,
+                label: view.input_slot === 0 ? '' : view.label
+              }))
+            }
+          };
         }
+      });
+      const pipelines = production?.production_settings.pipelines;
+      const multiviewsArr = await Promise.all(updatedLayouts);
+
+      const updatedMultiviews = pipelines[0].multiviews?.map((oldItem) => {
+        const updatedItem = multiviewsArr.find(
+          (newItem) => newItem && newItem._id === oldItem._id
+        );
+        return updatedItem
+          ? {
+              ...oldItem,
+              layout: updatedItem.layout
+            }
+          : oldItem;
+      });
+
+      if (pipelines && pipelines[0] && updatedMultiviews) {
+        const updatedFirstPipeline = {
+          ...pipelines[0],
+          multiviews: updatedMultiviews.map((multiview) => ({
+            ...multiview,
+            _id: multiview._id?.toString() || ''
+          }))
+        };
+
+        // Replace the first pipeline with the updated one
+        const newPipelines = [updatedFirstPipeline, ...pipelines.slice(1)];
+
+        // Update the db-production with the new layout-input slot
+        const res = await putProduction(production._id, {
+          ...production,
+          production_settings: {
+            ...production?.production_settings,
+            pipelines: newPipelines
+          }
+        });
+        setLoading(false);
+        return res;
       }
     }
   };
