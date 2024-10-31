@@ -58,13 +58,14 @@ function SourceListItem({
 
   return (
     <li
-      className={`relative w-full items-center border-b border-gray-600 ${
+      className={`w-full items-center border-b border-gray-600 ${
         disabled ? 'bg-unclickable-bg' : 'hover:bg-zinc-700'
       } ${disabled || !action ? '' : 'hover:cursor-pointer'}`}
+      style={{ boxSizing: 'border-box' }}
       onClick={() => (disabled || !action ? '' : action(source))}
     >
       <div className="flex">
-        <div className="flex flex-row flex-1 items-center space-x-4 p-3 sm:pb-4 ">
+        <div className="flex flex-row flex-1 items-center space-x-4 p-3 sm:pb-4">
           <SourceListItemThumbnail source={source} />
           <div
             style={style}

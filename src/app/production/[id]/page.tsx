@@ -1037,7 +1037,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
       <div className="flex h-[95%] flex-row">
         <div
           className={`overflow-hidden transition-[min-width] w-0 ${
-            inventoryVisible ? 'min-w-fit ml-2 mt-2 max-h-[89vh]' : 'min-w-0'
+            inventoryVisible
+              ? 'min-w-fit ml-2 mt-2 h-[96vh] overflow-scroll'
+              : 'min-w-0'
           }`}
         >
           <SourceList

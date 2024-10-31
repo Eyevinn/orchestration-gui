@@ -17,7 +17,6 @@ interface SourceListProps {
   actionText: string;
   locked: boolean;
 }
-
 const SourceList: React.FC<SourceListProps> = (props) => {
   const {
     sources,
@@ -59,11 +58,11 @@ const SourceList: React.FC<SourceListProps> = (props) => {
         <div
           className={
             inventoryVisible
-              ? `${styles.no_scrollbar}  min-w-fit overflow-hidden max-w-2xl transition-[width] ml-2 mt-2 w-[50%]`
+              ? `${styles.no_scrollbar}  min-w-fit overflow-hidden h-[96vh] max-w-2xl transition-[width] ml-2 mt-2 w-[50%]`
               : 'hidden'
           }
         >
-          <div className="p-3 bg-container rounded break-all h-full">
+          <div className="p-3 bg-container rounded break-all h-[94vh]">
             <div className="flex justify-between mb-1">
               <FilterOptions
                 onFilteredSources={(filtered: Map<string, SourceWithId>) =>
@@ -80,7 +79,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
               )}
             </div>
             <ul
-              className={`flex flex-col border-t border-gray-600 overflow-scroll h-full ${styles.no_scrollbar}`}
+              className={`flex flex-col border-t border-gray-600 overflow-scroll h-[89vh] ${styles.no_scrollbar}`}
             >
               {getSourcesToDisplay(filteredSources)}
             </ul>
