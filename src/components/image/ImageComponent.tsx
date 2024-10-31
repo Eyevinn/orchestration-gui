@@ -2,6 +2,7 @@
 
 import {
   PropsWithChildren,
+  SyntheticEvent,
   useContext,
   useEffect,
   useRef,
@@ -12,41 +13,34 @@ import { IconExclamationCircle } from '@tabler/icons-react';
 import { Loader } from '../loader/Loader';
 import { GlobalContext } from '../../contexts/GlobalContext';
 import { Type } from '../../interfaces/Source';
-
 interface ImageComponentProps extends PropsWithChildren {
   src?: string;
   alt?: string;
   type?: Type;
-  isStatusGone?: boolean;
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = (props) => {
-  const { src, alt = 'Image', children, type, isStatusGone } = props;
+  const { src, alt = 'Image', children, type } = props;
   const { imageRefetchKey } = useContext(GlobalContext);
   const [imgSrc, setImgSrc] = useState<string>();
   const [loaded, setLoaded] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<SyntheticEvent<HTMLImageElement, Event>>();
   const timeout = useRef<ReturnType<typeof setTimeout>>();
 
   const refetchImage = () => {
     setImgSrc(`${src}?${imageRefetchKey}`);
+    setError(undefined);
     setLoading(true);
     clearTimeout(timeout.current);
     timeout.current = setTimeout(() => setLoading(false), 500);
   };
-
   useEffect(() => {
     refetchImage();
   }, [imageRefetchKey]);
 
   useEffect(() => {
-    if (isStatusGone) {
-      setLoading(false);
-      setLoaded(true);
-    }
-  }, [isStatusGone]);
-
-  useEffect(() => {
+    setError(undefined);
     setImgSrc(`${src}?${imageRefetchKey}`);
   }, [src]);
 
@@ -55,12 +49,11 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
       clearTimeout(timeout.current);
     };
   }, []);
-
   return (
     <>
       {(!type || type === 'ingest_source') && src && (
         <div className="relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
-          {((!imgSrc || isStatusGone) && (
+          {((!imgSrc || error) && (
             <IconExclamationCircle className="text-error fill-white w-full h-full" />
           )) || (
             <>
@@ -71,10 +64,14 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
                 }`}
                 src={imgSrc!}
                 onLoad={() => {
-                  isStatusGone ? '' : setLoaded(false);
+                  setError(undefined);
+                  setLoaded(false);
                 }}
                 onLoadingComplete={() => {
-                  isStatusGone ? '' : setLoaded(true);
+                  setLoaded(true);
+                }}
+                onError={(err) => {
+                  setError(err);
                 }}
                 placeholder="empty"
                 width={0}
@@ -109,5 +106,4 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
     </>
   );
 };
-
 export default ImageComponent;
