@@ -106,7 +106,11 @@ export async function runSyncInventory() {
       status: statusUpdateCheck(inventorySource, apiSource, lastConnected),
       lastConnected: lastConnected,
       // Add srt metadata if missing from SRT sources
-      srt: (apiSource.ingest_type === 'SRT' && apiSource.srt) || undefined
+      srt:
+        (apiSource.ingest_type === 'SRT' &&
+          !inventorySource.srt &&
+          apiSource.srt) ||
+        inventorySource.srt
     } satisfies WithId<Source>;
   });
 
