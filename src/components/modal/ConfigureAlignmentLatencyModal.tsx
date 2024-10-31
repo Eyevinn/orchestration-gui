@@ -288,6 +288,11 @@ export function ConfigureAlignmentLatencyModal({
     return result;
   };
 
+  const handleCloseRestartStreamModal = () => {
+    setShowRestartStreamModal(false);
+    onAbort();
+  };
+
   return (
     <Modal className="w-[500px]" open={open}>
       <div className="flex flex-col space-y-6 px-10 py-10">
@@ -406,7 +411,7 @@ export function ConfigureAlignmentLatencyModal({
       <RestartStreamModal
         open={showRestartStreamModal}
         loading={false}
-        onAbort={() => setShowRestartStreamModal(false)}
+        onAbort={handleCloseRestartStreamModal}
         onConfirm={() => handleSaveAlignmentAndLatency(true)}
       />
     </Modal>
