@@ -366,7 +366,7 @@ export function ConfigureAlignmentLatencyModal({
                   <Input
                     className="mt-2 w-full"
                     type="number"
-                    value={latencies[pipeline.pipeline_id || '']}
+                    value={latencies[pipeline.pipeline_id || ''] || ''}
                     onChange={(e) =>
                       handleInputChange(
                         pipeline.pipeline_id || '',
