@@ -860,34 +860,28 @@ export async function startProduction(
                 const ingestUuid = await getUuidFromIngestName(
                   source.ingest_name
                 );
-                if (!ingestUuid) {
-                  throw new Error(
-                    `Ingest UUID not found for ingest name: ${source.ingest_name}`
-                  );
-                }
                 const sourceId = await getSourceIdFromSourceName(
-                  ingestUuid,
+                  ingestUuid || '',
                   source.ingest_source_name
                 );
+
+                const currentSettings = pipeline.sources?.find(
+                  (s) => s.source_id === sourceId
+                )?.settings;
 
                 return {
                   source_id: sourceId || 0,
                   settings: {
                     alignment_ms:
-                      pipeline.sources?.find((s) => s.source_id === sourceId)
-                        ?.settings.alignment_ms || pipeline.alignment_ms,
+                      currentSettings?.alignment_ms ?? pipeline.alignment_ms,
                     max_network_latency_ms:
-                      pipeline.sources?.find((s) => s.source_id === sourceId)
-                        ?.settings.max_network_latency_ms ||
+                      currentSettings?.max_network_latency_ms ??
                       pipeline.max_network_latency_ms
                   }
                 };
               })
             );
-            return {
-              ...pipeline,
-              sources: newSources
-            };
+            return { ...pipeline, sources: newSources };
           })
         )
       },

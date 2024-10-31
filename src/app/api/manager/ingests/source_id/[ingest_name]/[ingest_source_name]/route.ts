@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAuthenticated } from '../../../../../../../api/manager/auth';
-import { Log } from '../../../../../../../api/logger';
 import {
   getSourceIdFromSourceName,
   getUuidFromIngestName

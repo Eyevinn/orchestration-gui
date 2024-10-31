@@ -2,7 +2,6 @@ import { Db, ObjectId, UpdateResult } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
 import { Production, ProductionWithId } from '../../interfaces/production';
 import { Log } from '../logger';
-import { SourceReference } from '../../interfaces/Source';
 
 export async function getProductions(): Promise<Production[]> {
   const db = await getDatabase();
@@ -118,19 +117,9 @@ export async function getProductionPipelineSourceAlignment(
     (p) => p.pipeline_id === pipelineId
   );
 
-  if (!pipeline) {
-    console.error('Pipeline not found');
-    return null;
-  }
-
   const source = pipeline?.sources?.find(
     (source) => String(source.source_id) === String(sourceId)
   );
-
-  if (!source) {
-    console.error('Source not found');
-    return null;
-  }
 
   const alignment =
     source?.settings?.alignment_ms !== undefined
@@ -197,19 +186,9 @@ export async function getProductionSourceLatency(
     (p) => p.pipeline_id === pipelineId
   );
 
-  if (!pipeline) {
-    console.error('Pipeline not found');
-    return null;
-  }
-
   const source = pipeline?.sources?.find(
     (source) => String(source.source_id) === String(sourceId)
   );
-
-  if (!source) {
-    console.error('Source not found');
-    return null;
-  }
 
   const latency =
     source?.settings?.max_network_latency_ms !== undefined
@@ -258,4 +237,34 @@ export async function setProductionPipelineSourceLatency(
     console.error('Database error:', error);
     throw new Error('Error updating pipeline source latency');
   }
+}
+
+export async function replaceProductionSourceStreamIds(
+  productionId: string,
+  sourceId: string | ObjectId,
+  newStreamUuids: string[]
+) {
+  const db = await getDatabase();
+  const productionObjectId = new ObjectId(productionId);
+
+  const sourceIdForQuery =
+    typeof sourceId === 'string' ? sourceId : sourceId.toString();
+
+  const updateResult = await db.collection('productions').updateOne(
+    {
+      _id: productionObjectId,
+      'sources._id': sourceIdForQuery
+    },
+    {
+      $set: {
+        'sources.$.stream_uuids': newStreamUuids
+      }
+    }
+  );
+
+  if (updateResult.matchedCount === 0) {
+    throw new Error('Production or source not found');
+  }
+
+  return updateResult;
 }

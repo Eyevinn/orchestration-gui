@@ -115,7 +115,11 @@ export const sv = {
     configure_alignment_latency:
       'Ställ in alignment och latency för strömmarna på produktionens pipelines',
     save: 'Spara',
-    cancel: 'Avbryt'
+    cancel: 'Avbryt',
+    restart_stream_info:
+      'Vill du starta om strömmarna du ändrat latency för direkt? Annars behöver du stoppa och starta om produktionen för att få med dina ändringar.',
+    no: 'Nej',
+    restart_stream: 'Starta om strömmar'
   },
   create_new: 'Skapa ny',
   default_prod_placeholder: 'Min Nya Konfiguration',

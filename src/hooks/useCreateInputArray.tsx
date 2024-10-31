@@ -1,36 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Production } from '../interfaces/production';
-import { ResourcesCompactPipelineResponse } from '../../types/ateliere-live';
 import { TListSource } from '../interfaces/multiview';
-import { API_SECRET_KEY } from '../utils/constants';
-
-type ModifiedDataHook<DataType> = [DataType | undefined, boolean];
-
-function GetPipelines(): [
-  ...ModifiedDataHook<ResourcesCompactPipelineResponse[]>
-] {
-  const [loading, setLoading] = useState(true);
-  const [pipelines, setPipelines] = useState<
-    ResourcesCompactPipelineResponse[]
-  >([]);
-  useEffect(() => {
-    setLoading(true);
-    fetch('/api/manager/pipelines', {
-      method: 'GET',
-      headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          setPipelines((await response.json()).pipelines);
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  return [pipelines.sort((a, b) => a.name.localeCompare(b.name)), loading];
-}
+import { GetPipelines } from './pipelines';
 
 export function useCreateInputArray(production: Production | undefined) {
   const [inputList, setInputList] = useState<TListSource[] | undefined>();

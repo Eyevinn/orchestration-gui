@@ -113,7 +113,11 @@ export const en = {
     source_name: 'Source name',
     error: 'The alignment value must be higher than the latency',
     save: 'Save',
-    cancel: 'Cancel'
+    cancel: 'Cancel',
+    restart_stream_info:
+      'Do you wish to restart the streams you have changed latency for right away? Otherwise you will need to stop and start your production to apply your changes.',
+    no: 'No',
+    restart_stream: 'Restart stream'
   },
   create_new: 'Create New',
   default_prod_placeholder: 'My New Configuration',

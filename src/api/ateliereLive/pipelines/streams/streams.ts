@@ -107,13 +107,20 @@ export async function createStream(
         `Allocated port ${availablePort} on '${source.ingest_name}' for ${source.ingest_source_name}`
       );
 
+      const pipelineSource = pipeline.sources?.find(
+        (source) => source.source_id === sourceId
+      );
+
       const stream: PipelineStreamSettings = {
         ingest_id: ingestUuid || '',
         source_id: sourceId || 0,
         pipeline_id: pipeline.pipeline_id!,
         input_slot: input_slot,
-        alignment_ms: pipeline.alignment_ms,
-        max_network_latency_ms: pipeline.max_network_latency_ms,
+        alignment_ms:
+          pipelineSource?.settings.alignment_ms || pipeline.alignment_ms,
+        max_network_latency_ms:
+          pipelineSource?.settings.max_network_latency_ms ||
+          pipeline.max_network_latency_ms,
         width: pipeline.width,
         height: pipeline.height,
         frame_rate_d: pipeline.frame_rate_d,

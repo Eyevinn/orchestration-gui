@@ -15,7 +15,11 @@ import {
   SourceReference,
   SourceWithId
 } from '../../../interfaces/Source';
-import { useGetProduction, usePutProduction } from '../../../hooks/productions';
+import {
+  useGetProduction,
+  usePutProduction,
+  useReplaceProductionSourceStreamIds
+} from '../../../hooks/productions';
 import { Production } from '../../../interfaces/production';
 import { updateSetupItem } from '../../../hooks/items/updateSetupItem';
 import { removeSetupItem } from '../../../hooks/items/removeSetupItem';
@@ -45,7 +49,6 @@ import { useMultiviews } from '../../../hooks/multiviews';
 import SourceList from '../../../components/sourceList/SourceList';
 import { GlobalContext } from '../../../contexts/GlobalContext';
 import { Select } from '../../../components/select/Select';
-import { useAddSource } from '../../../hooks/sources/useAddSource';
 import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import { ConfigureMultiviewButton } from '../../../components/modal/configureMultiviewModal/ConfigureMultiviewButton';
 import { useUpdateSourceInputSlotOnMultiviewLayouts } from '../../../hooks/useUpdateSourceInputSlotOnMultiviewLayouts';
@@ -92,6 +95,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const putProduction = usePutProduction();
   const getPresets = useGetPresets();
   const getProduction = useGetProduction();
+  const replaceProductionSourceStreamIds =
+    useReplaceProductionSourceStreamIds();
   const [configurationName, setConfigurationName] = useState<string>('');
   const [productionSetup, setProductionSetup] = useState<Production>();
   const [presets, setPresets] = useState<Preset[]>();
@@ -127,7 +132,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   // Create source
   const [firstEmptySlot] = useGetFirstEmptySlot();
-  const [addSource] = useAddSource();
 
   const [updateStream, loading] = useUpdateStream();
   const [getIngestSourceId, ingestSourceIdLoading] = useIngestSourceId();
@@ -338,7 +342,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     putProduction(id, productionSetup);
   };
 
-  const handleSetPipelineSourceSettings = (
+  const handleSetPipelineSourceSettings = async (
     source: ISource,
     sourceId: number,
     data: {
@@ -346,7 +350,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
       stream_uuid: string;
       alignment: number;
       latency: number;
-    }[]
+    }[],
+    shouldRestart?: boolean,
+    streamUuids?: string[]
   ) => {
     if (
       productionSetup?._id &&
@@ -361,8 +367,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
           source.ingest_source_name,
           alignment,
           latency
-        );
-        updateStream(stream_uuid, alignment);
+        ).then(() => refreshProduction());
+
+        if (productionSetup.isActive) {
+          updateStream(stream_uuid, alignment);
+        }
 
         const updatedProduction = {
           ...productionSetup,
@@ -386,6 +395,39 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
         setProductionSetup(updatedProduction);
       });
+    }
+
+    if (shouldRestart && productionSetup && streamUuids) {
+      const sourceToDeleteFrom = productionSetup.sources.find((source) =>
+        source.stream_uuids?.includes(streamUuids[0])
+      );
+      deleteStream(streamUuids, productionSetup, sourceId)
+        .then(() => {
+          delete sourceToDeleteFrom?.stream_uuids;
+        })
+        .then(() =>
+          setTimeout(async () => {
+            const result = await createStream(
+              source,
+              productionSetup,
+              source.input_slot
+            );
+            if (result.ok) {
+              if (result.value.success) {
+                const newStreamUuids = result.value.streams.map(
+                  (r) => r.stream_uuid
+                );
+                if (sourceToDeleteFrom?._id) {
+                  replaceProductionSourceStreamIds(
+                    productionSetup._id,
+                    sourceToDeleteFrom?._id,
+                    newStreamUuids
+                  ).then(() => refreshProduction());
+                }
+              }
+            }
+          }, 1500)
+        );
     }
   };
 
@@ -510,7 +552,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     );
   }
 
-  const addSourceAction = (source: SourceWithId) => {
+  const addSourceAction = async (source: SourceWithId) => {
     if (productionSetup && productionSetup.isActive) {
       setSelectedSource(source);
       setAddSourceModal(true);
@@ -521,13 +563,60 @@ export default function ProductionConfiguration({ params }: PageProps) {
         label: source.ingest_source_name,
         input_slot: firstEmptySlot(productionSetup)
       };
-      addSource(input, productionSetup).then((updatedSetup) => {
-        if (!updatedSetup) return;
-        setProductionSetup(updatedSetup);
-        setAddSourceModal(false);
-        setSelectedSource(undefined);
-      });
+
+      let updatedSetup = addSetupItem(input, productionSetup);
+
+      if (!updatedSetup) return;
+
+      updatedSetup = await updatePipelinesWithSource(updatedSetup, source);
+
+      setProductionSetup(updatedSetup);
+      await putProduction(updatedSetup._id.toString(), updatedSetup);
+
+      setAddSourceModal(false);
+      setSelectedSource(undefined);
     }
+  };
+
+  const updatePipelinesWithSource = async (
+    productionSetup: Production,
+    source: SourceWithId
+  ): Promise<Production> => {
+    const updatedPipelines = await Promise.all(
+      productionSetup.production_settings.pipelines.map(async (pipeline) => {
+        const newSource = {
+          source_id: await getIngestSourceId(
+            source.ingest_name,
+            source.ingest_source_name
+          ),
+          settings: {
+            alignment_ms: pipeline.alignment_ms,
+            max_network_latency_ms: pipeline.max_network_latency_ms
+          }
+        };
+
+        const exists = pipeline.sources?.some(
+          (s) => s.source_id === newSource.source_id
+        );
+
+        const updatedSources = exists
+          ? pipeline.sources
+          : [...(pipeline.sources || []), newSource];
+
+        return {
+          ...pipeline,
+          sources: updatedSources
+        };
+      })
+    );
+
+    return {
+      ...productionSetup,
+      production_settings: {
+        ...productionSetup.production_settings,
+        pipelines: updatedPipelines
+      }
+    };
   };
 
   const addHtmlSource = (height: number, width: number, url: string) => {
@@ -992,11 +1081,20 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   onSourceUpdate={(source: SourceReference) => {
                     updateSource(source, productionSetup);
                   }}
-                  onSourceRemoval={(source: SourceReference) => {
+                  onSourceRemoval={async (
+                    source: SourceReference,
+                    ingestSource?: ISource
+                  ) => {
                     if (productionSetup && productionSetup.isActive) {
                       setSelectedSourceRef(source);
                       setRemoveSourceModal(true);
                     } else if (productionSetup) {
+                      const ingestSourceId = ingestSource
+                        ? await getIngestSourceId(
+                            ingestSource.ingest_name,
+                            ingestSource.ingest_source_name
+                          )
+                        : undefined;
                       const updatedSetup = removeSetupItem(
                         {
                           _id: source._id,
@@ -1004,7 +1102,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                           label: source.label,
                           input_slot: source.input_slot
                         },
-                        productionSetup
+                        productionSetup,
+                        ingestSourceId
                       );
                       if (!updatedSetup) return;
                       setProductionSetup(updatedSetup);

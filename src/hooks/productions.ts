@@ -116,3 +116,24 @@ export function usePutProductionPipelineSourceAlignmentAndLatency() {
     throw await response.text();
   };
 }
+
+export function useReplaceProductionSourceStreamIds() {
+  return async (
+    id: string,
+    sourceId: string | ObjectId,
+    stream_uuids: string[]
+  ): Promise<void> => {
+    const response = await fetch(
+      `/api/manager/productions/${id}/sources/${sourceId}`,
+      {
+        method: 'PUT',
+        headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
+        body: JSON.stringify({ stream_uuids })
+      }
+    );
+    if (response.ok) {
+      return;
+    }
+    throw await response.text();
+  };
+}

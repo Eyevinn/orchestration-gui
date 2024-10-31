@@ -9,14 +9,12 @@ import { getSourceThumbnail } from '../../utils/source';
 import { GlobalContext } from '../../contexts/GlobalContext';
 import { ConfigureAlignmentLatencyModal } from '../modal/ConfigureAlignmentLatencyModal';
 import { Production } from '../../interfaces/production';
-import { useDeleteHtmlSource } from '../../hooks/renderingEngine/useDeleteHtmlSource';
-import { useDeleteMediaSource } from '../../hooks/renderingEngine/useDeleteMediaSource';
 
 type SourceCardProps = {
   source?: ISource;
   loading: boolean;
   onSourceUpdate: (source: SourceReference) => void;
-  onSourceRemoval: (source: SourceReference) => void;
+  onSourceRemoval: (source: SourceReference, ingestSource?: ISource) => void;
   onSelectingText: (bool: boolean) => void;
   onConfirm: (
     source: ISource,
@@ -26,8 +24,9 @@ type SourceCardProps = {
       stream_uuid: string;
       alignment: number;
       latency: number;
-    }[]
-  ) => void;
+    }[],
+    shouldRestart?: boolean
+  ) => Promise<void>;
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   sourceRef?: SourceReference;
@@ -50,10 +49,13 @@ export default function SourceCard({
   const [isAlignmentModalOpen, setIsAlignmentModalOpen] = useState(false);
 
   const t = useTranslate();
-  const [deleteHtmlSource, deleteHtmlLoading] = useDeleteHtmlSource();
-  const [deleteMediaSource, deleteMediaLoading] = useDeleteMediaSource();
 
   const { locked } = useContext(GlobalContext);
+
+  const pipelinesAreSelected =
+    productionSetup?.production_settings.pipelines.some(
+      (pipeline) => pipeline.pipeline_id === undefined
+    ) === false;
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
@@ -90,6 +92,8 @@ export default function SourceCard({
       event.currentTarget.blur();
     }
   };
+
+  const closeAlignmentLatencyModal = () => setIsAlignmentModalOpen(false);
 
   return (
     <div
@@ -140,9 +144,14 @@ export default function SourceCard({
           })}
         </h2>
       )}
-      {productionSetup && productionSetup.isActive && source && (
+      {productionSetup && source && pipelinesAreSelected && (
         <button
-          className="absolute top-0 left-0 text-p hover:border bg-zinc-600 hover:bg-zinc-500 min-w-fit p-1 rounded-br-lg z-50"
+          disabled={locked}
+          className={`${
+            locked
+              ? 'bg-zinc-600/50'
+              : 'hover:border hover:bg-zinc-500 bg-zinc-600'
+          } absolute top-0 left-0 text-p   min-w-fit p-1 rounded-br-lg z-50`}
           onClick={() => setIsAlignmentModalOpen(true)}
         >
           <IconSettings className="text-p w-4 h-4" />
@@ -151,18 +160,24 @@ export default function SourceCard({
       {sourceRef && (
         <button
           disabled={locked}
-          className="absolute bottom-0 right-0 text-p hover:border-l hover:border-t bg-red-700 hover:bg-red-600 min-w-fit p-1 rounded-tl-lg z-20"
-          onClick={() => onSourceRemoval(sourceRef)}
+          className={`${
+            locked
+              ? 'bg-red-700/50'
+              : 'bg-red-700 hover:bg-red-600 hover:border-l hover:border-t'
+          } absolute bottom-0 right-0 text-p min-w-fit p-1 rounded-tl-lg z-20`}
+          onClick={() => onSourceRemoval(sourceRef, source)}
         >
           <IconTrash className="text-p w-4 h-4" />
         </button>
       )}
-      {source && productionSetup?.isActive && (
+      {source && productionSetup && (
         <ConfigureAlignmentLatencyModal
+          pipelinesAreSelected={pipelinesAreSelected}
           productionId={productionSetup._id}
           source={source}
           open={isAlignmentModalOpen}
-          onAbort={() => setIsAlignmentModalOpen(false)}
+          productionSetup={productionSetup}
+          onAbort={closeAlignmentLatencyModal}
           onConfirm={onConfirm}
           loading={loading}
         />

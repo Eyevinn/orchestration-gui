@@ -22,7 +22,7 @@ export default function SourceCards({
   loading: boolean;
   updateProduction: (updated: Production) => void;
   onSourceUpdate: (source: SourceReference) => void;
-  onSourceRemoval: (source: SourceReference) => void;
+  onSourceRemoval: (source: SourceReference, ingestSource?: ISource) => void;
   onConfirm: (
     source: ISource,
     sourceId: number,
@@ -31,8 +31,9 @@ export default function SourceCards({
       stream_uuid: string;
       alignment: number;
       latency: number;
-    }[]
-  ) => void;
+    }[],
+    shouldRestart?: boolean
+  ) => Promise<void>;
 }) {
   const [items, moveItem] = useDragableItems(productionSetup.sources);
   const [selectingText, setSelectingText] = useState(false);
