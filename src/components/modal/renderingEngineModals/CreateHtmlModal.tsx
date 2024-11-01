@@ -53,12 +53,12 @@ export function CreateHtmlModal({
   const handleCreate = () => {
     let hasError = false;
 
-    if (!height) {
+    if (!height || height < 20) {
       setHeightError(true);
       hasError = true;
     }
 
-    if (!width) {
+    if (!width || width < 20) {
       setWidthError(true);
       hasError = true;
     }
