@@ -8,9 +8,10 @@ import { useTranslate } from '../../i18n/useTranslate';
 import { usePostProduction } from '../../hooks/productions';
 import { refresh } from '../../utils/refresh';
 import { PresetDropdown } from '../startProduction/presetDropdown';
-import { Preset, PresetWithId } from '../../interfaces/preset';
+import { PresetWithId } from '../../interfaces/preset';
 import { useGetMultiviewLayout } from '../../hooks/multiviewLayout';
 import { MultiviewSettings } from '../../interfaces/multiview';
+import { Loader } from '../loader/Loader';
 
 export function CreateProduction() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export function CreateProduction() {
 
   const inputRef: LegacyRef<HTMLInputElement> = useRef<HTMLInputElement>(null);
   const [showing, setShowing] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedPreset, setSelectedPreset] = useState<PresetWithId>();
   const getMultiviewLayout = useGetMultiviewLayout();
 
@@ -29,6 +31,7 @@ export function CreateProduction() {
       return;
     }
     let defaultMultiview: MultiviewSettings | undefined;
+    setLoading(true);
     if (selectedPreset.default_multiview_reference) {
       const defaultMv = await getMultiviewLayout(
         selectedPreset.default_multiview_reference
@@ -40,13 +43,17 @@ export function CreateProduction() {
         for_pipeline_idx: 0
       };
     }
-    const insertedId = await postProduction(
-      name,
-      selectedPreset,
-      defaultMultiview
-    );
-    refresh('/');
-    router.push(`/production/${insertedId}`);
+    try {
+      const insertedId = await postProduction(
+        name,
+        selectedPreset,
+        defaultMultiview
+      );
+      refresh('/');
+      router.push(`/production/${insertedId}`);
+    } catch (e) {
+      setLoading(false);
+    }
   }, [router, postProduction]);
 
   const handleOpen = useCallback(
@@ -112,7 +119,7 @@ export function CreateProduction() {
                 className="hover:bg-button-hover-bg bg-button-bg"
                 onClick={handleCreateNew}
               >
-                {t('create')}
+                {loading ? <Loader className="w-10 h-8" /> : t('create')}
               </Button>
             </div>
           </div>

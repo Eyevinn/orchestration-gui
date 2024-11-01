@@ -65,17 +65,17 @@ const ProductionPage: React.FC<ProductionPageProps> = (props) => {
 
   // EVERY TIME THE PRODUCTION IS UPDATE -> UPLOAD IT TO DB
   useEffect(() => {
-    const newProduction = {
-      ...production,
-      name: productionName,
-      sources,
-      pipelines,
-      outputs,
-      multiviews,
-      control_connection: controlConnection
-    } as Production;
-    setProduction(newProduction);
     if (production?._id) {
+      const newProduction = {
+        ...production,
+        name: productionName,
+        sources,
+        pipelines,
+        outputs,
+        multiviews,
+        control_connection: controlConnection
+      } as Production;
+      setProduction(newProduction);
       putProduction(production._id, newProduction);
     }
   }, [
