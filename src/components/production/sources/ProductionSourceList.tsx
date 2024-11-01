@@ -40,7 +40,7 @@ const ProductionSourceList: React.FC<SourceListProps> = (props) => {
     ).map((source, index) => {
       return (
         <SourceListItem
-          actionText={actionText}
+          actionText={actionText || ''}
           key={`${source.ingest_source_name}-${index}`}
           source={source}
           disabled={isDisabledFunc?.(source)}
