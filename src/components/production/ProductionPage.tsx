@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslate } from '../../i18n/useTranslate';
 import ProductionMonitoring from './monitoring/ProductionMonitoring';
 import {
@@ -65,16 +65,18 @@ const ProductionPage: React.FC<ProductionPageProps> = (props) => {
 
   // EVERY TIME THE PRODUCTION IS UPDATE -> UPLOAD IT TO DB
   useEffect(() => {
+    const newProduction = {
+      ...production,
+      name: productionName,
+      sources,
+      pipelines,
+      outputs,
+      multiviews,
+      control_connection: controlConnection
+    } as Production;
+    setProduction(newProduction);
     if (production?._id) {
-      putProduction(production._id, {
-        ...production,
-        name: productionName,
-        sources,
-        pipelines,
-        outputs,
-        multiviews,
-        control_connection: controlConnection
-      });
+      putProduction(production._id, newProduction);
     }
   }, [
     productionName,
