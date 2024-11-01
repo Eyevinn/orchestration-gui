@@ -93,7 +93,7 @@ export const en = {
   production_configuration: 'Production Configuration',
   production: {
     productions: 'Productions',
-    add_source: 'Add ingest',
+    add_source: 'Add ingested',
     select_preset: 'Select Preset',
     clear_selection: 'Clear Selection',
     started: 'Production started: {{name}}',

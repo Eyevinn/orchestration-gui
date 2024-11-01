@@ -12,5 +12,18 @@ module.exports = {
   },
   images: {
     minimumCacheTTL: 0
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Permissions-Policy',
+            value: 'clipboard-write=(self)'
+          }
+        ]
+      }
+    ];
   }
 };
