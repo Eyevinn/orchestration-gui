@@ -6,7 +6,10 @@ import {
   SourceWithId
 } from '../../../../interfaces/Source';
 import { MultiviewSettings } from '../../../../interfaces/multiview';
-import { PipelineStreamSettings } from '../../../../interfaces/pipeline';
+import {
+  PipelineSettings,
+  PipelineStreamSettings
+} from '../../../../interfaces/pipeline';
 import { Production } from '../../../../interfaces/production';
 import { Result } from '../../../../interfaces/result';
 import { Log } from '../../../logger';
@@ -50,15 +53,14 @@ export async function getPipelineStreams(
 
 export async function createStream(
   source: SourceWithId,
-  production: Production,
+  pipelines: PipelineSettings[],
   input_slot: number
 ): Promise<Result<AddSourceResult>> {
   const sourceToPipelineStreams: SourceToPipelineStream[] = [];
   try {
     const allPipelines = await getPipelines();
-    const { production_settings } = production;
     const pipelinesToUseCompact = allPipelines.filter((pipeline) =>
-      production_settings.pipelines.some((p) => p.pipeline_id === pipeline.uuid)
+      pipelines.some((p) => p.pipeline_id === pipeline.uuid)
     );
 
     const usedPorts = await getCurrentlyUsedPorts(
@@ -89,7 +91,7 @@ export async function createStream(
 
     await initDedicatedPorts();
 
-    for (const pipeline of production_settings.pipelines) {
+    for (const pipeline of pipelines) {
       const availablePorts = getAvailablePortsForIngest(
         source.ingest_name,
         usedPorts
@@ -208,18 +210,16 @@ export async function createStream(
   }
 
   try {
-    if (!production.production_settings.pipelines[0].pipeline_id) {
-      Log().error(
-        `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`
-      );
-      throw `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`;
+    if (!pipelines[0].pipeline_id) {
+      Log().error(`Missing pipeline_id for: ${pipelines[0].pipeline_name}`);
+      throw `Missing pipeline_id for: ${pipelines[0].pipeline_name}`;
     }
     const multiviewsResponse = await getMultiviewsForPipeline(
-      production.production_settings.pipelines[0].pipeline_id
+      pipelines[0].pipeline_id
     );
 
     const multiviews = multiviewsResponse.filter((multiview) => {
-      const pipeline = production.production_settings.pipelines[0];
+      const pipeline = pipelines[0];
       const multiviewArray = pipeline.multiviews;
 
       if (Array.isArray(multiviewArray)) {
@@ -237,9 +237,9 @@ export async function createStream(
 
     if (multiviews.length === 0) {
       Log().error(
-        `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`
+        `No multiview found for pipeline: ${pipelines[0].pipeline_id}`
       );
-      throw `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`;
+      throw `No multiview found for pipeline: ${pipelines[0].pipeline_id}`;
     }
     multiviews.map(async (multiview) => {
       const views = multiview.layout.views;
@@ -278,7 +278,7 @@ export async function createStream(
       ];
 
       await updateMultiviewForPipeline(
-        production.production_settings.pipelines[0].pipeline_id!,
+        pipelines[0].pipeline_id!,
         multiview.id,
         updatedViews
       );

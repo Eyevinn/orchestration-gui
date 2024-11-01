@@ -85,12 +85,17 @@ export interface PipelineSettings {
 export interface PipelineOutput {
   uuid: string;
   settings: PipelineOutputEncoderSettings;
-  streams: PipelineOutputSettings[];
+  streams: PipelineOutputWithoutEncoderSettings[];
 }
 
 // In order for there to be multiple streams on the same output
 // all streams need to share encoder settings
 export type PipelineOutputEncoderSettings = Pick<
+  PipelineOutputSettings,
+  'video_format' | 'video_bit_depth' | 'video_kilobit_rate'
+>;
+
+export type PipelineOutputWithoutEncoderSettings = Omit<
   PipelineOutputSettings,
   'video_format' | 'video_bit_depth' | 'video_kilobit_rate'
 >;

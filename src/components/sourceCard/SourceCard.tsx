@@ -8,7 +8,7 @@ import ImageComponent from '../image/ImageComponent';
 import { getSourceThumbnail } from '../../utils/source';
 import { GlobalContext } from '../../contexts/GlobalContext';
 import { ConfigureAlignmentLatencyModal } from '../modal/ConfigureAlignmentLatencyModal';
-import { Production } from '../../interfaces/production';
+import { PipelineSettings } from '../../interfaces/pipeline';
 
 type SourceCardProps = {
   source?: ISource;
@@ -26,11 +26,13 @@ type SourceCardProps = {
       latency: number;
     }[],
     shouldRestart?: boolean
-  ) => Promise<void>;
+  ) => void;
   forwardedRef?: React.LegacyRef<HTMLDivElement>;
   style?: object;
   sourceRef?: SourceReference;
-  productionSetup?: Production;
+  productionId: string;
+  isProductionActive: boolean;
+  pipelines: PipelineSettings[];
 };
 
 export default function SourceCard({
@@ -43,7 +45,9 @@ export default function SourceCard({
   forwardedRef,
   style,
   sourceRef,
-  productionSetup
+  productionId,
+  isProductionActive,
+  pipelines
 }: SourceCardProps) {
   const [sourceLabel, setSourceLabel] = useState(sourceRef?.label || '');
   const [isAlignmentModalOpen, setIsAlignmentModalOpen] = useState(false);
@@ -53,9 +57,7 @@ export default function SourceCard({
   const { locked } = useContext(GlobalContext);
 
   const pipelinesAreSelected =
-    productionSetup?.production_settings.pipelines.some(
-      (pipeline) => pipeline.pipeline_id === undefined
-    ) === false;
+    pipelines.some((pipeline) => pipeline.pipeline_id === undefined) === false;
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
@@ -139,7 +141,7 @@ export default function SourceCard({
           })}
         </h2>
       )}
-      {productionSetup && source && pipelinesAreSelected && (
+      {pipelinesAreSelected && source && (
         <button
           disabled={locked}
           className={`${
@@ -165,16 +167,17 @@ export default function SourceCard({
           <IconTrash className="text-p w-4 h-4" />
         </button>
       )}
-      {source && productionSetup && (
+      {source && (
         <ConfigureAlignmentLatencyModal
           pipelinesAreSelected={pipelinesAreSelected}
-          productionId={productionSetup._id}
+          productionId={productionId}
           source={source}
           open={isAlignmentModalOpen}
-          productionSetup={productionSetup}
           onAbort={closeAlignmentLatencyModal}
           onConfirm={onConfirm}
           loading={loading}
+          isProductionActive={isProductionActive}
+          pipelinesProp={pipelines}
         />
       )}
     </div>

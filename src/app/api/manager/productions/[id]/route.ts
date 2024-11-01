@@ -25,8 +25,9 @@ export async function GET(
     const production = await getProduction(params.id);
     const prod = {
       ...production,
-      sources: production.sources.sort((a, b) => a.input_slot - b.input_slot),
-      _id: production._id.toString()
+      sources:
+        production?.sources.sort((a, b) => a.input_slot - b.input_slot) || [],
+      _id: production?._id.toString()
     };
     return new NextResponse(JSON.stringify(prod), { status: 200 });
   } catch (error) {

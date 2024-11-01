@@ -8,10 +8,11 @@ import { CallbackHook } from '../types';
 import { Result } from '../../interfaces/result';
 import { API_SECRET_KEY } from '../../utils/constants';
 import { MediaSource } from '../../interfaces/renderingEngine';
+import { PipelineSettings } from '../../interfaces/pipeline';
 
 export function useCreateMediaSource(): CallbackHook<
   (
-    production: Production,
+    pipelines: PipelineSettings[],
     inputSlot: number,
     mediaBody: MediaSource,
     source: SourceReference
@@ -20,7 +21,7 @@ export function useCreateMediaSource(): CallbackHook<
   const [loading, setLoading] = useState<boolean>(false);
 
   const createMediaSource = async (
-    production: Production,
+    pipelines: PipelineSettings[],
     inputSlot: number,
     mediaBody: MediaSource,
     source: SourceReference
@@ -31,7 +32,7 @@ export function useCreateMediaSource(): CallbackHook<
       method: 'POST',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({
-        production: production,
+        pipelines,
         inputSlot: inputSlot,
         mediaBody: mediaBody,
         source: source

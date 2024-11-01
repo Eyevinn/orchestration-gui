@@ -11,17 +11,18 @@ import {
   ResourcesIngestStreamResponse
 } from '../../../types/ateliere-live';
 import Input from '../input/Input';
-import { Production } from '../../interfaces/production';
 import { RestartStreamModal } from './RestartStreamModal';
 import { GetPipelines } from '../../hooks/pipelines';
+import { PipelineSettings } from '../../interfaces/pipeline';
 
 type ConfigureAlignmentModalProps = {
   productionId: string;
   source: ISource;
   open: boolean;
   loading: boolean;
-  productionSetup: Production;
+  pipelinesProp: PipelineSettings[];
   pipelinesAreSelected?: boolean;
+  isProductionActive: boolean;
   onAbort: () => void;
   onConfirm: (
     source: ISource,
@@ -53,8 +54,9 @@ export function ConfigureAlignmentLatencyModal({
   source,
   open,
   loading,
-  productionSetup,
+  pipelinesProp,
   pipelinesAreSelected,
+  isProductionActive,
   onAbort,
   onConfirm
 }: ConfigureAlignmentModalProps) {
@@ -84,7 +86,7 @@ export function ConfigureAlignmentLatencyModal({
 
   useEffect(() => {
     if (pipelinesAreSelected) {
-      const productionPipelines = productionSetup.production_settings.pipelines;
+      const productionPipelines = pipelinesProp;
       for (const pipeline of productionPipelines) {
         if (latencies[pipeline.pipeline_id || ''] === undefined) {
           latencies[pipeline.pipeline_id || ''] =
@@ -165,32 +167,30 @@ export function ConfigureAlignmentLatencyModal({
       (key) => previousLatenciesRef.current[key] !== latencies[key]
     );
 
-    if (latenciesChanged && productionSetup.isActive) {
+    if (latenciesChanged && isProductionActive) {
       setShowRestartStreamModal(true);
     }
 
-    if (sourceStreams && sourceStreams.length > 0 && productionSetup.isActive) {
+    if (sourceStreams && sourceStreams.length > 0 && isProductionActive) {
       alignmentData = sourceStreams.map((stream) => ({
         pipeline_uuid: stream.pipeline_uuid,
         stream_uuid: stream.stream_uuid,
         alignment: alignments[stream.pipeline_uuid],
         latency: latencies[stream.pipeline_uuid]
       }));
-    } else if (!productionSetup.isActive) {
-      alignmentData = productionSetup.production_settings.pipelines.map(
-        (pipeline) => ({
-          pipeline_uuid: pipeline.pipeline_id || '',
-          stream_uuid: '',
-          alignment: alignments[pipeline.pipeline_id || ''],
-          latency: latencies[pipeline.pipeline_id || '']
-        })
-      );
+    } else if (!isProductionActive) {
+      alignmentData = pipelinesProp.map((pipeline) => ({
+        pipeline_uuid: pipeline.pipeline_id || '',
+        stream_uuid: '',
+        alignment: alignments[pipeline.pipeline_id || ''],
+        latency: latencies[pipeline.pipeline_id || '']
+      }));
     }
 
     const errors: Record<string, boolean> = {};
     let hasError = false;
 
-    if (sourceStreams.length > 0 && productionSetup.isActive) {
+    if (sourceStreams.length > 0 && isProductionActive) {
       sourceStreams.forEach((stream) => {
         if (
           alignments[stream.pipeline_uuid] < latencies[stream.pipeline_uuid]
@@ -222,8 +222,8 @@ export function ConfigureAlignmentLatencyModal({
           handleCloseModal();
         }
       }
-    } else if (!productionSetup.isActive) {
-      productionSetup.production_settings.pipelines.forEach((pipeline) => {
+    } else if (!isProductionActive) {
+      pipelinesProp.forEach((pipeline) => {
         if (
           alignments[pipeline.pipeline_id || ''] <
           latencies[pipeline.pipeline_id || '']
@@ -303,7 +303,7 @@ export function ConfigureAlignmentLatencyModal({
           {t('configure_alignment_latency.source_name')}: {source.name}
         </p>
         <div className="mt-12 mb-2 flex flex-col w-full space-y-6">
-          {productionSetup.isActive &&
+          {isProductionActive &&
             sourceStreams.map((stream, index) => (
               <div key={index}>
                 <p className="text-md font-bold">
@@ -342,47 +342,45 @@ export function ConfigureAlignmentLatencyModal({
                 )}
               </div>
             ))}
-          {!productionSetup.isActive &&
-            productionSetup.production_settings.pipelines.map(
-              (pipeline, index) => (
-                <div key={index}>
-                  <p className="text-md font-bold">
-                    {getPipelineName(pipeline.pipeline_id || '')}
+          {!isProductionActive &&
+            pipelinesProp.map((pipeline, index) => (
+              <div key={index}>
+                <p className="text-md font-bold">
+                  {getPipelineName(pipeline.pipeline_id || '')}
+                </p>
+                <p className="mt-1">Alignment (ms): </p>
+                <Input
+                  className="mt-2 w-full"
+                  type="number"
+                  value={alignments[pipeline.pipeline_id || ''] || ''}
+                  onChange={(e) =>
+                    handleInputChange(
+                      pipeline.pipeline_id || '',
+                      e.target.valueAsNumber,
+                      'alignment'
+                    )
+                  }
+                />
+                <p className="mt-2">Latency (ms): </p>
+                <Input
+                  className="mt-2 w-full"
+                  type="number"
+                  value={latencies[pipeline.pipeline_id || ''] || ''}
+                  onChange={(e) =>
+                    handleInputChange(
+                      pipeline.pipeline_id || '',
+                      e.target.valueAsNumber,
+                      'latency'
+                    )
+                  }
+                />
+                {inputErrors[pipeline.pipeline_id || ''] && (
+                  <p className="text-button-delete">
+                    {t('configure_alignment_latency.error')}
                   </p>
-                  <p className="mt-1">Alignment (ms): </p>
-                  <Input
-                    className="mt-2 w-full"
-                    type="number"
-                    value={alignments[pipeline.pipeline_id || ''] || ''}
-                    onChange={(e) =>
-                      handleInputChange(
-                        pipeline.pipeline_id || '',
-                        e.target.valueAsNumber,
-                        'alignment'
-                      )
-                    }
-                  />
-                  <p className="mt-2">Latency (ms): </p>
-                  <Input
-                    className="mt-2 w-full"
-                    type="number"
-                    value={latencies[pipeline.pipeline_id || ''] || ''}
-                    onChange={(e) =>
-                      handleInputChange(
-                        pipeline.pipeline_id || '',
-                        e.target.valueAsNumber,
-                        'latency'
-                      )
-                    }
-                  />
-                  {inputErrors[pipeline.pipeline_id || ''] && (
-                    <p className="text-button-delete">
-                      {t('configure_alignment_latency.error')}
-                    </p>
-                  )}
-                </div>
-              )
-            )}
+                )}
+              </div>
+            ))}
         </div>
         <div className="flex flex-row justify-between mt-8">
           <Button

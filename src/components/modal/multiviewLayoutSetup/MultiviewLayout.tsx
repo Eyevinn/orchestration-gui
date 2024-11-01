@@ -1,6 +1,6 @@
-import { TListSource } from '../../../../interfaces/multiview';
-import { MultiviewPreset } from '../../../../interfaces/preset';
-import Options from '../../configureOutputModal/Options';
+import { TListSource } from '../../../interfaces/multiview';
+import { MultiviewPreset } from '../../../interfaces/preset';
+import Options from '../configureOutputModal/Options';
 
 export default function MultiviewLayout({
   multiviewPresetLayout,

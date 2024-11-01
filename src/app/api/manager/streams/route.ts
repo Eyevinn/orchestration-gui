@@ -4,9 +4,10 @@ import { SourceWithId } from '../../../../interfaces/Source';
 import { Production } from '../../../../interfaces/production';
 import { createStream } from '../../../../api/ateliereLive/pipelines/streams/streams';
 import { Log } from '../../../../api/logger';
+import { PipelineSettings } from '../../../../interfaces/pipeline';
 export type CreateStreamRequestBody = {
   source: SourceWithId;
-  production: Production;
+  pipelines: PipelineSettings[];
   input_slot: number;
 };
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   return await createStream(
     createStreamRequest.source,
-    createStreamRequest.production,
+    createStreamRequest.pipelines,
     createStreamRequest.input_slot
   )
     .then((response) => {

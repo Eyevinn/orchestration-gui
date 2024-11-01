@@ -1,7 +1,6 @@
 import { SourceReference, SourceWithId } from './../../interfaces/Source';
 import {
   Production,
-  ProductionSettings,
   StartProductionStep,
   StopProductionStep
 } from '../../interfaces/production';
@@ -61,6 +60,7 @@ import {
   deleteHtmlFromPipeline,
   deleteMediaFromPipeline
 } from '../ateliereLive/pipelines/renderingengine/renderingengine';
+import cloneDeep from 'lodash.clonedeep';
 
 const isUsed = (pipeline: ResourcesPipelineResponse) => {
   const hasStreams = pipeline.streams.length > 0;
@@ -81,7 +81,7 @@ const isUsed = (pipeline: ResourcesPipelineResponse) => {
 
 async function connectIngestSources(
   productionSources: SourceReference[],
-  productionSettings: ProductionSettings,
+  production: Production,
   sources: SourceWithId[],
   usedPorts: Set<number>
 ) {
@@ -109,7 +109,7 @@ async function connectIngestSources(
     const newAudioMapping = audioSettings?.audio_stream?.audio_mapping;
     const audioMapping = newAudioMapping?.length ? newAudioMapping : [[0, 1]];
 
-    for (const pipeline of productionSettings.pipelines) {
+    for (const pipeline of production.pipelines) {
       const availablePorts = getAvailablePortsForIngest(
         source.ingest_name,
         usedPorts
@@ -195,19 +195,16 @@ async function connectIngestSources(
   return sourceToPipelineStreams;
 }
 
-async function insertPipelineUuid(productionSettings: ProductionSettings) {
+async function insertPipelineUuid(production: Production) {
   const availablePipelines = await getPipelines().catch((error) => {
-    Log().error(
-      `Failed to get pipeline IDs for '${productionSettings.name}'`,
-      error
-    );
-    throw `Failed to get pipeline IDs for '${productionSettings.name}: ${error.message}'`;
+    Log().error(`Failed to get pipeline IDs for '${production.name}'`, error);
+    throw `Failed to get pipeline IDs for '${production.name}: ${error.message}'`;
   });
 
-  for (const pipelinePreset of productionSettings.pipelines) {
+  for (const pipelinePreset of production.pipelines) {
     const pipeline = availablePipelines.find(
       (p: ResourcesCompactPipelineResponse) =>
-        p.name === pipelinePreset.pipeline_name
+        p.uuid === pipelinePreset.pipeline_id
     );
     if (pipeline) {
       pipelinePreset.pipeline_id = pipeline.uuid;
@@ -330,16 +327,14 @@ export async function stopProduction(
       success: true
     } as StopProductionStep
   };
-  const pipelineIds = production.production_settings.pipelines.map(
-    (p) => p.pipeline_id
-  );
+  const pipelineIds = production.pipelines.map((p) => p.pipeline_id);
 
   const productionHasRenderingEngineSources = production.sources.some(
     (source) => source.type === 'html' || source.type === 'mediaplayer'
   );
 
   if (productionHasRenderingEngineSources) {
-    for (const pipeline of production.production_settings.pipelines) {
+    for (const pipeline of production.pipelines) {
       const pipelineId = pipeline.pipeline_id;
       if (pipelineId) {
         const pipelineRenderingEngine = await getPipelineRenderingEngine(
@@ -350,7 +345,7 @@ export async function stopProduction(
         const mediaSources = pipelineRenderingEngine.media;
 
         if (htmlSources.length > 0 && htmlSources) {
-          for (const pipeline of production.production_settings.pipelines) {
+          for (const pipeline of production.pipelines) {
             for (const htmlSource of htmlSources) {
               const pipelineId = pipeline.pipeline_id;
               if (pipelineId !== undefined) {
@@ -359,9 +354,8 @@ export async function stopProduction(
             }
           }
         }
-
         if (mediaSources.length > 0 && mediaSources) {
-          for (const pipeline of production.production_settings.pipelines) {
+          for (const pipeline of production.pipelines) {
             for (const mediaSource of mediaSources) {
               const pipelineId = pipeline.pipeline_id;
               if (pipelineId !== undefined) {
@@ -509,9 +503,8 @@ export async function stopProduction(
 export async function startProduction(
   production: Production
 ): Promise<Result<StartProductionStep[]>> {
-  const { production_settings } = production;
   Log().info(
-    `Starting production '${production.name}' with preset '${production_settings.name}'`
+    `Starting production '${production.name}' with preset '${production.preset_name}'`
   );
 
   await initDedicatedPorts();
@@ -541,17 +534,15 @@ export async function startProduction(
       throw "Can't get source!";
     });
 
-    // Lookup pipeline UUIDs from pipeline names and insert to production_settings
-    await insertPipelineUuid(production_settings).catch((error) => {
+    // Lookup pipeline UUIDs from pipeline names and insert to production
+    await insertPipelineUuid(production).catch((error) => {
       throw error;
     });
 
     // Fetch expanded pipeline objects from Ateliere Live
-    const pipelinesToUsePromises = production_settings.pipelines.map(
-      (pipeline) => {
-        return getPipeline(pipeline.pipeline_id!);
-      }
-    );
+    const pipelinesToUsePromises = production.pipelines.map((pipeline) => {
+      return getPipeline(pipeline.pipeline_id!);
+    });
     const pipelinesToUse = await Promise.all(pipelinesToUsePromises);
 
     // Check if pipelines are already in use by another production
@@ -570,11 +561,9 @@ export async function startProduction(
       )}`;
     }
 
-    const resetPipelinePromises = production_settings.pipelines.map(
-      (pipeline) => {
-        return resetPipeline(pipeline.pipeline_id!);
-      }
-    );
+    const resetPipelinePromises = production.pipelines.map((pipeline) => {
+      return resetPipeline(pipeline.pipeline_id!);
+    });
     await Promise.all(resetPipelinePromises).catch((error) => {
       throw `Failed to reset pipelines: ${error}`;
     });
@@ -583,8 +572,8 @@ export async function startProduction(
     const allControlPanels = await getControlPanels();
     // Check which control panels that should be used by this production
     const controlPanelsToUse = allControlPanels.filter((controlPanel) =>
-      production.production_settings.control_connection.control_panel_name?.includes(
-        controlPanel.name
+      production.control_connection?.control_panel_ids?.includes(
+        controlPanel.uuid
       )
     );
     // Check if control panels are already in use by another production
@@ -606,7 +595,7 @@ export async function startProduction(
     // TODO: Is this really neccessary? We have checked that pipeline and controlpanels are not in use by another production
     // can they still be in a state where we need to stop them? Removing streams and multiviews might be left to do though..
     await stopPipelines(
-      production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
+      production.pipelines.map((pipeline) => pipeline.pipeline_id!)
     ).catch((error) => {
       throw `Failed to stop pipelines during startup: ${error}`;
     });
@@ -619,13 +608,13 @@ export async function startProduction(
     );
     streams = await connectIngestSources(
       production.sources,
-      production_settings,
+      production,
       sources,
       usedPorts
     ).catch(async (error) => {
       Log().error('Stopping pipelines');
       await stopPipelines(
-        production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
+        production.pipelines.map((pipeline) => pipeline.pipeline_id!)
       ).catch((error) => {
         throw `Failed to stop pipelines after production start failure: ${error}`;
       });
@@ -653,19 +642,21 @@ export async function startProduction(
 
   // Try to connect control panels and pipeline-to-pipeline connections start
   try {
-    // TODO: This will re-fetch pipelines from the Ateliere Live API, but we fetched them above into pipelinesToUse
-    await connectControlPanelToPipeline(
-      production_settings.control_connection,
-      production_settings.pipelines
-    ).catch(async (error) => {
-      Log().error('Stopping pipelines');
-      await stopPipelines(
-        production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
-      ).catch((error) => {
-        throw `Failed to stop pipelines after production start failure: ${error}`;
+    if (production.control_connection) {
+      // TODO: This will re-fetch pipelines from the Ateliere Live API, but we fetched them above into pipelinesToUse
+      await connectControlPanelToPipeline(
+        production.control_connection,
+        production.pipelines
+      ).catch(async (error) => {
+        Log().error('Stopping pipelines');
+        await stopPipelines(
+          production.pipelines.map((pipeline) => pipeline.pipeline_id!)
+        ).catch((error) => {
+          throw `Failed to stop pipelines after production start failure: ${error}`;
+        });
+        throw error;
       });
-      throw error;
-    });
+    }
   } catch (error) {
     Log().error('Could not setup control panels');
     Log().error(error);
@@ -693,15 +684,15 @@ export async function startProduction(
 
   // Try to setup pipeline outputs start
   try {
-    for (const pipeline of production_settings.pipelines) {
-      await createPipelineOutputs(pipeline);
+    for (const [index, pipeline] of production.pipelines.entries()) {
+      await createPipelineOutputs(pipeline, production.outputs[index]);
     }
   } catch (e) {
     Log().error('Could not setup pipeline outputs');
     Log().error(e);
     Log().error('Stopping pipelines');
     await stopPipelines(
-      production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
+      production.pipelines.map((pipeline) => pipeline.pipeline_id!)
     ).catch((error) => {
       throw `Failed to stop pipelines after production start failure: ${error}`;
     });
@@ -732,7 +723,7 @@ export async function startProduction(
   // Try to setup pipeline outputs end
   // Try to setup multiviews start
   try {
-    if (!production.production_settings.pipelines[0].multiviews) {
+    if (!production.multiviews) {
       Log().error(
         `No multiview settings specified for production: ${production.name}`
       );
@@ -740,31 +731,30 @@ export async function startProduction(
     }
 
     const runtimeMultiviews = await createMultiviewForPipeline(
-      production_settings,
-      production.sources
+      production
     ).catch(async (error) => {
       Log().error(
-        `Failed to create multiview for pipeline '${production_settings.pipelines[0].pipeline_name}/${production_settings.pipelines[0].pipeline_id}'`,
+        `Failed to create multiview for pipeline '${production.pipelines[0].pipeline_readable_name}/${production.pipelines[0].pipeline_id}'`,
         error
       );
       Log().error('Stopping pipelines');
       await stopPipelines(
-        production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
+        production.pipelines.map((pipeline) => pipeline.pipeline_id!)
       ).catch((error) => {
         throw `Failed to stop pipelines after production start failure: ${error}`;
       });
-      throw `Failed to create multiview for pipeline '${production_settings.pipelines[0].pipeline_name}/${production_settings.pipelines[0].pipeline_id}': ${error}`;
+      throw `Failed to create multiview for pipeline '${production.pipelines[0].pipeline_readable_name}/${production.pipelines[0].pipeline_id}': ${error}`;
     });
 
     runtimeMultiviews.flatMap((runtimeMultiview, index) => {
-      const multiview = production.production_settings.pipelines[0].multiviews;
+      const multiview = production.pipelines[0].multiviews;
       if (multiview && multiview[index]) {
         return (multiview[index].multiview_id = runtimeMultiview.id);
       }
     });
 
     Log().info(
-      `Production '${production.name}' with preset '${production_settings.name}' started`
+      `Production '${production.name}' with preset '${production.name}' started`
     );
   } catch (e) {
     Log().error('Could not start multiviews');
@@ -812,7 +802,7 @@ export async function startProduction(
           input_slot: htmlSource.input_slot
         };
         await createPipelineHtmlSource(
-          production,
+          production.pipelines,
           htmlSource.input_slot,
           htmlData,
           htmlSource
@@ -828,7 +818,7 @@ export async function startProduction(
         input_slot: mediaSource.input_slot
       };
       await createPipelineMediaSource(
-        production,
+        production.pipelines,
         mediaSource.input_slot,
         mediaData,
         mediaSource
@@ -849,6 +839,7 @@ export async function startProduction(
     // Store updated production in database
     await putProduction(production._id.toString(), {
       ...production,
+      isActive: true,
       sources: production.sources.map((source) => {
         const streamsForSource = streams?.filter(
           (stream) => stream.source_id === source._id?.toString()
@@ -860,46 +851,41 @@ export async function startProduction(
           input_slot: source.input_slot
         };
       }),
-      production_settings: {
-        ...production.production_settings,
-        pipelines: await Promise.all(
-          production.production_settings.pipelines.map(async (pipeline) => {
-            const newSources = await Promise.all(
-              sourcesWithId.map(async (source) => {
-                const ingestUuid = await getUuidFromIngestName(
-                  source.ingest_name
-                );
-                const sourceId = await getSourceIdFromSourceName(
-                  ingestUuid || '',
-                  source.ingest_source_name
-                );
+      pipelines: await Promise.all(
+        production.pipelines.map(async (pipeline) => {
+          const newSources = await Promise.all(
+            sourcesWithId.map(async (source) => {
+              const ingestUuid = await getUuidFromIngestName(
+                source.ingest_name
+              );
+              const sourceId = await getSourceIdFromSourceName(
+                ingestUuid || '',
+                source.ingest_source_name
+              );
+              const currentSettings = pipeline.sources?.find(
+                (s) => s.source_id === sourceId
+              )?.settings;
 
-                const currentSettings = pipeline.sources?.find(
-                  (s) => s.source_id === sourceId
-                )?.settings;
-
-                return {
-                  source_id: sourceId || 0,
-                  settings: {
-                    alignment_ms:
-                      currentSettings?.alignment_ms ?? pipeline.alignment_ms,
-                    max_network_latency_ms:
-                      currentSettings?.max_network_latency_ms ??
-                      pipeline.max_network_latency_ms
-                  }
-                };
-              })
-            );
-            return { ...pipeline, sources: newSources };
-          })
-        )
-      },
-      isActive: true
+              return {
+                source_id: sourceId || 0,
+                settings: {
+                  alignment_ms:
+                    currentSettings?.alignment_ms ?? pipeline.alignment_ms,
+                  max_network_latency_ms:
+                    currentSettings?.max_network_latency_ms ??
+                    pipeline.max_network_latency_ms
+                }
+              };
+            })
+          );
+          return { ...pipeline, sources: newSources };
+        })
+      )
     }).catch(async (error) => {
       Log().error(error);
       Log().error('Stopping pipelines');
       await stopPipelines(
-        production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
+        production.pipelines.map((pipeline) => pipeline.pipeline_id!)
       ).catch((error) => {
         throw `Failed to stop pipelines after production start failure: ${error}`;
       });
@@ -973,7 +959,7 @@ export async function startProduction(
   } catch (error) {
     Log().error('Stopping pipelines, error: ', error);
     await stopPipelines(
-      production_settings.pipelines.map((pipeline) => pipeline.pipeline_id!)
+      production.pipelines.map((pipeline) => pipeline.pipeline_id!)
     ).catch((error) => {
       throw `Failed to stop pipelines after production start failure: ${error}`;
     });
@@ -1003,7 +989,7 @@ export async function postMultiviewersOnRunningProduction(
   additions: MultiviewSettings[]
 ) {
   try {
-    const multiview = production.production_settings.pipelines[0].multiviews;
+    const multiview = production.multiviews;
     if (!multiview) {
       Log().error(
         `No multiview settings specified for production: ${production.name}`
@@ -1011,25 +997,16 @@ export async function postMultiviewersOnRunningProduction(
       throw `No multiview settings specified for production: ${production.name}`;
     }
 
-    const productionSettings = {
-      ...production.production_settings,
-      pipelines: production.production_settings.pipelines.map((pipeline) => {
-        return {
-          ...pipeline,
-          multiviews: additions
-        };
-      })
-    };
-
+    const newProduction = cloneDeep(production);
+    newProduction.multiviews = additions;
     const runtimeMultiviews = await createMultiviewForPipeline(
-      productionSettings,
-      production.sources
+      newProduction
     ).catch(async (error) => {
       Log().error(
-        `Failed to create multiview for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}'`,
+        `Failed to create multiview for pipeline '${newProduction.pipelines[0].pipeline_name}/${newProduction.pipelines[0].pipeline_id}'`,
         error
       );
-      throw `Failed to create multiview for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}': ${error}`;
+      throw `Failed to create multiview for pipeline '${newProduction.pipelines[0].pipeline_name}/${newProduction.pipelines[0].pipeline_id}': ${error}`;
     });
 
     const multiviewsWithUpdatedId: MultiviewSettings[] = [
@@ -1044,18 +1021,10 @@ export async function postMultiviewersOnRunningProduction(
 
     await putProduction(production._id.toString(), {
       ...production,
-      production_settings: {
-        ...production.production_settings,
-        pipelines: production.production_settings.pipelines.map((pipeline) => {
-          return {
-            ...pipeline,
-            multiviews: multiviewsWithUpdatedId
-          };
-        })
-      }
+      multiviews: multiviewsWithUpdatedId
     }).catch(async (error) => {
       Log().error(
-        `Failed to save multiviews for pipeline '${productionSettings.pipelines[0].pipeline_name}/${productionSettings.pipelines[0].pipeline_id}' to database`,
+        `Failed to save multiviews for pipeline '${newProduction.pipelines[0].pipeline_name}/${newProduction.pipelines[0].pipeline_id}' to database`,
         error
       );
       throw error;
@@ -1116,12 +1085,9 @@ export async function putMultiviewersOnRunningProduction(
     updates.map(async (multiview) => {
       const views = multiview.layout.views;
 
-      if (
-        multiview.multiview_id &&
-        production.production_settings.pipelines[0].pipeline_id
-      ) {
+      if (multiview.multiview_id && production.pipelines[0].pipeline_id) {
         await updateMultiviewForPipeline(
-          production.production_settings.pipelines[0].pipeline_id,
+          production.pipelines[0].pipeline_id,
           multiview.multiview_id,
           views
         );
@@ -1180,18 +1146,15 @@ export async function deleteMultiviewersOnRunningProduction(
   removals: MultiviewSettings[]
 ) {
   try {
-    const pipeline = production.production_settings.pipelines.find((p) =>
-      p.multiviews ? p.multiviews?.length > 0 : undefined
-    );
-    const multiviewIndexArray = pipeline?.multiviews
-      ? pipeline.multiviews.map((p) => p.for_pipeline_idx)
+    const multiviewIndexArray = production.multiviews
+      ? production.multiviews.map((p) => p.for_pipeline_idx)
       : undefined;
 
     const multiviewIndex = multiviewIndexArray?.find((p) => p !== undefined);
 
     const pipelineUUID =
       multiviewIndex !== undefined
-        ? production.production_settings.pipelines[multiviewIndex].pipeline_id
+        ? production.pipelines[multiviewIndex].pipeline_id
         : undefined;
 
     if (!pipelineUUID) return;

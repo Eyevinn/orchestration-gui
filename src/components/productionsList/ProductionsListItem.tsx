@@ -113,38 +113,63 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
     refresh('/'); // TODO: Only refresh incase of a "failed" stop attempt
   };
   const isConfigured = (production: Production) => {
-    if (!production.production_settings) return false;
-    const hasSetPipelines = production.production_settings.pipelines.every(
-      (p) => p.pipeline_name
-    );
+    if (!production) return false;
+    const hasSetPipelines = production.pipelines?.every((p) => p.pipeline_id);
     const hasSetControlPanels =
-      production.production_settings.control_connection.control_panel_name;
+      !!production.control_connection?.control_panel_ids?.length;
     return hasSetPipelines && hasSetControlPanels;
   };
+  const isOutdated = (production: any) => {
+    if (!production) return false;
+    return !!production.production_settings;
+  };
+
   return (
     <li className="flex space-x-4 m-2 p-3 pb-3 sm:pb-4 bg-container rounded shadow-md">
-      <Link
-        className="flex items-center space-x-4 flex-1"
-        href={`/production/${production._id}`}
-      >
-        <div className="flex justify-start items-center w-6">
-          {production.isActive ? (
-            <RunningIndication running={production.isActive} />
-          ) : (
-            <IconServerCog className="min-w-max text-brand" />
-          )}
+      {(!isOutdated(production) && (
+        <Link
+          className="flex items-center space-x-4 flex-1"
+          href={`/production/${production._id}`}
+        >
+          <div className="flex justify-start items-center w-6">
+            {production.isActive ? (
+              <RunningIndication running={production.isActive} />
+            ) : (
+              <IconServerCog className="min-w-max text-brand" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0 flex-row">
+            <p className="text-sm font-medium text-p truncate inline-flex w-96">
+              {production.name}
+            </p>
+          </div>
+        </Link>
+      )) || (
+        <div className="flex items-center space-x-4 flex-1">
+          <div className="flex justify-start items-center w-6">
+            {production.isActive ? (
+              <RunningIndication running={production.isActive} />
+            ) : (
+              <IconServerCog className="min-w-max text-brand" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0 flex-row">
+            <p className="text-sm font-medium text-p truncate inline-flex w-96">
+              {production.name}
+            </p>
+            {isOutdated(production) && (
+              <p className="ml-4 text-sm font-medium text-p truncate italic text-gray-800 inline-flex">
+                This production is outdated and can only be deleted
+              </p>
+            )}
+          </div>
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-p truncate">
-            {production.name}
-          </p>
-        </div>
-      </Link>
+      )}
       <div className="flex space-x-4">
         {production.isActive && (
           <MonitoringButton id={production._id.toString()} />
         )}
-        {isConfigured(production) && (
+        {isConfigured(production) && !isOutdated(production) && (
           <div
             onClick={() => handleStartStopButtonClick()}
             className={`${

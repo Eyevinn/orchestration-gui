@@ -1,47 +1,33 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DropDown from './DropDown';
+import useEffectNotOnMount from '../../hooks/utils/useEffectNotOnMount';
 
 type PipelineNamesDropDownProps = {
   label: string;
-  options?: { option: string; available: boolean; id: string }[];
-  initial?: string;
-  setSelectedPipelineName: (
-    pipelineIndex: number,
-    pipelineName?: string,
-    id?: string
-  ) => void;
-  pipelineIndex: number;
-  disabled: boolean;
+  options: { option: string; available: boolean; id: string }[];
+  disabled?: boolean;
+  value: string;
+  onChange: (id: string) => void;
 };
 export default function PipelineNamesDropDown({
   label,
   options,
-  setSelectedPipelineName,
-  pipelineIndex,
-  initial,
-  disabled
+  disabled = false,
+  value,
+  onChange
 }: PipelineNamesDropDownProps) {
-  const [selected, setSelected] = useState<string | undefined>(initial);
-  useEffect(() => {
-    const id = options?.find((o) => o.option === selected)?.id;
-    setSelectedPipelineName(pipelineIndex, selected, id);
-  }, [selected]);
+  const [selectedOption, setSelectedOption] = useState<string | undefined>(
+    options.find((o) => o.id === value)?.option
+  );
 
-  const handleSetSelected = (option: string) => {
-    setSelected((prevState) => {
-      if (prevState === option) return undefined;
-      return option;
-    });
-  };
-  useEffect(() => {
-    if (!options || options.length === 0) return;
-    const initialDoesNotExist = !options?.find((o) => o.option === initial);
-    if (initialDoesNotExist || !initial) {
-      setSelected(undefined);
-    } else {
-      setSelected(initial);
+  useEffectNotOnMount(() => {
+    if (options) {
+      const foundOptionID = options.find(
+        (o) => o.option === selectedOption
+      )?.id;
+      onChange(foundOptionID || '');
     }
-  }, [initial]);
+  }, [selectedOption]);
 
   return (
     <div>
@@ -50,8 +36,8 @@ export default function PipelineNamesDropDown({
         title="Select pipeline"
         label={label}
         options={options}
-        selected={selected}
-        setSelected={handleSetSelected}
+        selected={selectedOption}
+        setSelected={setSelectedOption}
       />
     </div>
   );

@@ -5,9 +5,10 @@ import { Log } from '../../../../../api/logger';
 import { HTMLSource } from '../../../../../interfaces/renderingEngine';
 import { Production } from '../../../../../interfaces/production';
 import { SourceReference } from '../../../../../interfaces/Source';
+import { PipelineSettings } from '../../../../../interfaces/pipeline';
 
 export type CreateHtmlRequestBody = {
-  production: Production;
+  pipelines: PipelineSettings[];
   htmlBody: HTMLSource;
   inputSlot: number;
   source: SourceReference;
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const createHtmlRequest = data as CreateHtmlRequestBody;
 
   return await createPipelineHtmlSource(
-    createHtmlRequest.production,
+    createHtmlRequest.pipelines,
     createHtmlRequest.inputSlot,
     createHtmlRequest.htmlBody,
     createHtmlRequest.source

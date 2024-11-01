@@ -13,6 +13,7 @@ module.exports = {
   images: {
     minimumCacheTTL: 0
   },
+  reactStrictMode: false,
   async headers() {
     return [
       {
