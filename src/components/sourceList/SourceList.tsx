@@ -70,7 +70,7 @@ const SourceList: React.FC<SourceListProps> = (props) => {
                 }
               />
               {onClose && (
-                <button className="flex justify-end">
+                <button className="flex h-12 justify-end">
                   <IconX
                     className="h-full w-8 ml-2 text-brand"
                     onClick={onClose}

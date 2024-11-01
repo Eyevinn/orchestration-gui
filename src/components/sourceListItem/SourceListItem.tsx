@@ -17,6 +17,7 @@ type SourceListItemProps = {
   actionText: string;
   disabled: unknown;
   locked: boolean;
+  className?: string;
 };
 
 function SourceListItem({
@@ -24,7 +25,8 @@ function SourceListItem({
   action,
   disabled,
   locked,
-  actionText
+  actionText,
+  className = ''
 }: SourceListItemProps) {
   const t = useTranslate();
 
@@ -58,10 +60,10 @@ function SourceListItem({
 
   return (
     <li
-      className={`w-full items-center border-b border-gray-600 ${
-        disabled ? 'bg-unclickable-bg' : 'hover:bg-zinc-700'
-      } ${disabled || !action ? '' : 'hover:cursor-pointer'}`}
       style={{ boxSizing: 'border-box' }}
+      className={`relative items-center border-b border-gray-600 ${
+        disabled ? 'bg-unclickable-bg' : 'hover:bg-zinc-700'
+      } ${disabled || !action ? '' : 'hover:cursor-pointer'} ${className}`}
       onClick={() => (disabled || !action ? '' : action(source))}
     >
       <div className="flex">

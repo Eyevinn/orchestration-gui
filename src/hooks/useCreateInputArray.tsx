@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Production } from '../interfaces/production';
 import { TListSource } from '../interfaces/multiview';
 import { GetPipelines } from './pipelines';
+import { SourceReference } from '../interfaces/Source';
 
-export function useCreateInputArray(production: Production | undefined) {
+export function useCreateInputArray(sources: SourceReference[]) {
   const [inputList, setInputList] = useState<TListSource[] | undefined>();
   const [pipelines] = GetPipelines();
 
   useEffect(() => {
-    if (production && pipelines) {
+    if (sources && pipelines) {
       const list: TListSource[] = [];
-      production.sources.map((source) => {
+      sources.map((source) => {
         list.push({
           id: source._id ? source._id : '',
           input_slot: source.input_slot,
@@ -37,7 +37,7 @@ export function useCreateInputArray(production: Production | undefined) {
       );
       return setInputList(uniqueList);
     }
-  }, [production, pipelines]);
+  }, [sources, pipelines]);
 
   return { inputList };
 }

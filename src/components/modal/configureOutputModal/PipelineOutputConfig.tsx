@@ -6,6 +6,7 @@ import {
   PipelineOutput,
   PipelineOutputEncoderSettings,
   PipelineOutputSettings,
+  PipelineOutputWithoutEncoderSettings,
   PipelineSettings
 } from '../../../interfaces/pipeline';
 import StreamAccordion from './StreamAccordion';
@@ -142,7 +143,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
     if (!outputStreams.length) return;
 
     const convertStream = (
-      stream: PipelineOutputSettings,
+      stream: PipelineOutputWithoutEncoderSettings,
       index: number
     ): OutputStream => {
       return {
@@ -152,9 +153,6 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
         srtMode: stream.srt_mode,
         srtPassphrase: stream.srt_passphrase,
         port: stream.local_port,
-        videoFormat: stream.video_format,
-        videoBit: stream.video_bit_depth,
-        videoKiloBit: stream.video_kilobit_rate,
         srt_stream_id: stream.srt_stream_id
       };
     };

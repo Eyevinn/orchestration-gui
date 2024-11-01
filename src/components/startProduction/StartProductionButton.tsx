@@ -61,29 +61,26 @@ export function StartProductionButton({
 
   const onClick = () => {
     if (!production) return;
-    const hasUndefinedPipeline = production.production_settings.pipelines.some(
-      (p) => !p.pipeline_name
+    const hasUndefinedPipeline = production.pipelines.some(
+      (p) => !p.pipeline_id
     );
     if (hasUndefinedPipeline) {
       toast.error(t('start_production_errors.no_pipeline_selected'));
       return;
     }
-    const hasSamePipelines = production.production_settings.pipelines.some(
-      (p, i) => {
-        const rest = production.production_settings.pipelines
-          .slice(i + 1)
-          .map((pipe) => pipe.pipeline_name);
-        return rest.includes(p.pipeline_name);
-      }
-    );
+    const hasSamePipelines = production.pipelines.some((p, i) => {
+      const rest = production.pipelines
+        .slice(i + 1)
+        .map((pipe) => pipe.pipeline_id);
+      return rest.includes(p.pipeline_id);
+    });
     if (hasSamePipelines) {
       toast.error(t('start_production_errors.same_pipeline_selected'));
       return;
     }
     const hasUndefinedControlPanel =
-      !production.production_settings.control_connection.control_panel_name ||
-      production.production_settings.control_connection.control_panel_name
-        .length === 0;
+      !production.control_connection?.control_panel_ids ||
+      production.control_connection?.control_panel_ids.length === 0;
     if (hasUndefinedControlPanel) {
       toast.error(t('start_production_errors.no_control_panel_selected'));
       return;
@@ -98,56 +95,17 @@ export function StartProductionButton({
   }, []);
 
   const onConfirm = useCallback(() => {
-    if (!productionSetup) {
+    if (!production) {
       return;
     }
-    let productionToStart: Production;
-    if (!productionSetup.production_settings.pipelines[0].multiviews) {
-      if (!multiviewLayouts || multiviewLayouts.length === 0) {
-        toast.error(t('start_production_status.unexpected'));
-        return;
-      }
-      const pipelineToUpdateMultiview =
-        productionSetup.production_settings.pipelines[0];
-      productionToStart = {
-        ...productionSetup,
-        sources: productionSetup.sources.map((source, i) => ({
-          ...source,
-          input_slot: i + 1
-        })),
-        production_settings: {
-          ...productionSetup.production_settings,
-          pipelines: [
-            ...productionSetup.production_settings.pipelines.filter(
-              (p) => p.pipeline_name !== pipelineToUpdateMultiview.pipeline_name
-            ),
-            {
-              ...pipelineToUpdateMultiview,
-              multiviews: [
-                {
-                  ...multiviewLayouts[0],
-                  for_pipeline_idx: 0,
-                  _id: multiviewLayouts[0]._id?.toString()
-                }
-              ]
-            }
-          ]
-        }
-      };
-    } else {
-      productionToStart = {
-        ...productionSetup,
-        sources: productionSetup.sources.map((source, i) => ({
-          ...source,
-          input_slot: i + 1
-        }))
-      };
-    }
-
-    startProduction(productionToStart)
+    production.sources = production?.sources.map((source, i) => ({
+      ...source,
+      input_slot: i + 1
+    }));
+    startProduction(production)
       .then((status) => {
         if (status.ok) {
-          console.log(`Starting production '${productionSetup.name}'`);
+          console.log(`Starting production '${production.name}'`);
           refreshProduction();
           refresh('/');
           setModalOpen(false);

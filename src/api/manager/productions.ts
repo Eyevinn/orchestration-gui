@@ -1,6 +1,6 @@
 import { Db, ObjectId, UpdateResult } from 'mongodb';
 import { getDatabase } from '../mongoClient/dbClient';
-import { Production, ProductionWithId } from '../../interfaces/production';
+import { Production } from '../../interfaces/production';
 import { Log } from '../logger';
 
 export async function getProductions(): Promise<Production[]> {
@@ -10,12 +10,12 @@ export async function getProductions(): Promise<Production[]> {
   ) as Production[];
 }
 
-export async function getProduction(id: string): Promise<ProductionWithId> {
+export async function getProduction(id: string): Promise<Production | null> {
   const db = await getDatabase();
 
   return (await db
     .collection('productions')
-    .findOne({ _id: new ObjectId(id) })) as ProductionWithId;
+    .findOne({ _id: new ObjectId(id) })) as Production | null;
 }
 
 export async function setProductionsIsActiveFalse(): Promise<
@@ -32,14 +32,13 @@ export async function putProduction(
   production: Production
 ): Promise<Production> {
   const db = await getDatabase();
-  const newSourceId = new ObjectId().toString();
 
   const sources = production.sources
     ? production.sources.flatMap((singleSource) => {
         return singleSource._id
           ? singleSource
           : {
-              _id: newSourceId,
+              _id: new ObjectId().toString(),
               type: singleSource.type,
               label: singleSource.label,
               input_slot: singleSource.input_slot,
@@ -60,7 +59,11 @@ export async function putProduction(
       name: production.name,
       isActive: production.isActive,
       sources: sources,
-      production_settings: production.production_settings
+      preset_name: production.preset_name,
+      pipelines: production.pipelines,
+      control_connection: production.control_connection,
+      outputs: production.outputs,
+      multiviews: production.multiviews
     }
   );
 
@@ -73,7 +76,11 @@ export async function putProduction(
     name: production.name,
     isActive: production.isActive,
     sources: sources,
-    production_settings: production.production_settings
+    preset_name: production.preset_name,
+    pipelines: production.pipelines,
+    control_connection: production.control_connection,
+    outputs: production.outputs,
+    multiviews: production.multiviews
   };
 }
 
@@ -113,7 +120,7 @@ export async function getProductionPipelineSourceAlignment(
     return null;
   }
 
-  const pipeline = production.production_settings.pipelines.find(
+  const pipeline = production.pipelines.find(
     (p) => p.pipeline_id === pipelineId
   );
 
@@ -141,13 +148,12 @@ export async function setProductionPipelineSourceAlignment(
     const result = await db.collection('productions').updateOne(
       {
         _id: new ObjectId(productionId),
-        'production_settings.pipelines.pipeline_id': pipelineId,
-        'production_settings.pipelines.sources.source_id': sourceId
+        'pipelines.pipeline_id': pipelineId,
+        'pipelines.sources.source_id': sourceId
       },
       {
         $set: {
-          'production_settings.pipelines.$[p].sources.$[s].settings.alignment_ms':
-            alignment_ms
+          'pipelines.$[p].sources.$[s].settings.alignment_ms': alignment_ms
         }
       },
       {
@@ -182,7 +188,7 @@ export async function getProductionSourceLatency(
     return null;
   }
 
-  const pipeline = production.production_settings.pipelines.find(
+  const pipeline = production.pipelines.find(
     (p) => p.pipeline_id === pipelineId
   );
 
@@ -210,12 +216,12 @@ export async function setProductionPipelineSourceLatency(
     const result = await db.collection('productions').updateOne(
       {
         _id: new ObjectId(productionId),
-        'production_settings.pipelines.pipeline_id': pipelineId,
-        'production_settings.pipelines.sources.source_id': sourceId
+        'pipelines.pipeline_id': pipelineId,
+        'pipelines.sources.source_id': sourceId
       },
       {
         $set: {
-          'production_settings.pipelines.$[p].sources.$[s].settings.max_network_latency_ms':
+          'pipelines.$[p].sources.$[s].settings.max_network_latency_ms':
             max_network_latency_ms
         }
       },

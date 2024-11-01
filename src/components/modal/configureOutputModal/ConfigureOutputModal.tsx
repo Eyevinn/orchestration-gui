@@ -21,9 +21,9 @@ export interface OutputStream {
   srtMode: string;
   srtPassphrase: string;
   port: number;
-  videoFormat: string;
-  videoBit: number;
-  videoKiloBit: number;
+  videoFormat?: string;
+  videoBit?: number;
+  videoKiloBit?: number;
   srt_stream_id: string;
 }
 

@@ -5,7 +5,6 @@ import {
 } from '../../../../../types/ateliere-live';
 import { LIVE_BASE_API_PATH } from '../../../../constants';
 import { MultiviewSettings } from '../../../../interfaces/multiview';
-import { Production } from '../../../../interfaces/production';
 import {
   HTMLSource,
   MediaSource
@@ -17,6 +16,7 @@ import {
   getMultiviewsForPipeline,
   updateMultiviewForPipeline
 } from '../multiviews/multiviews';
+import { PipelineSettings } from '../../../../interfaces/pipeline';
 
 export async function getPipelineHtmlSources(
   pipelineUuid: string
@@ -44,20 +44,19 @@ export async function getPipelineHtmlSources(
 }
 
 export async function createPipelineHtmlSource(
-  production: Production,
+  pipelines: PipelineSettings[],
   inputSlot: number,
   data: HTMLSource,
   source: SourceReference
 ) {
   try {
-    const { production_settings } = production;
     const htmlResults = [];
 
-    for (let i = 0; i < production_settings.pipelines.length; i++) {
+    for (let i = 0; i < pipelines.length; i++) {
       const response = await fetch(
         new URL(
           LIVE_BASE_API_PATH +
-            `/pipelines/${production_settings.pipelines[i].pipeline_id}/renderingengine/html`,
+            `/pipelines/${pipelines[i].pipeline_id}/renderingengine/html`,
           process.env.LIVE_URL
         ),
         {
@@ -117,18 +116,16 @@ export async function createPipelineHtmlSource(
   }
 
   try {
-    if (!production.production_settings.pipelines[0].pipeline_id) {
-      Log().error(
-        `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`
-      );
-      throw `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`;
+    if (!pipelines[0].pipeline_id) {
+      Log().error(`Missing pipeline_id for: ${pipelines[0].pipeline_name}`);
+      throw `Missing pipeline_id for: ${pipelines[0].pipeline_name}`;
     }
     const multiviewsResponse = await getMultiviewsForPipeline(
-      production.production_settings.pipelines[0].pipeline_id
+      pipelines[0].pipeline_id
     );
 
     const multiviews = multiviewsResponse.filter((multiview) => {
-      const pipeline = production.production_settings.pipelines[0];
+      const pipeline = pipelines[0];
       const multiviewArray = pipeline.multiviews;
 
       if (Array.isArray(multiviewArray)) {
@@ -146,9 +143,9 @@ export async function createPipelineHtmlSource(
 
     if (multiviews.length === 0 || !multiviews) {
       Log().error(
-        `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`
+        `No multiview found for pipeline: ${pipelines[0].pipeline_id}`
       );
-      throw `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`;
+      throw `No multiview found for pipeline: ${pipelines[0].pipeline_id}`;
     }
 
     await Promise.all(
@@ -188,7 +185,7 @@ export async function createPipelineHtmlSource(
         ];
 
         await updateMultiviewForPipeline(
-          production.production_settings.pipelines[0].pipeline_id!,
+          pipelines[0].pipeline_id!,
           multiview.id,
           updatedViews
         );
@@ -303,20 +300,19 @@ export async function getPipelineMediaSources(
 }
 
 export async function createPipelineMediaSource(
-  production: Production,
+  pipelines: PipelineSettings[],
   inputSlot: number,
   data: MediaSource,
   source: SourceReference
 ) {
   try {
-    const { production_settings } = production;
     const mediaResults = [];
 
-    for (let i = 0; i < production_settings.pipelines.length; i++) {
+    for (let i = 0; i < pipelines.length; i++) {
       const response = await fetch(
         new URL(
           LIVE_BASE_API_PATH +
-            `/pipelines/${production_settings.pipelines[i].pipeline_id}/renderingengine/media`,
+            `/pipelines/${pipelines[i].pipeline_id}/renderingengine/media`,
           process.env.LIVE_URL
         ),
         {
@@ -373,18 +369,16 @@ export async function createPipelineMediaSource(
   }
 
   try {
-    if (!production.production_settings.pipelines[0].pipeline_id) {
-      Log().error(
-        `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`
-      );
-      throw `Missing pipeline_id for: ${production.production_settings.pipelines[0].pipeline_name}`;
+    if (pipelines[0].pipeline_id) {
+      Log().error(`Missing pipeline_id for: ${pipelines[0].pipeline_name}`);
+      throw `Missing pipeline_id for: ${pipelines[0].pipeline_name}`;
     }
     const multiviewsResponse = await getMultiviewsForPipeline(
-      production.production_settings.pipelines[0].pipeline_id
+      pipelines[0].pipeline_id || ''
     );
 
     const multiviews = multiviewsResponse.filter((multiview) => {
-      const pipeline = production.production_settings.pipelines[0];
+      const pipeline = pipelines[0];
       const multiviewArray = pipeline.multiviews;
 
       if (Array.isArray(multiviewArray)) {
@@ -402,9 +396,9 @@ export async function createPipelineMediaSource(
 
     if (multiviews.length === 0 || !multiviews) {
       Log().error(
-        `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`
+        `No multiview found for pipeline: ${pipelines[0].pipeline_id}`
       );
-      throw `No multiview found for pipeline: ${production.production_settings.pipelines[0].pipeline_id}`;
+      throw `No multiview found for pipeline: ${pipelines[0].pipeline_id}`;
     }
 
     await Promise.all(
@@ -444,7 +438,7 @@ export async function createPipelineMediaSource(
         ];
 
         await updateMultiviewForPipeline(
-          production.production_settings.pipelines[0].pipeline_id!,
+          pipelines[0].pipeline_id!,
           multiview.id,
           updatedViews
         );

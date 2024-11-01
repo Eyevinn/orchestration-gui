@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { MultiviewSettings } from '../../../interfaces/multiview';
 import { TMultiviewLayout } from '../../../interfaces/preset';
@@ -35,11 +35,16 @@ export default function MultiviewSettingsConfig({
   const [multiviewLayouts] = useMultiviewLayouts(refresh);
 
   const currentValue = multiview || selectedMultiviewLayout;
-  const avaliableMultiviewLayouts = multiviewLayouts?.filter(
-    (layout) => layout.productionId === productionId || !layout.productionId
-  );
-  const multiviewLayoutNames =
-    avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+
+  const avaliableMultiviewLayouts = useMemo(() => {
+    return multiviewLayouts?.filter(
+      (layout) => layout.productionId === productionId || !layout.productionId
+    );
+  }, [multiviewLayouts]);
+
+  const multiviewLayoutNames = useMemo(() => {
+    return avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
+  }, [multiviewLayouts]);
 
   useEffect(() => {
     if (
@@ -198,7 +203,7 @@ export default function MultiviewSettingsConfig({
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded p-4 pr-7">
+    <div className="flex flex-col gap-2 rounded p-4 pr-7 text-white">
       <div className="flex justify-between pb-5">
         <h1 className="font-bold">{t('preset.multiview_output_settings')}</h1>
       </div>

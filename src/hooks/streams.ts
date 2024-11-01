@@ -2,18 +2,19 @@ import { useState } from 'react';
 import {
   AddSourceResult,
   DeleteSourceStep,
+  SourceReference,
   SourceWithId
 } from '../interfaces/Source';
-import { Production } from '../interfaces/production';
 import { CallbackHook } from './types';
 import { MultiviewSettings } from '../interfaces/multiview';
 import { Result } from '../interfaces/result';
 import { API_SECRET_KEY } from '../utils/constants';
+import { PipelineSettings } from '../interfaces/pipeline';
 
 export function useCreateStream(): CallbackHook<
   (
     source: SourceWithId,
-    production: Production,
+    pipelines: PipelineSettings[],
     input_slot: number
   ) => Promise<Result<AddSourceResult>>
 > {
@@ -21,7 +22,7 @@ export function useCreateStream(): CallbackHook<
 
   const createStream = async (
     source: SourceWithId,
-    production: Production,
+    pipelines: PipelineSettings[],
     input_slot: number
   ): Promise<Result<AddSourceResult>> => {
     setLoading(true);
@@ -31,7 +32,7 @@ export function useCreateStream(): CallbackHook<
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({
         source: source,
-        production: production,
+        pipelines,
         input_slot: input_slot
       })
     })
@@ -49,22 +50,23 @@ export function useCreateStream(): CallbackHook<
 export function useDeleteStream(): CallbackHook<
   (
     streamUuids: string[],
-    production: Production,
+    pipelines: PipelineSettings[],
+    multiviews: MultiviewSettings[],
+    sources: SourceReference[],
     input_slot: number
   ) => Promise<Result<DeleteSourceStep[]>>
 > {
   const [loading, setLoading] = useState(false);
   const deleteStream = async (
     streamUuids: string[],
-    production: Production,
+    pipelines: PipelineSettings[],
+    multiviews: MultiviewSettings[],
+    sources: SourceReference[],
     input_slot: number
   ): Promise<Result<DeleteSourceStep[]>> => {
     setLoading(true);
 
-    const pipelineUUID =
-      production.production_settings.pipelines[0].pipeline_id;
-
-    const multiviews = production.production_settings.pipelines[0].multiviews;
+    const pipelineUUID = pipelines[0].pipeline_id;
     const multiviewViews = multiviews?.flatMap((singleMultiview) => {
       return singleMultiview.layout.views;
     });
@@ -113,9 +115,7 @@ export function useDeleteStream(): CallbackHook<
     const rest = multiviewViews?.filter((v) => v.input_slot !== input_slot);
 
     const restWithLabels = rest?.map((v) => {
-      const sourceForView = production.sources.find(
-        (s) => s.input_slot === v.input_slot
-      );
+      const sourceForView = sources.find((s) => s.input_slot === v.input_slot);
 
       if (sourceForView) {
         return { ...v, label: sourceForView.label };

@@ -1,6 +1,6 @@
 import React, { ReactElement, memo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { SourceReference } from '../../interfaces/Source';
+import { Source, SourceReference } from '../../interfaces/Source';
 import { ObjectId } from 'mongodb';
 import { Production } from '../../interfaces/production';
 
@@ -11,8 +11,7 @@ interface IDrag {
   children: ReactElement;
   previousOrder: SourceReference[];
   currentOrder: SourceReference[];
-  updateProduction: (updated: Production) => void;
-  productionSetup: Production;
+  setSources: (sources: SourceReference[]) => void;
 }
 const DragItem: React.FC<IDrag> = memo(
   ({
@@ -22,8 +21,7 @@ const DragItem: React.FC<IDrag> = memo(
     children,
     previousOrder,
     currentOrder,
-    updateProduction,
-    productionSetup
+    setSources
   }) => {
     const ref = useRef(null);
 
@@ -54,15 +52,12 @@ const DragItem: React.FC<IDrag> = memo(
           : false;
 
         if (!isSame) {
-          const updatedProduction = {
-            ...productionSetup,
-            sources: currentOrder.map((source) => ({
+          setSources(
+            currentOrder.map((source) => ({
               ...source,
               _id: source._id || undefined
             }))
-          };
-
-          updateProduction(updatedProduction);
+          );
         }
       }
     });

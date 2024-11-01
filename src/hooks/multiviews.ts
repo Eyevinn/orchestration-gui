@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { SourceReference } from '../interfaces/Source';
 import { CallbackHook } from './types';
-import { Production } from '../interfaces/production';
 import { MultiviewSettings } from '../interfaces/multiview';
 
 export function useMultiviews(): CallbackHook<
   (
     pipelineId: string,
-    production: Production,
+    sources: SourceReference[],
     source: SourceReference,
     singleMultiview: MultiviewSettings
   ) => void
@@ -16,7 +15,7 @@ export function useMultiviews(): CallbackHook<
 
   const putMultiviewView = (
     pipelineId: string,
-    production: Production,
+    sources: SourceReference[],
     source: SourceReference,
     singleMultiview: MultiviewSettings
   ) => {
@@ -40,7 +39,7 @@ export function useMultiviews(): CallbackHook<
     });
 
     const restWithLabels = rest.map((view) => {
-      const sourceForView = production.sources.find(
+      const sourceForView = sources.find(
         (s) => s.input_slot === view.input_slot
       );
 

@@ -1,14 +1,19 @@
 import { WithId, Document, ObjectId } from 'mongodb';
 import { SourceReference } from './Source';
 import { ControlConnection } from './controlConnections';
-import { PipelineSettings } from './pipeline';
+import { PipelineOutput, PipelineSettings } from './pipeline';
+import { MultiviewSettings } from './multiview';
 
 export interface Production {
   _id: string;
   isActive: boolean;
   name: string;
   sources: SourceReference[];
-  production_settings: ProductionSettings;
+  preset_name: string;
+  pipelines: PipelineSettings[];
+  control_connection?: ProductionControlConnection;
+  outputs: PipelineOutput[][];
+  multiviews: MultiviewSettings[];
 }
 
 export interface ProductionWithId extends WithId<Document> {
@@ -16,7 +21,6 @@ export interface ProductionWithId extends WithId<Document> {
   isActive: boolean;
   name: string;
   sources: SourceReference[];
-  production_settings: ProductionSettings;
 }
 
 export interface ProductionSettings {
@@ -26,8 +30,8 @@ export interface ProductionSettings {
   name: string;
 }
 
-interface ProductionControlConnection extends ControlConnection {
-  control_panel_name?: string[];
+export interface ProductionControlConnection extends ControlConnection {
+  control_panel_ids?: string[];
 }
 
 export interface StartProductionStatus {

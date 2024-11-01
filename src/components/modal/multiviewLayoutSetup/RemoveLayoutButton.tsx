@@ -28,16 +28,12 @@ export default function RemoveLayoutButton({
   return (
     <button
       type="button"
-      className="flex items-center flex-row mb-5 pl-2 w-[50%] cursor-default"
+      title={title}
+      className="flex items-center flex-row mb-5 pl-2 w-[50%]"
+      onClick={() => removeMultiviewLayout()}
       disabled={deleteDisabled}
     >
-      <div
-        title={title}
-        className={`w-6 h-6 ${deleteDisabled ? '' : 'hover:cursor-pointer'}`}
-        onClick={() => removeMultiviewLayout()}
-      >
-        <IconTrash className={handleCheckboxChange()} />
-      </div>
+      <IconTrash className={handleCheckboxChange()} />
     </button>
   );
 }

@@ -40,9 +40,8 @@ export async function updatedMonitoringForProduction(
   production: Production
 ) {
   const productionId = production._id;
-  const { production_settings } = production;
 
-  const productionPipelineUUIDs = production_settings.pipelines.map(
+  const productionPipelineUUIDs = production.pipelines.map(
     (pipeline) => pipeline.pipeline_id!
   );
 
@@ -1230,11 +1229,9 @@ const createMonitoringComponentControlPanels = async (
   prevMonitoring?: Monitoring
 ) => {
   const pipelineIndex =
-    production.production_settings.control_connection.control_panel_endpoint
-      .toPipelineIdx;
+    production.control_connection?.control_panel_endpoint.toPipelineIdx || 0;
 
-  const pipelineId =
-    production.production_settings.pipelines[pipelineIndex].pipeline_id;
+  const pipelineId = production.pipelines[pipelineIndex].pipeline_id;
 
   const pipeline = pipelines.find((p) => p.uuid === pipelineId);
 
@@ -1294,11 +1291,9 @@ const createMonitoringControlPanels = async (
   pipelines: ResourcesPipelineResponse[]
 ) => {
   const pipelineIndex =
-    production.production_settings.control_connection.control_panel_endpoint
-      .toPipelineIdx;
+    production.control_connection?.control_panel_endpoint.toPipelineIdx || 0;
 
-  const pipelineId =
-    production.production_settings.pipelines[pipelineIndex].pipeline_id;
+  const pipelineId = production.pipelines[pipelineIndex].pipeline_id;
 
   const pipeline = pipelines.find((p) => p.uuid === pipelineId);
 

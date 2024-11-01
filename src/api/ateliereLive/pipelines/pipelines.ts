@@ -163,8 +163,25 @@ export async function removePipelineStreams(pipeId: string) {
   return { status: 200, results };
 }
 
-export async function createPipelineOutputs(pipeline: PipelineSettings) {
-  const outputs = pipeline.outputs;
+export async function createPipelineOutputs(
+  pipeline: PipelineSettings,
+  outputsParam: PipelineOutput[]
+) {
+  if (!pipeline.pipeline_id) return;
+  const pipelinesOutputs = await getPipelineOutputs(pipeline.pipeline_id).catch(
+    (error) => {
+      throw error.message;
+    }
+  );
+  const outputsWithStreams = outputsParam.filter(
+    (output) => output.streams?.length
+  );
+  const outputs = outputsWithStreams?.map((output, index) => {
+    return {
+      ...output,
+      uuid: pipelinesOutputs[index]?.uuid
+    };
+  });
   if (!outputs) return;
   const startOutputStreamsPromises = outputs.map((o) => {
     return startPipelineStream(
@@ -176,14 +193,14 @@ export async function createPipelineOutputs(pipeline: PipelineSettings) {
   const startedOutputs = await Promise.all(startOutputStreamsPromises).catch(
     (error) => {
       Log().error(
-        `Failed to create outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}'`,
+        `Failed to create outputs for pipeline '${pipeline.pipeline_readable_name}/${pipeline.pipeline_id}'`,
         error
       );
-      throw `Failed to create outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}': ${error.message}`;
+      throw `Failed to create outputs for pipeline '${pipeline.pipeline_readable_name}/${pipeline.pipeline_id}': ${error.message}`;
     }
   );
   Log().info(
-    `Outputs for pipeline '${pipeline.pipeline_name}/${pipeline.pipeline_id}' created`
+    `Outputs for pipeline '${pipeline.pipeline_readable_name}/${pipeline.pipeline_id}' created`
   );
   return startedOutputs;
 }
@@ -198,14 +215,14 @@ export async function connectControlPanelToPipeline(
   });
 
   const productionControlPanels = controlPanels.filter((c) =>
-    control_connection.control_panel_name?.includes(c.name)
+    control_connection.control_panel_ids?.includes(c.uuid)
   );
 
   if (!productionControlPanels || productionControlPanels.length === 0) {
     Log().error(
-      `Did not find control panel: ${control_connection.control_panel_name}`
+      `Did not find control panel: ${control_connection.control_panel_ids}`
     );
-    throw `Did not find control panel: ${control_connection.control_panel_name}`;
+    throw `Did not find control panel: ${control_connection.control_panel_ids}`;
   }
 
   const pipelinesIds = pipelines.map((pipeline) => {

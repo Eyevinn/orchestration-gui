@@ -7,7 +7,10 @@ import { getAuthorizationHeader } from '../../utils/authheader';
 import { createMultiview } from '../../utils/multiview';
 import { getSourcesByIds } from '../../../manager/sources';
 import { Log } from '../../../logger';
-import { ProductionSettings } from '../../../../interfaces/production';
+import {
+  Production,
+  ProductionSettings
+} from '../../../../interfaces/production';
 import { MultiviewSettings } from '../../../../interfaces/multiview';
 import { LIVE_BASE_API_PATH } from '../../../../constants';
 
@@ -35,14 +38,10 @@ export async function getMultiviewsForPipeline(
 }
 
 export async function createMultiviewForPipeline(
-  productionSettings: ProductionSettings,
-  sourceRefs: SourceReference[]
+  production: Production
 ): Promise<ResourcesPipelineMultiviewResponse[]> {
-  const pipeline = productionSettings.pipelines.find((p) =>
-    p.multiviews ? p.multiviews?.length > 0 : undefined
-  );
-  const multiviewIndexArray = pipeline?.multiviews
-    ? pipeline.multiviews.map((p) => p.for_pipeline_idx)
+  const multiviewIndexArray = production?.multiviews
+    ? production.multiviews.map((p) => p.for_pipeline_idx)
     : undefined;
 
   const multiviewIndex = multiviewIndexArray?.find((p) => p !== undefined);
@@ -51,22 +50,17 @@ export async function createMultiviewForPipeline(
     Log().error(`Did not find a specified pipeline in multiview settings`);
     throw `Did not find a specified pipeline in multiview settings`;
   }
-  if (
-    !productionSettings.pipelines[multiviewIndex].multiviews ||
-    productionSettings.pipelines[multiviewIndex].multiviews?.length === 0
-  ) {
-    Log().error(
-      `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`
-    );
-    throw `Did not find any multiview settings in pipeline settings for: ${productionSettings.pipelines[multiviewIndex]}`;
+  if (!production.multiviews || production.multiviews?.length === 0) {
+    Log().error(`Did not find any multiviews for: ${production.name}`);
+    throw `Did not find any multiviews for: ${production.name}`;
   }
   const pipelineUUID =
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    productionSettings.pipelines[multiviewIndex].pipeline_id!;
+    production.pipelines[0].pipeline_id!;
   const sources = await getSourcesByIds(
-    sourceRefs.map((ref) => (ref._id ? ref._id.toString() : ''))
+    production.sources.map((ref) => (ref._id ? ref._id.toString() : ''))
   );
-  const sourceRefsWithLabels = sourceRefs.map((ref) => {
+  const sourceRefsWithLabels = production.sources.map((ref) => {
     const refId = ref._id ? ref._id.toString() : '';
     if (!ref.label) {
       const source = sources.find((source) => source._id.toString() === refId);
@@ -76,8 +70,7 @@ export async function createMultiviewForPipeline(
   });
   Log().info(`Creating a multiview for pipeline '${pipelineUUID}' from preset`);
 
-  const multiviewsSettings: MultiviewSettings[] =
-    productionSettings.pipelines[multiviewIndex].multiviews ?? [];
+  const multiviewsSettings: MultiviewSettings[] = production.multiviews ?? [];
 
   const createEachMultiviewer = multiviewsSettings.map(
     async (singleMultiviewSettings) => {

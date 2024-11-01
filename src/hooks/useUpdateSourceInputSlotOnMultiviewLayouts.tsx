@@ -87,10 +87,9 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
           };
         }
       });
-      const pipelines = production?.production_settings.pipelines;
       const multiviewsArr = await Promise.all(updatedLayouts);
 
-      const updatedMultiviews = pipelines[0].multiviews?.map((oldItem) => {
+      const updatedMultiviews = production.multiviews?.map((oldItem) => {
         const updatedItem = multiviewsArr.find(
           (newItem) => newItem && newItem._id === oldItem._id
         );
@@ -102,29 +101,18 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
           : oldItem;
       });
 
-      if (pipelines && pipelines[0] && updatedMultiviews) {
-        const updatedFirstPipeline = {
-          ...pipelines[0],
-          multiviews: updatedMultiviews.map((multiview) => ({
-            ...multiview,
-            _id: multiview._id?.toString() || ''
-          }))
-        };
+      const newMultiviews = updatedMultiviews.map((multiview) => ({
+        ...multiview,
+        _id: multiview._id?.toString() || ''
+      }));
 
-        // Replace the first pipeline with the updated one
-        const newPipelines = [updatedFirstPipeline, ...pipelines.slice(1)];
-
-        // Update the db-production with the new layout-input slot
-        const res = await putProduction(production._id, {
-          ...production,
-          production_settings: {
-            ...production?.production_settings,
-            pipelines: newPipelines
-          }
-        });
-        setLoading(false);
-        return res;
-      }
+      // Update the db-production with the new layout-input slot
+      const res = await putProduction(production._id, {
+        ...production,
+        multiviews: newMultiviews
+      });
+      setLoading(false);
+      return res;
     }
   };
 

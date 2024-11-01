@@ -68,12 +68,12 @@ export default function DropDown({
     }
   }, [disabled]);
   return (
-    <div>
-      <div className="text-white font-medium">{label}</div>
-      <div ref={toggleButton}>
+    <div className="flex flex-row items-center">
+      <div className="text-white font-medium mr-4 w-48">{label}</div>
+      <div ref={toggleButton} className="relative">
         <button
           onClick={() => toggleIsOpen()}
-          className={`text-white bg-container focus:ring-1 focus:outline-none w-64 break-all font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between mb-2 ${
+          className={`text-white bg-light focus:ring-1 focus:outline-none w-64 break-all font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between ${
             disabled && 'opacity-40 cursor-default'
           }`}
           type="button"
@@ -91,35 +91,35 @@ export default function DropDown({
             <IconChevronDown className="w-6 h-6 text-p" />
           </div>
         </button>
-      </div>
-      <div
-        ref={element}
-        className={` ${
-          !isOpen && 'hidden'
-        } bg-white divide-y divide-gray-100 rounded-lg shadow-md dark:bg-gray-700 w-64`}
-      >
-        <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
-          {options &&
-            options.map((option) => {
-              return (
-                <li
-                  className="w-64"
-                  key={option.option + label}
-                  onClick={() => handleClick(option.option, option.available)}
-                >
-                  <div
-                    className={`${
-                      !option.available && 'text-gray-400 cursor-default'
-                    } px-4 py-2 cursor-pointer hover:bg-gray-100 rounded-2xl dark:hover:bg-gray-600 dark:hover:text-white flex w-64 justify-between break-all`}
+        <div
+          ref={element}
+          className={` ${
+            !isOpen && 'hidden'
+          } absolute bg-white divide-y divide-gray-100 rounded-lg shadow-md dark:bg-gray-700 w-64`}
+        >
+          <ul className="py-2 text-sm text-gray-700 dark:text-gray-200">
+            {options &&
+              options.map((option) => {
+                return (
+                  <li
+                    className="w-64"
+                    key={option.option + label}
+                    onClick={() => handleClick(option.option, option.available)}
                   >
-                    {option.option}
-                    {(multipleSelected?.includes(option.option) ||
-                      option.option === selected) && <IconX size={20} />}
-                  </div>
-                </li>
-              );
-            })}
-        </ul>
+                    <div
+                      className={`${
+                        !option.available && 'text-gray-400 cursor-default'
+                      } px-4 py-2 cursor-pointer hover:bg-gray-100 rounded-2xl dark:hover:bg-gray-600 dark:hover:text-white flex w-64 justify-between break-all`}
+                    >
+                      {option.option}
+                      {(multipleSelected?.includes(option.option) ||
+                        option.option === selected) && <IconX size={20} />}
+                    </div>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
       </div>
     </div>
   );

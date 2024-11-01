@@ -5,9 +5,10 @@ import { Log } from '../../../../../api/logger';
 import { MediaSource } from '../../../../../interfaces/renderingEngine';
 import { Production } from '../../../../../interfaces/production';
 import { SourceReference } from '../../../../../interfaces/Source';
+import { PipelineSettings } from '../../../../../interfaces/pipeline';
 
 export type CreateMediaRequestBody = {
-  production: Production;
+  pipelines: PipelineSettings[];
   mediaBody: MediaSource;
   inputSlot: number;
   source: SourceReference;
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const createMediaRequest = data as CreateMediaRequestBody;
 
   return await createPipelineMediaSource(
-    createMediaRequest.production,
+    createMediaRequest.pipelines,
     createMediaRequest.inputSlot,
     createMediaRequest.mediaBody,
     createMediaRequest.source

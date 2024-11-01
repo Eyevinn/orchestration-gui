@@ -8,10 +8,11 @@ import { CallbackHook } from '../types';
 import { Result } from '../../interfaces/result';
 import { API_SECRET_KEY } from '../../utils/constants';
 import { HTMLSource } from '../../interfaces/renderingEngine';
+import { PipelineSettings } from '../../interfaces/pipeline';
 
 export function useCreateHtmlSource(): CallbackHook<
   (
-    production: Production,
+    pipelines: PipelineSettings[],
     inputSlot: number,
     htmlBody: HTMLSource,
     source: SourceReference
@@ -20,7 +21,7 @@ export function useCreateHtmlSource(): CallbackHook<
   const [loading, setLoading] = useState<boolean>(false);
 
   const createHtmlSource = async (
-    production: Production,
+    pipelines: PipelineSettings[],
     inputSlot: number,
     htmlBody: HTMLSource,
     source: SourceReference
@@ -31,7 +32,7 @@ export function useCreateHtmlSource(): CallbackHook<
       method: 'POST',
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
       body: JSON.stringify({
-        production: production,
+        pipelines,
         inputSlot: inputSlot,
         htmlBody: htmlBody,
         source: source

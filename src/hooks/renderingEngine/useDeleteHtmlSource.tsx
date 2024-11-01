@@ -1,7 +1,10 @@
 import { MultiviewSettings } from '../../interfaces/multiview';
 import { Production } from '../../interfaces/production';
 import { Result } from '../../interfaces/result';
-import { DeleteRenderingEngineSourceStep } from '../../interfaces/Source';
+import {
+  DeleteRenderingEngineSourceStep,
+  SourceReference
+} from '../../interfaces/Source';
 import { API_SECRET_KEY } from '../../utils/constants';
 import { CallbackHook } from '../types';
 import { useState } from 'react';
@@ -10,7 +13,8 @@ export function useDeleteHtmlSource(): CallbackHook<
   (
     pipelineUuid: string,
     inputSlot: number,
-    production: Production
+    multiviews: MultiviewSettings[],
+    sources: SourceReference[]
   ) => Promise<Result<DeleteRenderingEngineSourceStep[]>>
 > {
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,11 +22,11 @@ export function useDeleteHtmlSource(): CallbackHook<
   const deleteHtmlSource = async (
     pipelineUuid: string,
     inputSlot: number,
-    production: Production
+    multiviews: MultiviewSettings[],
+    sources: SourceReference[]
   ): Promise<Result<DeleteRenderingEngineSourceStep[]>> => {
     setLoading(true);
 
-    const multiviews = production.production_settings.pipelines[0].multiviews;
     const multiviewViews = multiviews?.flatMap((singleMultiview) => {
       return singleMultiview.layout.views;
     });
@@ -59,9 +63,7 @@ export function useDeleteHtmlSource(): CallbackHook<
     const rest = multiviewViews?.filter((v) => v.input_slot !== inputSlot);
 
     const restWithLabels = rest?.map((v) => {
-      const sourceForView = production.sources.find(
-        (s) => s.input_slot === v.input_slot
-      );
+      const sourceForView = sources.find((s) => s.input_slot === v.input_slot);
 
       if (sourceForView) {
         return { ...v, label: sourceForView.label };
