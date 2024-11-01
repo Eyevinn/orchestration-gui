@@ -15,7 +15,7 @@ const ProductionControlConnections: React.FC<
 > = (props) => {
   const { controlConnection, onChange } = props;
 
-  const [controlPanels, loading] = useControlPanels();
+  const [controlPanels] = useControlPanels();
 
   const onControlConnectionChange = (ids: string[]) => {
     if (controlConnection) {
