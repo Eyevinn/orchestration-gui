@@ -334,33 +334,42 @@ export async function stopProduction(
     (p) => p.pipeline_id
   );
 
-  for (const pipeline of production.production_settings.pipelines) {
-    const pipelineId = pipeline.pipeline_id;
-    if (pipelineId) {
-      const pipelineRenderingEngine = await getPipelineRenderingEngine(
-        pipelineId
-      );
+  const productionHasRenderingEngineSources = production.sources.some(
+    (source) => source.type === 'html' || source.type === 'mediaplayer'
+  );
 
-      const htmlSources = pipelineRenderingEngine.html;
-      const mediaSources = pipelineRenderingEngine.media;
+  if (productionHasRenderingEngineSources) {
+    for (const pipeline of production.production_settings.pipelines) {
+      const pipelineId = pipeline.pipeline_id;
+      if (pipelineId) {
+        const pipelineRenderingEngine = await getPipelineRenderingEngine(
+          pipelineId
+        );
 
-      if (htmlSources.length > 0 && htmlSources) {
-        for (const pipeline of production.production_settings.pipelines) {
-          for (const htmlSource of htmlSources) {
-            const pipelineId = pipeline.pipeline_id;
-            if (pipelineId !== undefined) {
-              await deleteHtmlFromPipeline(pipelineId, htmlSource.input_slot);
+        const htmlSources = pipelineRenderingEngine.html;
+        const mediaSources = pipelineRenderingEngine.media;
+
+        if (htmlSources.length > 0 && htmlSources) {
+          for (const pipeline of production.production_settings.pipelines) {
+            for (const htmlSource of htmlSources) {
+              const pipelineId = pipeline.pipeline_id;
+              if (pipelineId !== undefined) {
+                await deleteHtmlFromPipeline(pipelineId, htmlSource.input_slot);
+              }
             }
           }
         }
-      }
 
-      if (mediaSources.length > 0 && mediaSources) {
-        for (const pipeline of production.production_settings.pipelines) {
-          for (const mediaSource of mediaSources) {
-            const pipelineId = pipeline.pipeline_id;
-            if (pipelineId !== undefined) {
-              await deleteMediaFromPipeline(pipelineId, mediaSource.input_slot);
+        if (mediaSources.length > 0 && mediaSources) {
+          for (const pipeline of production.production_settings.pipelines) {
+            for (const mediaSource of mediaSources) {
+              const pipelineId = pipeline.pipeline_id;
+              if (pipelineId !== undefined) {
+                await deleteMediaFromPipeline(
+                  pipelineId,
+                  mediaSource.input_slot
+                );
+              }
             }
           }
         }
