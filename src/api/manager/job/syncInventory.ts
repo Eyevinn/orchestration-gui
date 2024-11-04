@@ -100,7 +100,12 @@ export async function runSyncInventory() {
       fetch('/api/manager/inventory', {
         method: 'POST',
         body: JSON.stringify({
-          source: updatedSrt
+          ...inventorySource,
+          video_stream: apiSource.video_stream,
+          audio_stream: apiSource.audio_stream,
+          srt: {
+            ...updatedSrt
+          }
         }),
         headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
       });
