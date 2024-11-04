@@ -529,7 +529,7 @@ export async function getPipelineRenderingEngine(
       method: 'GET',
       headers: {
         authorization: getAuthorizationHeader()
-      }, 
+      },
       next: {
         revalidate: 0
       }
