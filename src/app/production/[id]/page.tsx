@@ -152,10 +152,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   const memoizedProduction = useMemo(() => productionSetup, [productionSetup]);
 
-  const pipelinesAreSelected =
-    productionSetup?.production_settings.pipelines.some(
-      (pipeline) => pipeline.pipeline_id === undefined
-    ) === false;
+  const pipelinesAreSelected = productionSetup?.production_settings
+    ? productionSetup?.production_settings.pipelines.some(
+        (pipeline) => pipeline.pipeline_id === undefined
+      ) === false
+    : false;
 
   const isAddButtonDisabled =
     (selectedValue !== 'HTML' && selectedValue !== 'Media Player') ||
