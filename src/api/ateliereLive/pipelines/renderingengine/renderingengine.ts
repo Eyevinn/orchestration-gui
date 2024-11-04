@@ -529,11 +529,33 @@ export async function getPipelineRenderingEngine(
       method: 'GET',
       headers: {
         authorization: getAuthorizationHeader()
+      }, 
+      next: {
+        revalidate: 0
       }
     }
   );
+
   if (response.ok) {
-    return await response.json();
+    try {
+      return await response.json();
+    } catch (error) {
+      console.error('Failed to parse successful JSON response:', error);
+      throw new Error('Parsing error in successful response.');
+    }
   }
-  throw await response.json();
+
+  const contentType = response.headers.get('content-type');
+  const responseText = await response.text();
+
+  if (contentType && contentType.includes('application/json')) {
+    try {
+      throw JSON.parse(responseText);
+    } catch (error) {
+      console.error('Failed to parse JSON error response:', error);
+      throw new Error(`Failed to parse JSON error response: ${responseText}`);
+    }
+  } else {
+    throw new Error(`Unexpected non-JSON response: ${responseText}`);
+  }
 }
