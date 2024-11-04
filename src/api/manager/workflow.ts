@@ -378,10 +378,12 @@ export async function stopProduction(
   }
 
   for (const source of production.sources) {
-    for (const stream_uuid of source.stream_uuids || []) {
-      await deleteStreamByUuid(stream_uuid).catch((error) => {
-        Log().error('Failed to delete stream! \nError: ', error);
-      });
+    if (source.type === 'ingest_source') {
+      for (const stream_uuid of source.stream_uuids || []) {
+        await deleteStreamByUuid(stream_uuid).catch((error) => {
+          Log().error('Failed to delete stream! \nError: ', error);
+        });
+      }
     }
   }
 
@@ -441,7 +443,7 @@ export async function stopProduction(
           value: {
             step: 'remove_pipeline_streams',
             success: false,
-            message: 'Unexpected error occured'
+            message: `Error occurred when removing streams from pipeline: ${e}`
           }
         };
       } else {
@@ -464,7 +466,7 @@ export async function stopProduction(
           value: {
             step: 'remove_pipeline_multiviews',
             success: false,
-            message: 'Unexpected error occured'
+            message: `Error occurred when removing multiviews from pipeline: ${e}`
           }
         };
       } else {
@@ -638,7 +640,7 @@ export async function startProduction(
       return {
         ok: false,
         value: [{ step: 'streams', success: false }],
-        error: 'Could not setup streams: Unexpected error occured'
+        error: `Could not setup streams: Unexpected error occured: ${e}`
       };
     }
     return {
