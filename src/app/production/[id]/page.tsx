@@ -225,6 +225,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     const selectedPresetCopy = cloneDeep(selectedPreset);
     const foundPipeline = selectedPresetCopy?.pipelines[pipelineIndex];
     if (foundPipeline) {
+      console.log('foundPipeline outputs: ', foundPipeline.outputs);
       foundPipeline.outputs = foundPipeline.outputs || [];
       foundPipeline.pipeline_name = pipelineName;
       foundPipeline.pipeline_id = id;
@@ -238,6 +239,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
       // console.log('setSelectedPipelineName - prevState:', prevState);
       const updatedPipelines = prevState?.production_settings.pipelines;
       if (!updatedPipelines) return;
+      console.log(
+        'prevState outputs: ',
+        prevState.production_settings.pipelines[pipelineIndex].outputs
+      );
       updatedPipelines[pipelineIndex].pipeline_name = pipelineName;
       updatedPipelines[pipelineIndex].pipeline_id = id;
       updatedPipelines[pipelineIndex].outputs =
