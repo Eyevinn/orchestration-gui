@@ -275,12 +275,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
           ? config.production_settings.pipelines[0].pipeline_id
           : ''
       );
-      if (
-        config.production_settings?.pipelines[0].pipeline_id &&
-        productionSetup?.production_settings?.pipelines[0].pipeline_id
-      ) {
-        return;
-      }
       // check if production has pipelines in use or control panels in use, if so update production
       const production = config.isActive
         ? config
