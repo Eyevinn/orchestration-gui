@@ -225,7 +225,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     const selectedPresetCopy = cloneDeep(selectedPreset);
     const foundPipeline = selectedPresetCopy?.pipelines[pipelineIndex];
     if (foundPipeline) {
-      foundPipeline.outputs = [];
+      foundPipeline.outputs = foundPipeline.outputs || [];
       foundPipeline.pipeline_name = pipelineName;
       foundPipeline.pipeline_id = id;
     }
@@ -240,7 +240,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
       if (!updatedPipelines) return;
       updatedPipelines[pipelineIndex].pipeline_name = pipelineName;
       updatedPipelines[pipelineIndex].pipeline_id = id;
-      updatedPipelines[pipelineIndex].outputs = [];
+      updatedPipelines[pipelineIndex].outputs =
+        prevState.production_settings.pipelines[pipelineIndex].outputs || [];
       console.log(
         'PUT REQUEST:',
         prevState.production_settings.pipelines[0].pipeline_id
