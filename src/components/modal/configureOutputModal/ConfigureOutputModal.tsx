@@ -49,6 +49,10 @@ export function ConfigureOutputModal({
   }, [preset]);
 
   const onSave = () => {
+    console.log(
+      'pipeline Ids at start of save: ',
+      pipelines.map((p) => p.pipeline_id)
+    );
     const locations = pipelines
       .map((p) =>
         p.outputs?.map((o) =>
@@ -67,6 +71,10 @@ export function ConfigureOutputModal({
       setCurrentError('Same <IP>:<Port> used for multiple streams');
       return;
     }
+    console.log(
+      'Pipeline Ids right before update prod outputs/end of save',
+      pipelines.map((p) => p.pipeline_id)
+    );
     updatePreset({ ...preset, pipelines: pipelines });
     onClose();
   };

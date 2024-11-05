@@ -224,20 +224,17 @@ export default function ProductionConfiguration({ params }: PageProps) {
     );
     const selectedPresetCopy = cloneDeep(selectedPreset);
     const foundPipeline = selectedPresetCopy?.pipelines[pipelineIndex];
+    console.log('FOUND PIPELINE', foundPipeline);
     if (foundPipeline) {
       foundPipeline.outputs = [];
       foundPipeline.pipeline_name = pipelineName;
+      foundPipeline.pipeline_id = id;
     }
+    console.log(
+      'SETTING SELECTED PRESET IN SET SELECTED PIPELINE NAME',
+      selectedPresetCopy?.pipelines.map((p) => p.pipeline_id)
+    );
     setSelectedPreset(selectedPresetCopy);
-    // console.log(
-    //   'RUNNING selectedPresetCopy',
-    //   selectedPresetCopy?.pipelines[0].pipeline_id
-    // );
-    // console.log('RUNNING foundPipeline', foundPipeline?.pipeline_id);
-    // console.log(
-    //   'RUNNING selectedPreset',
-    //   selectedPreset?.pipelines[0].pipeline_id
-    // );
     setProductionSetup((prevState) => {
       // console.log('setSelectedPipelineName - prevState:', prevState);
       const updatedPipelines = prevState?.production_settings.pipelines;
