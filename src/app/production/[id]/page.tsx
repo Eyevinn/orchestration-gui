@@ -224,7 +224,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
     );
     const selectedPresetCopy = cloneDeep(selectedPreset);
     const foundPipeline = selectedPresetCopy?.pipelines[pipelineIndex];
-    console.log('FOUND PIPELINE', foundPipeline);
     if (foundPipeline) {
       foundPipeline.outputs = [];
       foundPipeline.pipeline_name = pipelineName;
