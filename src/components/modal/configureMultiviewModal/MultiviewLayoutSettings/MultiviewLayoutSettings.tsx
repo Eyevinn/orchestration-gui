@@ -119,7 +119,12 @@ export default function MultiviewLayoutSettings({
         productionId: production._id
       });
     }
-  }, [newPresetName, selectedMultiviewPreset, setNewMultiviewPreset]);
+  }, [
+    newPresetName,
+    selectedMultiviewPreset,
+    setNewMultiviewPreset,
+    production
+  ]);
 
   useEffect(() => {
     if (multiviewLayout) {
