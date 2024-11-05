@@ -170,9 +170,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
     );
     console.log(
       'pipeline_id',
-      productionSetup?.production_settings.pipelines[0].pipeline_id
+      productionSetup?.production_settings?.pipelines[0].pipeline_id
     );
-  }, [productionSetup?.production_settings.pipelines]);
+  }, [productionSetup?.production_settings?.pipelines]);
 
   useEffect(() => {
     refreshPipelines();
@@ -180,9 +180,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
   }, [productionSetup?.isActive]);
 
   const setSelectedControlPanel = (controlPanel: string[]) => {
-    console.log('RUNNING');
+    // console.log('RUNNING');
     setProductionSetup((prevState) => {
-      console.log('setSelectedControlPanel - prevState:', prevState);
+      // console.log('setSelectedControlPanel - prevState:', prevState);
       if (!prevState) return;
       console.log(
         'PUT REQUEST:',
@@ -216,6 +216,12 @@ export default function ProductionConfiguration({ params }: PageProps) {
     pipelineName?: string,
     id?: string
   ) => {
+    console.log(
+      'RUNNING setSelectedPipelineName',
+      pipelineIndex,
+      pipelineName,
+      id
+    );
     const selectedPresetCopy = cloneDeep(selectedPreset);
     const foundPipeline = selectedPresetCopy?.pipelines[pipelineIndex];
     if (foundPipeline) {
@@ -223,17 +229,17 @@ export default function ProductionConfiguration({ params }: PageProps) {
       foundPipeline.pipeline_name = pipelineName;
     }
     setSelectedPreset(selectedPresetCopy);
-    console.log(
-      'RUNNING selectedPresetCopy',
-      selectedPresetCopy?.pipelines[0].pipeline_id
-    );
-    console.log('RUNNING foundPipeline', foundPipeline?.pipeline_id);
-    console.log(
-      'RUNNING selectedPreset',
-      selectedPreset?.pipelines[0].pipeline_id
-    );
+    // console.log(
+    //   'RUNNING selectedPresetCopy',
+    //   selectedPresetCopy?.pipelines[0].pipeline_id
+    // );
+    // console.log('RUNNING foundPipeline', foundPipeline?.pipeline_id);
+    // console.log(
+    //   'RUNNING selectedPreset',
+    //   selectedPreset?.pipelines[0].pipeline_id
+    // );
     setProductionSetup((prevState) => {
-      console.log('setSelectedPipelineName - prevState:', prevState);
+      // console.log('setSelectedPipelineName - prevState:', prevState);
       const updatedPipelines = prevState?.production_settings.pipelines;
       if (!updatedPipelines) return;
       updatedPipelines[pipelineIndex].pipeline_name = pipelineName;
@@ -265,16 +271,24 @@ export default function ProductionConfiguration({ params }: PageProps) {
       console.log(
         'REFRESH RUNNING',
         params.id,
-        config.production_settings.pipelines[0].pipeline_id
+        config.production_settings
+          ? config.production_settings.pipelines[0].pipeline_id
+          : ''
       );
+      if (
+        config.production_settings?.pipelines[0].pipeline_id &&
+        productionSetup?.production_settings?.pipelines[0].pipeline_id
+      ) {
+        return;
+      }
       // check if production has pipelines in use or control panels in use, if so update production
       const production = config.isActive
         ? config
         : checkProductionPipelines(config, pipelines);
-      console.log('REFRESH pipelines', pipelines);
+      // console.log('REFRESH pipelines', pipelines);
       console.log(
         'PUT REQUEST:',
-        production.production_settings.pipelines[0].pipeline_id
+        production.production_settings?.pipelines[0].pipeline_id
       );
       putProduction(production._id, production);
       setProductionSetup(production);
@@ -391,7 +405,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
   };
 
   const updateProduction = (id: string, productionSetup: Production) => {
-    console.log('RUNNING');
+    // console.log('RUNNING');
     setProductionSetup(productionSetup);
     console.log(
       'PUT REQUEST:',
@@ -450,7 +464,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             )
           }
         };
-        console.log('RUNNING');
+        // console.log('RUNNING');
         setProductionSetup(updatedProduction);
       });
     }
@@ -516,7 +530,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
     productionSetup: Production
   ) => {
     const updatedSetup = updateSetupItem(source, productionSetup);
-    console.log('RUNNING');
+    // console.log('RUNNING');
     setProductionSetup(updatedSetup);
     console.log(
       'PUT REQUEST:',
@@ -535,7 +549,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       ...productionSetup,
       name: nameChange
     } as Production;
-    console.log('RUNNING');
+    // console.log('RUNNING');
     setProductionSetup(updatedSetup);
     console.log(
       'PUT REQUEST:',
@@ -595,7 +609,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       }
     } as Production;
     updatedSetup.production_settings.pipelines[0].multiviews = [multiview];
-    console.log('RUNNING');
+    // console.log('RUNNING');
     setProductionSetup(updatedSetup);
   }
 
@@ -640,6 +654,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
       updatedSetup = await updatePipelinesWithSource(updatedSetup, source);
 
       setProductionSetup(updatedSetup);
+      // console.log('RUNNING');
+      console.log(
+        'PUT REQUEST:',
+        updatedSetup.production_settings.pipelines[0].pipeline_id
+      );
       await putProduction(updatedSetup._id.toString(), updatedSetup);
 
       setAddSourceModal(false);
@@ -702,7 +721,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       };
       const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
       if (!updatedSetup) return;
-      console.log('RUNNING');
+      // console.log('RUNNING');
       setProductionSetup(updatedSetup);
       console.log(
         'PUT REQUEST:',
@@ -736,7 +755,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       };
       const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
       if (!updatedSetup) return;
-      console.log('RUNNING');
+      // console.log('RUNNING');
       setProductionSetup(updatedSetup);
       console.log(
         'PUT REQUEST:',
@@ -859,7 +878,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
             (result) => {
               if (!result) return;
-              console.log('RUNNING');
+              // console.log('RUNNING');
               setProductionSetup(result);
               updateMultiview(sourceToAdd, result);
               console.log('REFRESH()');
@@ -923,7 +942,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                 updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
                   (result) => {
                     if (!result) return;
-                    console.log('RUNNING');
+                    // console.log('RUNNING');
                     setProductionSetup(updatedSetup);
                     updateMultiview(selectedSourceRef, result);
                     setSelectedSourceRef(undefined);
@@ -945,7 +964,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
           updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
             (result) => {
               if (!result) return;
-              console.log('RUNNING');
+              // console.log('RUNNING');
               setProductionSetup(updatedSetup);
               updateMultiview(selectedSourceRef, result);
               setRemoveSourceModal(false);
@@ -981,7 +1000,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
               updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
                 (result) => {
                   if (!result) return;
-                  console.log('RUNNING');
+                  // console.log('RUNNING');
                   setProductionSetup(result);
                   updateMultiview(selectedSourceRef, result);
                 }
@@ -1028,7 +1047,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       if (!updatedSetup) return;
       updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then((result) => {
         if (!result) return;
-        console.log('RUNNING');
+        // console.log('RUNNING');
         setProductionSetup(result);
         updateMultiview(selectedSourceRef, result);
         setRemoveSourceModal(false);
@@ -1198,7 +1217,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
                         ingestSourceId
                       );
                       if (!updatedSetup) return;
-                      console.log('RUNNING');
+                      // console.log('RUNNING');
                       setProductionSetup(updatedSetup);
                       console.log(
                         'PUT REQUEST:',

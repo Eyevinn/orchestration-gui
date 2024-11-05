@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import CopyItem from './CopyItem';
 import { WhepMultiview } from '../../interfaces/whep';
 import { SrtOutput } from '../../interfaces/pipeline';
@@ -15,6 +15,9 @@ interface ICopyToClipboard {
 }
 
 export const CopyToClipboard = ({ allSrtUrls }: ICopyToClipboard) => {
+  useEffect(() => {
+    console.log('allSrtUrls', allSrtUrls);
+  }, [allSrtUrls]);
   return (
     <div className="flex flex-col">
       {allSrtUrls.map(({ value, isMulti, viewer }) => (

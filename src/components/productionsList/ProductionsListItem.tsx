@@ -42,6 +42,10 @@ export function ProductionsListItem({ production }: ProductionListItemProps) {
   const handleStopProduction = async () => {
     stopProduction(production)
       .then((status) => {
+        console.log(
+          'PUT REQUEST:',
+          production.production_settings?.pipelines[0].pipeline_id
+        );
         putProduction(production._id.toString(), {
           ...production,
           isActive: false

@@ -520,6 +520,7 @@ export async function deleteMediaFromPipeline(
 export async function getPipelineRenderingEngine(
   pipelineUuid: string
 ): Promise<ResourcesRenderingEngineResponse> {
+  console.log('getPipelineRenderingEngine', pipelineUuid);
   const response = await fetch(
     new URL(
       LIVE_BASE_API_PATH + `/pipelines/${pipelineUuid}/renderingengine`,
