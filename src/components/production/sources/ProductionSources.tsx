@@ -43,7 +43,6 @@ import { PipelineSettings } from '../../../interfaces/pipeline';
 import { useGetFirstEmptySlot } from '../../../hooks/useGetFirstEmptySlot';
 import useEffectNotOnMount from '../../../hooks/utils/useEffectNotOnMount';
 import { LoadingCover } from '../../loader/LoadingCover';
-import { Production } from '../../../interfaces/production';
 
 interface ProductionSourcesProps {
   sources: SourceReference[];
@@ -154,11 +153,26 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
     setSelectedSource(undefined);
   };
 
-  const removeSource = (source: SourceReference) => {
+  const removeSource = (source: SourceReference, ingestSourceId?: number) => {
     const tempItems = selectedSources.filter(
       (tempItem) => tempItem._id !== source._id
     );
+
+    let updatedPipelines = pipelines;
+
+    if (ingestSourceId !== undefined) {
+      updatedPipelines = pipelines.map((pipeline) => ({
+        ...pipeline,
+        sources: pipeline.sources
+          ? pipeline.sources.filter(
+              (pipelineSource) => pipelineSource.source_id !== ingestSourceId
+            )
+          : []
+      }));
+    }
+
     setSelectedSources(tempItems);
+    updatePipelines(updatedPipelines);
   };
 
   const updatePipelinesWithSource = async (source: SourceWithId) => {
@@ -336,7 +350,7 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
     }
   };
 
-  const handleRemoveSource = async () => {
+  const handleRemoveSource = async (ingestSource?: SourceWithId) => {
     if (isProductionActive && selectedSourceRef) {
       if (!multiviews || multiviews.length === 0) return;
 
@@ -440,9 +454,18 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
         }
       }
 
-      removeSource(selectedSourceRef);
+      const ingestSourceId =
+        ingestSource !== undefined
+          ? await getIngestSourceId(
+              ingestSource.ingest_name,
+              ingestSource.ingest_source_name
+            )
+          : undefined;
+
+      removeSource(selectedSourceRef, ingestSourceId);
       setRemoveSourceModal(false);
       setSelectedSourceRef(undefined);
+      setSelectedSource(undefined);
     }
   };
 
@@ -576,12 +599,22 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
                     onSourceUpdate={(source: SourceReference) => {
                       updateSource(source);
                     }}
-                    onSourceRemoval={(source: SourceReference) => {
+                    onSourceRemoval={async (
+                      source: SourceReference,
+                      ingestSource?: ISource
+                    ) => {
                       if (isProductionActive) {
+                        setSelectedSource(ingestSource);
                         setSelectedSourceRef(source);
                         setRemoveSourceModal(true);
                       } else {
-                        removeSource(source);
+                        const ingestSourceId = ingestSource
+                          ? await getIngestSourceId(
+                              ingestSource.ingest_name,
+                              ingestSource.ingest_source_name
+                            )
+                          : undefined;
+                        removeSource(source, ingestSourceId);
                         setRemoveSourceModal(false);
                         setSelectedSourceRef(undefined);
                       }
@@ -593,7 +626,7 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
                       name={selectedSourceRef.label}
                       open={removeSourceModal}
                       onAbort={handleAbortRemoveSource}
-                      onConfirm={handleRemoveSource}
+                      onConfirm={() => handleRemoveSource(selectedSource)}
                       status={deleteSourceStatus}
                       loading={
                         loadingDeleteStream ||
