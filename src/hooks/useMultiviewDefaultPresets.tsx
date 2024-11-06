@@ -43,7 +43,9 @@ export function useMultiviewDefaultPresets({
               return {
                 ...view,
                 label: sourceSlot >= 0 ? source.label : view.label,
-                id: sourceSlot >= 0 ? source._id : view.id
+                id: sourceSlot >= 0 ? source._id : view.id,
+                input_slot:
+                  sourceSlot >= 0 ? source.input_slot : view.input_slot
               };
             })
           }

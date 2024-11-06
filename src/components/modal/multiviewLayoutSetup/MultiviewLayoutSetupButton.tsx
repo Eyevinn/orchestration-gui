@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconSettings } from '@tabler/icons-react';
 import { TMultiviewLayout } from '../../../interfaces/preset';
 import { useTranslate } from '../../../i18n/useTranslate';
@@ -13,19 +13,29 @@ type MultiviewLayoutSetupButtonProps = {
   productionId: string;
   isProductionActive: boolean;
   sourceList: SourceReference[];
+  resetRefresh: () => void;
 };
 
 export function MultiviewLayoutSetupButton({
   onUpdateLayoutPreset,
   productionId,
   isProductionActive,
-  sourceList
+  sourceList,
+  resetRefresh
 }: MultiviewLayoutSetupButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const t = useTranslate();
+
   const toggleConfigModal = () => {
     setModalOpen((state) => !state);
   };
-  const t = useTranslate();
+
+  useEffect(() => {
+    if (modalOpen) {
+      resetRefresh();
+    }
+  }, [modalOpen, resetRefresh]);
+
   return (
     <>
       <Button
@@ -40,9 +50,9 @@ export function MultiviewLayoutSetupButton({
         productionId={productionId}
         isProductionActive={isProductionActive}
         sourceList={sourceList}
-        onUpdateLayoutPreset={() => {
+        onUpdateLayoutPreset={(newLayout: TMultiviewLayout | null) => {
           setModalOpen(false);
-          onUpdateLayoutPreset;
+          onUpdateLayoutPreset(newLayout);
         }}
         open={modalOpen}
         onClose={() => setModalOpen(false)}

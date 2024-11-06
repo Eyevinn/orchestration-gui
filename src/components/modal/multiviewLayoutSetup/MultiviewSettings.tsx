@@ -40,11 +40,11 @@ export default function MultiviewSettingsConfig({
     return multiviewLayouts?.filter(
       (layout) => layout.productionId === productionId || !layout.productionId
     );
-  }, [multiviewLayouts]);
+  }, [multiviewLayouts, productionId]);
 
   const multiviewLayoutNames = useMemo(() => {
     return avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
-  }, [multiviewLayouts]);
+  }, [avaliableMultiviewLayouts]);
 
   useEffect(() => {
     if (

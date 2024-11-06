@@ -37,17 +37,14 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
   const [streamIdDuplicateIndexes, setStreamIdDuplicateIndexes] = useState<
     number[]
   >([]);
-  const [layoutModalOpen, setLayoutModalOpen] = useState(false);
   const [refresh, setRefresh] = useState(true);
   const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
   const t = useTranslate();
-  // const getMultiviewLayout = useGetMultiviewLayout();
 
   const clearInputs = () => {
-    setLayoutModalOpen(false);
     setMultiviews(multiviewsProp || []);
   };
 
@@ -98,7 +95,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
     }
 
     await addNewLayout(newLayout);
-    setLayoutModalOpen(false);
+    setNewMultiviewLayout(newLayout);
     setRefresh(true);
   };
 
@@ -203,81 +200,80 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
   return (
     <Section title="Multiviewers">
       <div id="card-wrapper" className="rounded-xl bg-zinc-700 p-4">
-        {!layoutModalOpen && (
-          <div className="flex gap-3">
-            {(multiviews &&
-              multiviews.length > 0 &&
-              multiviews.map((singleItem, index) => {
-                return (
-                  <div className="flex" key={index}>
-                    {index !== 0 && (
-                      <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
-                    )}
-                    <div className="flex flex-col">
-                      <MultiviewSettingsConfig
-                        productionId={productionId}
-                        newMultiviewLayout={newMultiviewLayout}
-                        lastItem={multiviews.length === index + 1}
-                        multiview={singleItem}
-                        handleUpdateMultiview={(input) =>
-                          handleUpdateMultiview(input, index)
-                        }
-                        portDuplicateError={
-                          portDuplicateIndexes.length > 0
-                            ? portDuplicateIndexes.includes(index)
-                            : false
-                        }
-                        streamIdDuplicateError={
-                          streamIdDuplicateIndexes.length > 0
-                            ? streamIdDuplicateIndexes.includes(index)
-                            : false
-                        }
-                        refresh={refresh}
-                      />
-                      <div
-                        className={`w-full flex ${
-                          multiviews.length > 1
-                            ? 'justify-between'
-                            : 'justify-end'
-                        }`}
-                      >
-                        {multiviews.length > 1 && (
-                          <button
-                            type="button"
-                            title={t('preset.remove_multiview')}
-                            onClick={() => removeNewMultiview(index)}
-                          >
-                            <IconTrash
-                              className={`ml-4 text-button-delete hover:text-red-400`}
-                            />
-                          </button>
-                        )}
-                        {multiviews.length === index + 1 && (
-                          <button
-                            type="button"
-                            title={t('preset.add_another_multiview')}
-                            onClick={() =>
-                              addNewMultiview({
-                                ...singleItem,
-                                multiview_id: (singleItem.multiview_id ?? 0) + 1
-                              })
-                            }
-                          >
-                            <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
-                          </button>
-                        )}
-                      </div>
+        <div className="flex gap-3">
+          {(multiviews &&
+            multiviews.length > 0 &&
+            multiviews.map((singleItem, index) => {
+              return (
+                <div className="flex" key={index}>
+                  {index !== 0 && (
+                    <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
+                  )}
+                  <div className="flex flex-col">
+                    <MultiviewSettingsConfig
+                      productionId={productionId}
+                      newMultiviewLayout={newMultiviewLayout}
+                      lastItem={multiviews.length === index + 1}
+                      multiview={singleItem}
+                      handleUpdateMultiview={(input) =>
+                        handleUpdateMultiview(input, index)
+                      }
+                      portDuplicateError={
+                        portDuplicateIndexes.length > 0
+                          ? portDuplicateIndexes.includes(index)
+                          : false
+                      }
+                      streamIdDuplicateError={
+                        streamIdDuplicateIndexes.length > 0
+                          ? streamIdDuplicateIndexes.includes(index)
+                          : false
+                      }
+                      refresh={refresh}
+                    />
+                    <div
+                      className={`w-full flex ${
+                        multiviews.length > 1
+                          ? 'justify-between'
+                          : 'justify-end'
+                      }`}
+                    >
+                      {multiviews.length > 1 && (
+                        <button
+                          type="button"
+                          title={t('preset.remove_multiview')}
+                          onClick={() => removeNewMultiview(index)}
+                        >
+                          <IconTrash
+                            className={`ml-4 text-button-delete hover:text-red-400`}
+                          />
+                        </button>
+                      )}
+                      {multiviews.length === index + 1 && (
+                        <button
+                          type="button"
+                          title={t('preset.add_another_multiview')}
+                          onClick={() =>
+                            addNewMultiview({
+                              ...singleItem,
+                              multiview_id: (singleItem.multiview_id ?? 0) + 1
+                            })
+                          }
+                        >
+                          <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
+                        </button>
+                      )}
                     </div>
                   </div>
-                );
-              })) || <div>No Multiviews</div>}
-          </div>
-        )}
+                </div>
+              );
+            })) || <div>No Multiviews</div>}
+        </div>
         <MultiviewLayoutSetupButton
           productionId={productionId}
           isProductionActive={isProductionActive}
           sourceList={sources}
           onUpdateLayoutPreset={onUpdateLayoutPreset}
+          resetRefresh={() => setRefresh(false)}
         />
         <div className="flex flex-col">
           <Decision
