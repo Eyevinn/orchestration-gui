@@ -269,7 +269,7 @@ export async function createStream(
         };
       }
       const updatedViewsForSource = viewsForSource.map((v) => {
-        return { ...v, label: source.name };
+        return { ...v, label: v.label || source.name };
       });
 
       const updatedViews = [
