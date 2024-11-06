@@ -1109,7 +1109,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                     ingestSource?: ISource
                   ) => {
                     if (productionSetup && productionSetup.isActive) {
-                      // MBY THIS WORKS???????
                       setSelectedSource(ingestSource);
                       setSelectedSourceRef(source);
                       setRemoveSourceModal(true);
@@ -1143,7 +1142,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   }}
                   loading={loading}
                 />
-                {/* Hur få in ISource här? */}
                 {removeSourceModal && selectedSourceRef && (
                   <RemoveSourceModal
                     name={selectedSourceRef.label}
