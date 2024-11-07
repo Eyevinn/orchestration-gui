@@ -55,7 +55,8 @@ import { updatedMonitoringForProduction } from './job/syncMonitoring';
 import { ObjectId } from 'mongodb';
 import { MultiviewSettings } from '../../interfaces/multiview';
 import {
-  getPipelineRenderingEngine,
+  getPipelineRenderingEngineHtml,
+  getPipelineRenderingEngineMedia,
   createPipelineHtmlSource,
   createPipelineMediaSource,
   deleteHtmlFromPipeline,
@@ -342,12 +343,11 @@ export async function stopProduction(
     for (const pipeline of production.production_settings.pipelines) {
       const pipelineId = pipeline.pipeline_id;
       if (pipelineId) {
-        const pipelineRenderingEngine = await getPipelineRenderingEngine(
-          pipelineId
-        );
+        const htmlSources = await getPipelineRenderingEngineHtml(pipelineId);
+        const mediaSources = await getPipelineRenderingEngineMedia(pipelineId);
 
-        const htmlSources = pipelineRenderingEngine.html;
-        const mediaSources = pipelineRenderingEngine.media;
+        Log().info('GET RENDERING ENGINE HTML SOURCES: ', htmlSources);
+        Log().info('GET RENDERING ENGINE MEDIA SOURCES: ', mediaSources);
 
         if (htmlSources.length > 0 && htmlSources) {
           for (const pipeline of production.production_settings.pipelines) {
@@ -805,12 +805,15 @@ export async function startProduction(
     (source) => source.type === 'mediaplayer'
   );
 
+  Log().info('HTML SOURCES IN START PRODUCTION: ', htmlSources);
+  Log().info('MEDIA SOURCES IN START PRODUCTION: ', mediaSources);
+
   if (htmlSources.length > 0) {
     for (const htmlSource of htmlSources) {
       if (htmlSource.html_data) {
         const htmlData = {
           ...htmlSource.html_data,
-          url: htmlSource.html_data?.url || '',
+          url: htmlSource.html_data.url || '',
           input_slot: htmlSource.input_slot
         };
         await createPipelineHtmlSource(

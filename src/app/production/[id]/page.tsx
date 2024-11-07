@@ -70,7 +70,6 @@ import { useDeleteHtmlSource } from '../../../hooks/renderingEngine/useDeleteHtm
 import { useDeleteMediaSource } from '../../../hooks/renderingEngine/useDeleteMediaSource';
 import { useCreateHtmlSource } from '../../../hooks/renderingEngine/useCreateHtmlSource';
 import { useCreateMediaSource } from '../../../hooks/renderingEngine/useCreateMediaSource';
-import { useRenderingEngine } from '../../../hooks/renderingEngine/useRenderingEngine';
 
 export default function ProductionConfiguration({ params }: PageProps) {
   const t = useTranslate();
@@ -146,7 +145,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
   const [deleteMediaSource, deleteMediaLoading] = useDeleteMediaSource();
   const [createHtmlSource, createHtmlLoading] = useCreateHtmlSource();
   const [createMediaSource, createMediaLoading] = useCreateMediaSource();
-  const [getRenderingEngine, renderingEngineLoading] = useRenderingEngine();
 
   const { locked } = useContext(GlobalContext);
 
@@ -1020,7 +1018,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
           const pipelineId =
             productionSetup.production_settings.pipelines[i].pipeline_id;
           if (pipelineId) {
-            getRenderingEngine(pipelineId);
             if (selectedSourceRef.type === 'html') {
               await deleteHtmlSource(
                 pipelineId,
