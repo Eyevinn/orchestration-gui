@@ -140,7 +140,12 @@ export async function runSyncInventory() {
       audio_stream:
         apiSource.ingest_type === 'SRT' && apiSource.status === 'gone'
           ? inventorySource.audio_stream
-          : apiSource.audio_stream,
+          : {
+              number_of_channels: apiSource.audio_stream.number_of_channels,
+              sample_rate: apiSource.audio_stream.sample_rate,
+              audio_mapping:
+                inventorySource.audio_stream.audio_mapping || undefined
+            },
       // Add srt metadata if missing from SRT sources
       srt: updateSrtMetadata(inventorySource, apiSource)
     } satisfies WithId<Source>;

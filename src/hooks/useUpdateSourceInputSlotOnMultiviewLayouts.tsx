@@ -45,7 +45,10 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
               )?.label;
 
               if ((view.id && view.id.length < 5) || preview || program) {
-                return view;
+                return {
+                  ...view,
+                  label: isUpdatedLabel || view.label
+                };
               } else if (isUpdatedInputSlot || isSameInputSlot) {
                 return {
                   ...view,

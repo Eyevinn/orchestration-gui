@@ -214,7 +214,7 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
       const input: SourceReference = {
         _id: source._id.toString(),
         type: 'ingest_source',
-        label: source.ingest_source_name,
+        label: source.name || source.ingest_source_name,
         input_slot: firstEmptySlot(selectedSources)
       };
       addSource(input);
