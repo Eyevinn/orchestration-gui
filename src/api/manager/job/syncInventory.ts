@@ -81,6 +81,34 @@ export async function runSyncInventory() {
     }
   };
 
+  const updateSrtMetadata = (
+    inventorySource: WithId<Source>,
+    apiSource: SourceWithoutLastConnected
+  ) => {
+    if (
+      apiSource.status === 'new' &&
+      apiSource.ingest_type === 'SRT' &&
+      apiSource.srt &&
+      apiSource.srt.video_format &&
+      inventorySource.srt
+    ) {
+      const updatedSrt = {
+        ...inventorySource.srt,
+        video_format: apiSource.srt.video_format
+      };
+
+      return updatedSrt;
+    } else if (
+      apiSource.ingest_type === 'SRT' &&
+      !inventorySource.srt &&
+      apiSource.srt
+    ) {
+      return apiSource.srt;
+    } else {
+      return inventorySource.srt;
+    }
+  };
+
   // Update status of all sources in the inventory to the status found in API.
   // If a source is not found in the API, it is marked as gone.
   const dbInventoryWithCorrectStatus = dbInventory.map((inventorySource) => {
@@ -105,12 +133,16 @@ export async function runSyncInventory() {
       ...inventorySource,
       status: statusUpdateCheck(inventorySource, apiSource, lastConnected),
       lastConnected: lastConnected,
+      video_stream:
+        apiSource.ingest_type === 'SRT' && apiSource.status === 'gone'
+          ? inventorySource.video_stream
+          : apiSource.video_stream,
+      audio_stream:
+        apiSource.ingest_type === 'SRT' && apiSource.status === 'gone'
+          ? inventorySource.audio_stream
+          : apiSource.audio_stream,
       // Add srt metadata if missing from SRT sources
-      srt:
-        (apiSource.ingest_type === 'SRT' &&
-          !inventorySource.srt &&
-          apiSource.srt) ||
-        inventorySource.srt
+      srt: updateSrtMetadata(inventorySource, apiSource)
     } satisfies WithId<Source>;
   });
 
