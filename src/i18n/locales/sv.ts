@@ -727,6 +727,8 @@ export const sv = {
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
     could_not_delete_layout: 'Kunde inte ta bort kompositionen',
+    could_not_delete_layout_in_use:
+      'Kompositionen används och kan inte tas bort',
     confirm_update_multiviewers:
       'Är du säker på att du vill uppdatera multiview för pågående produktion?',
     confirm_update: 'Uppdatera multiviewers'

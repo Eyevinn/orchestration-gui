@@ -33,7 +33,8 @@ export default function MultiviewLayoutSetup({
   isProductionActive,
   sourceList,
   open,
-  onClose
+  onClose,
+  savedMultiviews
 }: {
   onUpdateLayoutPreset: (newLayout: TMultiviewLayout | null) => void;
   productionId: string;
@@ -41,6 +42,7 @@ export default function MultiviewLayoutSetup({
   sourceList: SourceReference[];
   open: boolean;
   onClose: () => void;
+  savedMultiviews: string[];
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
@@ -136,6 +138,7 @@ export default function MultiviewLayoutSetup({
     setNewPresetName('');
     setPresetName('');
     setIsChecked(false);
+    setSelectedMultiviewPreset(null);
   };
 
   const handleLayoutUpdate = (name: string, type: string) => {
@@ -193,6 +196,21 @@ export default function MultiviewLayoutSetup({
       toast.error(t('preset.could_not_delete_layout'));
       return;
     }
+
+    // Check if the layout is in use
+    if (
+      layoutToRemove &&
+      layoutToRemove._id &&
+      savedMultiviews.includes(
+        typeof layoutToRemove._id === 'string'
+          ? layoutToRemove._id
+          : layoutToRemove._id.toString()
+      )
+    ) {
+      toast.error(t('preset.could_not_delete_layout_in_use'));
+      return;
+    }
+
     if (layoutToRemove && layoutToRemove._id) {
       deleteLayout(layoutToRemove._id.toString()).then(() => {
         setRefresh(true);

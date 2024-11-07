@@ -722,6 +722,8 @@ export const en = {
     clear_layout: 'Clear layout',
     add_another_multiview: 'Add another multiview',
     could_not_delete_layout: 'Could not delete layout',
+    could_not_delete_layout_in_use:
+      'Could not delete layout that is saved in production',
     layout_deleted: 'Layout deleted',
     confirm_update_multiviewers:
       'Are you sure you want to update multiviewers for the running production?',

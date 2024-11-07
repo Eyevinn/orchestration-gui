@@ -44,6 +44,10 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
   const addNewLayout = usePutMultiviewLayout();
   const t = useTranslate();
 
+  const savedMultiviews = multiviewsProp.map((singleMultiview) => {
+    return singleMultiview._id ?? '';
+  });
+
   const clearInputs = () => {
     setMultiviews(multiviewsProp || []);
   };
@@ -273,7 +277,8 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
           isProductionActive={isProductionActive}
           sourceList={sources}
           onUpdateLayoutPreset={onUpdateLayoutPreset}
-          resetRefresh={() => setRefresh(false)}
+          refreshLayoutList={setRefresh}
+          savedMultiviews={savedMultiviews}
         />
         <div className="flex flex-col">
           <Decision

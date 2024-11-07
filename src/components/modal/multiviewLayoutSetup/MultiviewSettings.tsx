@@ -42,6 +42,10 @@ export default function MultiviewSettingsConfig({
     );
   }, [multiviewLayouts, productionId]);
 
+  const defaultMultiview = multiviewLayouts
+    ? multiviewLayouts.find((m) => m.productionId !== undefined)
+    : undefined;
+
   const multiviewLayoutNames = useMemo(() => {
     return avaliableMultiviewLayouts?.map((layout) => layout.name) || [];
   }, [avaliableMultiviewLayouts]);
@@ -50,35 +54,30 @@ export default function MultiviewSettingsConfig({
     if (
       refresh &&
       multiview &&
-      multiviewLayouts &&
-      multiviewLayouts.length > 0
+      avaliableMultiviewLayouts &&
+      avaliableMultiviewLayouts.length > 0
     ) {
       handleSetSelectedMultiviewLayout(multiview.name);
     }
-  }, [refresh, multiviewLayouts]);
+  }, [refresh, avaliableMultiviewLayouts]);
 
   useEffect(() => {
     if (multiview) {
       setSelectedMultiviewLayout(multiview);
       return;
     }
-    if (multiviewLayouts) {
-      const defaultMultiview = multiviewLayouts.find(
-        (m) => m.productionId !== undefined
-      );
-      if (defaultMultiview) {
-        setSelectedMultiviewLayout(defaultMultiview);
-      }
+    if (defaultMultiview) {
+      setSelectedMultiviewLayout(defaultMultiview);
     }
-  }, [lastItem, multiview, multiviewLayouts, newMultiviewLayout]);
+  }, [lastItem, multiview, newMultiviewLayout, defaultMultiview]);
 
   if (!multiview) {
-    if (!multiviewLayouts || multiviewLayouts.length === 0) {
+    if (!defaultMultiview) {
       return null;
     }
     handleUpdateMultiview({
-      ...multiviewLayouts[0],
-      _id: multiviewLayouts[0]._id?.toString(),
+      ...defaultMultiview,
+      _id: defaultMultiview._id?.toString(),
       for_pipeline_idx: 0
     });
   }

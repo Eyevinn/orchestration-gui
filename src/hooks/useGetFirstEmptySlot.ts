@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Production } from '../interfaces/production';
 import { CallbackHook } from './types';
 import { SourceReference } from '../interfaces/Source';
 

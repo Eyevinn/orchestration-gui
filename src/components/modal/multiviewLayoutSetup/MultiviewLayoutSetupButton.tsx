@@ -13,7 +13,8 @@ type MultiviewLayoutSetupButtonProps = {
   productionId: string;
   isProductionActive: boolean;
   sourceList: SourceReference[];
-  resetRefresh: () => void;
+  refreshLayoutList: (reload: boolean) => void;
+  savedMultiviews: string[];
 };
 
 export function MultiviewLayoutSetupButton({
@@ -21,7 +22,8 @@ export function MultiviewLayoutSetupButton({
   productionId,
   isProductionActive,
   sourceList,
-  resetRefresh
+  refreshLayoutList,
+  savedMultiviews
 }: MultiviewLayoutSetupButtonProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const t = useTranslate();
@@ -31,10 +33,8 @@ export function MultiviewLayoutSetupButton({
   };
 
   useEffect(() => {
-    if (modalOpen) {
-      resetRefresh();
-    }
-  }, [modalOpen, resetRefresh]);
+    refreshLayoutList(!modalOpen);
+  }, [modalOpen, refreshLayoutList]);
 
   return (
     <>
@@ -56,6 +56,7 @@ export function MultiviewLayoutSetupButton({
         }}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+        savedMultiviews={savedMultiviews}
       />
     </>
   );
