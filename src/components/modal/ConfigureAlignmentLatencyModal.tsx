@@ -4,7 +4,7 @@ import { Button } from '../button/Button';
 import { Loader } from '../loader/Loader';
 import { ISource } from '../../hooks/useDragableItems';
 import { useState, useEffect, useRef } from 'react';
-import { useIngestStreams } from '../../hooks/ingests';
+import { useIngestStreams, useIngestSourceId } from '../../hooks/ingests';
 import { useGetProductionSourceAlignmentAndLatency } from '../../hooks/productions';
 import {
   ResourcesCompactPipelineResponse,
@@ -77,6 +77,7 @@ export function ConfigureAlignmentLatencyModal({
   const getProductionSourceAlignmentAndLatency =
     useGetProductionSourceAlignmentAndLatency();
   const [pipelines] = GetPipelines();
+  const [getIngestSourceId] = useIngestSourceId();
 
   useEffect(() => {
     setAvailablePipelines(pipelines);
@@ -96,6 +97,17 @@ export function ConfigureAlignmentLatencyModal({
       }
     }
   }, [pipelinesAreSelected, latencies, alignments]);
+
+  useEffect(() => {
+    const fetchSourceId = async () => {
+      const id = await getIngestSourceId(
+        source.ingest_name,
+        source.ingest_source_name
+      );
+      setSourceId(id);
+    };
+    fetchSourceId();
+  }, [source]);
 
   useEffect(() => {
     const fetchStreams = async () => {
@@ -130,7 +142,6 @@ export function ConfigureAlignmentLatencyModal({
             newAlignments[stream.pipeline_uuid] = 0;
             newLatencies[stream.pipeline_uuid] = 0;
           }
-          setSourceId(stream.source_id);
         }
       } else if (availablePipelines) {
         for (const pipeline of availablePipelines) {

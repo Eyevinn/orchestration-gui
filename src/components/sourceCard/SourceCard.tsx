@@ -54,7 +54,8 @@ export default function SourceCard({
 
   const pipelinesAreSelected =
     productionSetup?.production_settings.pipelines.some(
-      (pipeline) => pipeline.pipeline_id === undefined
+      (pipeline) =>
+        pipeline.pipeline_id === undefined || pipeline.pipeline_id === ''
     ) === false;
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
