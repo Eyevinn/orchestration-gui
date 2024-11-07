@@ -87,8 +87,12 @@ export async function createPipelineHtmlSource(
           Log().warn('Unexpected content for 201 response:', text);
         }
         Log().info('SUCCESSFUL CREATION OF HTML SOURCE');
-      } else if (response.status === 400 || response.status === 404 || response.status === 500) {
-        Log().info("ERROR WHEN CREATING AN HTML SOURCE");
+      } else if (
+        response.status === 400 ||
+        response.status === 404 ||
+        response.status === 500
+      ) {
+        Log().info('ERROR WHEN CREATING AN HTML SOURCE');
         try {
           const errorResponse = JSON.parse(text);
           Log().error('API error response:', errorResponse);
@@ -368,7 +372,7 @@ export async function createPipelineMediaSource(
         }
         Log().info('SUCCESSFULLY CREATED MEDIA SOURCE');
       } else if (response.status === 400 || response.status === 500) {
-        Log().info("ERROR WHEN CREATING A MEDIA SOURCE");
+        Log().info('ERROR WHEN CREATING A MEDIA SOURCE');
         try {
           const errorResponse = JSON.parse(text);
           Log().error('API error response:', errorResponse);
