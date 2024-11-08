@@ -283,6 +283,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
         <div className="flex flex-col">
           <Decision
             className="mt-6"
+            buttonText={t('clear')}
             onClose={() => clearInputs()}
             onSave={() => onSave()}
           />

@@ -151,6 +151,7 @@ export default function MultiviewLayoutSetup({
 
     switch (type) {
       case 'layout':
+        if (availableMultiviewLayouts.length === 0) return;
         setNewPresetName(name || '');
         if (chosenLayout) {
           setIsChecked(false);
@@ -169,7 +170,7 @@ export default function MultiviewLayoutSetup({
   };
 
   const handleChange = (viewId: string, value: string) => {
-    if (inputList && availableMultiviewLayouts) {
+    if (inputList) {
       const emptyView = {
         id: '',
         input_slot: 0,
@@ -253,7 +254,7 @@ export default function MultiviewLayoutSetup({
                     ? multiviewLayoutNames.map((singleItem) => ({
                         label: singleItem
                       }))
-                    : [{ label: 'No layouts available' }]
+                    : [{ label: t('preset.no_avaliable_layouts') }]
                 }
                 value={selectedMultiviewPreset?.name || ''}
                 update={(value) => handleLayoutUpdate(value, 'layout')}

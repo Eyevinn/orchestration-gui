@@ -702,6 +702,7 @@ export const en = {
     multiview_output_settings: 'Multiview output',
     select_multiview_layout: 'Layout',
     configure_layouts: 'Configure layouts',
+    no_avaliable_layouts: 'No available layouts',
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',

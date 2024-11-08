@@ -5,9 +5,15 @@ interface IDecision {
   onClose: () => void;
   onSave: () => void;
   className?: string;
+  buttonText?: string;
 }
 
-export default function Decision({ onClose, onSave, className }: IDecision) {
+export default function Decision({
+  onClose,
+  onSave,
+  className,
+  buttonText
+}: IDecision) {
   const t = useTranslate();
 
   return (
@@ -17,7 +23,7 @@ export default function Decision({ onClose, onSave, className }: IDecision) {
       }`}
     >
       <Button className="hover:bg-red-500" onClick={onClose} state="warning">
-        {t('close')}
+        {buttonText ? buttonText : t('close')}
       </Button>
       <Button
         className="relative flex hover:bg-green-400"
