@@ -109,7 +109,6 @@ const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
             handleUpdateOutputSetting('video_kilobit_rate', value)
           }
           disabled={locked}
-          classNames="bg-gray-500/50 text-white/50 pointer-events-none"
         />
       </div>
     );
