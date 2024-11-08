@@ -39,8 +39,6 @@ export function useMultiviewLayouts(
   );
 
   useEffect(() => {
-    setmultiviewLayouts([]);
-
     if (!refresh) {
       return;
     }

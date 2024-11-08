@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SourceReference } from '../interfaces/Source';
 import { CallbackHook } from './types';
 import { MultiviewSettings } from '../interfaces/multiview';
+import { useTranslate } from '../i18n/useTranslate';
 
 export function useMultiviews(): CallbackHook<
   (
@@ -12,6 +13,7 @@ export function useMultiviews(): CallbackHook<
   ) => void
 > {
   const [loading, setLoading] = useState(true);
+  const t = useTranslate();
 
   const putMultiviewView = (
     pipelineId: string,
@@ -21,7 +23,7 @@ export function useMultiviews(): CallbackHook<
   ) => {
     setLoading(true);
 
-    if (!singleMultiview) throw 'no multiview';
+    if (!singleMultiview) throw t('preset.no_multiview');
 
     const rest = singleMultiview.layout.views.filter(
       (v) => v.input_slot !== source.input_slot

@@ -702,6 +702,7 @@ export const sv = {
     video_kilobit_rate: 'Kilobit rate',
     add_stream: 'Lägg till ström',
     stream_name: 'Ström',
+    no_multiview: 'Ingen multiview hittas',
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
     no_ip_selected: 'Ingen IP-adress vald',
@@ -709,6 +710,7 @@ export const sv = {
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
     configure_layouts: 'Justera kompositioner',
+    no_avaliable_layouts: 'Inga kompositioner finns',
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
     no_updated_layout: 'Ingen uppdaterad komposition',
@@ -727,6 +729,8 @@ export const sv = {
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
     could_not_delete_layout: 'Kunde inte ta bort kompositionen',
+    could_not_delete_layout_in_use:
+      'Kompositionen används och kan inte tas bort',
     confirm_update_multiviewers:
       'Är du säker på att du vill uppdatera multiview för pågående produktion?',
     confirm_update: 'Uppdatera multiviewers'
