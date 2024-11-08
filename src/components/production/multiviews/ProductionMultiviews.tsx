@@ -270,7 +270,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                   </div>
                 </div>
               );
-            })) || <div>No Multiviews</div>}
+            })) || <div>{t('preset.no_multiview')}</div>}
         </div>
         <MultiviewLayoutSetupButton
           productionId={productionId}
