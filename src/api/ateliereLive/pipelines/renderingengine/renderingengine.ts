@@ -66,6 +66,10 @@ export async function createPipelineHtmlSource(
         'PIPELINE ID TO CREATE HTML SOURCE FOR: ',
         production_settings.pipelines[i].pipeline_id
       );
+      Log().info(
+        'Request URL:',
+        `${LIVE_BASE_API_PATH}/pipelines/${production_settings.pipelines[i].pipeline_id}/renderingengine/html`
+      );
       const response = await fetch(
         new URL(
           LIVE_BASE_API_PATH +
@@ -352,6 +356,10 @@ export async function createPipelineMediaSource(
       Log().info(
         'CREATING MEDIA FOR PIPELINE ID: ',
         production_settings.pipelines[i].pipeline_id
+      );
+      Log().info(
+        'Request URL:',
+        `${LIVE_BASE_API_PATH}/pipelines/${production_settings.pipelines[i].pipeline_id}/renderingengine/media`
       );
       const response = await fetch(
         new URL(
