@@ -74,7 +74,7 @@ export default function DropDown({
         <button
           onClick={() => toggleIsOpen()}
           className={`text-white bg-light focus:ring-1 focus:outline-none w-64 break-all font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-between ${
-            disabled && 'opacity-40 cursor-default'
+            disabled && 'opacity-40 pointer-events-none focus:ring-0'
           }`}
           type="button"
         >

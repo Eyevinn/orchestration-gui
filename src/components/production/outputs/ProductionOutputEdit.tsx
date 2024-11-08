@@ -9,6 +9,8 @@ import Input from '../../modal/configureOutputModal/Input';
 import Options from '../../modal/configureOutputModal/Options';
 import StreamAccordion from '../../modal/configureOutputModal/StreamAccordion';
 import cloneDeep from 'lodash.clonedeep';
+import { useContext } from 'react';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 
 const createNewStream = () => {
   return {
@@ -44,7 +46,9 @@ export interface OutputStream {
 
 const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
   const { output, onOutputChange } = props;
+
   const t = useTranslate();
+  const { locked } = useContext(GlobalContext);
 
   const preventCharacters = (evt: KeyboardEvent) => {
     ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault();
@@ -68,6 +72,7 @@ const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
     return (
       <div className="flex flex-col gap-3" key={`${output.uuid}-options`}>
         <Options
+          disabled={locked}
           label={t('preset.video_format')}
           options={[
             { id: 'AVC', label: 'AVC' },
@@ -77,6 +82,7 @@ const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
           update={(value) => handleUpdateOutputSetting('video_format', value)}
         />
         <Options
+          disabled={locked}
           options={[
             {
               id: '8',
@@ -102,6 +108,8 @@ const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
           update={(value) =>
             handleUpdateOutputSetting('video_kilobit_rate', value)
           }
+          disabled={locked}
+          classNames="bg-gray-500/50 text-white/50 pointer-events-none"
         />
       </div>
     );
@@ -172,6 +180,7 @@ const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
     return output.streams.map((stream, index) => {
       return (
         <StreamAccordion
+          disabled={locked}
           isOnlyStream={false}
           key={'output-streams-' + index}
           stream={convertStream(stream, index)}
@@ -190,8 +199,13 @@ const ProductionOutputEdit: React.FC<ProductionOutputEditProps> = (props) => {
       {getOutputFields(output)}
       <div className="flex flex-col gap-3">{getOutputStreams(output)}</div>
       <button
+        disabled={locked}
         onClick={() => handleAddStream(output)}
-        className="rounded-xl p-1 bg-gray-500 border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500 p-3"
+        className={`${
+          locked
+            ? 'bg-gray-500/50 text-p/50'
+            : 'hover:border-gray-500 bg-gray-500'
+        } rounded-xl border border-gray-600 focus:border-gray-400 focus:outline-none p-3`}
       >
         {t('preset.add_stream')}
       </button>

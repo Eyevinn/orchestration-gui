@@ -5,7 +5,6 @@ import Input from './Input';
 import {
   PipelineOutput,
   PipelineOutputEncoderSettings,
-  PipelineOutputSettings,
   PipelineOutputWithoutEncoderSettings,
   PipelineSettings
 } from '../../../interfaces/pipeline';
@@ -13,6 +12,8 @@ import StreamAccordion from './StreamAccordion';
 import { OutputStream } from './ConfigureOutputModal';
 import Options from './Options';
 import cloneDeep from 'lodash.clonedeep';
+import { useContext } from 'react';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 
 export type PipelineTypes = 'LD' | 'HQ';
 
@@ -63,6 +64,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
   const [updatedOutputs, setUpdatedOutputs] =
     useState<PipelineOutput[]>(pipelineOutputs);
   const t = useTranslate();
+  const { locked } = useContext(GlobalContext);
 
   useEffect(() => {
     updatePipelineOutputs(updatedOutputs);
@@ -159,6 +161,7 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
     return outputStreams.map((stream, index) => {
       return (
         <StreamAccordion
+          disabled={locked}
           isOnlyStream={false}
           key={'output-streams-' + index}
           stream={convertStream(stream, index)}
@@ -276,8 +279,9 @@ const PipelineOutputConfig: React.FC<PipelineOutputConfigProps> = (props) => {
               {getOutputStreams(output.uuid)}
             </div>
             <button
+              disabled={locked}
               onClick={() => handleAddStream(output.uuid)}
-              className="rounded-xl p-1 border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500 p-3"
+              className="rounded-xl border border-gray-600 focus:border-gray-400 focus:outline-none hover:border-gray-500 p-3"
             >
               {t('preset.add_stream')}
             </button>
