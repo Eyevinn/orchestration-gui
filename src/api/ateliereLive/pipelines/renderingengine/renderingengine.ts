@@ -81,9 +81,9 @@ export async function createPipelineHtmlSource(
         }
       );
       const text = await response.text();
-      Log().info("RESPONSE CREATE HTML: ", response);
-      Log().info("RESPONSE.TEXT CREATE HTML: ", text);
-      Log().info("RESPONSE.STATUS CREATE HTML: ", response.status);
+      Log().info('RESPONSE CREATE HTML: ', response);
+      Log().info('RESPONSE.TEXT CREATE HTML: ', text);
+      Log().info('RESPONSE.STATUS CREATE HTML: ', response.status);
 
       if (response.status === 201) {
         if (text.trim().length > 0) {
@@ -368,9 +368,9 @@ export async function createPipelineMediaSource(
         }
       );
       const text = await response.text();
-      Log().info("RESPONSE CREATE MEDIA: ", response);
-      Log().info("RESPONSE.TEXT CREATE MEDIA: ", text);
-      Log().info("RESPONSE.STATUS CREATE MEDIA: ", response.status);
+      Log().info('RESPONSE CREATE MEDIA: ', response);
+      Log().info('RESPONSE.TEXT CREATE MEDIA: ', text);
+      Log().info('RESPONSE.STATUS CREATE MEDIA: ', response.status);
 
       if (response.status === 201) {
         if (text.trim().length > 0) {
