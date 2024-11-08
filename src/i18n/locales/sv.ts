@@ -95,7 +95,7 @@ export const sv = {
   production_configuration: 'Produktionskonfiguration',
   production: {
     productions: 'Produktioner',
-    add_source: 'Lägg till ingång',
+    add_source: 'Lägg till källa',
     select_preset: 'Välj produktionsmall',
     clear_selection: 'Rensa val',
     started: 'Produktion startad: {{name}}',
@@ -107,7 +107,33 @@ export const sv = {
     add: 'Lägg till',
     add_other_source_type: 'Lägg till annan källtyp',
     configure_outputs: 'Konfigurera Outputs',
-    manage_multiviewers: 'Uppdatera multiviewers'
+    manage_multiviewers: 'Uppdatera multiviewers',
+    select_pipeline: 'Välj pipeline',
+    select_control_panel: 'Välj kontrollpanel',
+    control_panel: 'Kontrollpanel',
+    to_pipeline: 'Till pipeline',
+    from_pipeline: 'Från pipeline',
+    sources: 'Källor'
+  },
+  pipeline_card: {
+    audio_format: 'Ljudformat',
+    audio_mapping: 'Ljudmappning',
+    audio_sampling_frequency: 'Samplingsfrekvens',
+    bit_depth: 'Bit Depth',
+    convert_color_range: 'Konvertera Color Range',
+    encoder: 'Encoder',
+    format: 'Format',
+    frame_rate_d: 'Frame Rate D',
+    frame_rate_n: 'Frame Rate N',
+    gop_length: 'GOP Length',
+    height: 'Höjd',
+    width: 'Bredd',
+    video_kilobit_rate: 'Video Kilobit Rate'
+  },
+  output_card: {
+    format: 'Format',
+    bit_depth: 'Bit Depth',
+    video_kilobit_rate: 'Video Kilobit Rate'
   },
   configure_alignment_latency: {
     source_name: 'Källnamn',

@@ -105,7 +105,33 @@ export const en = {
     add: 'Add',
     add_other_source_type: 'Add other source type',
     configure_outputs: 'Configure Outputs',
-    manage_multiviewers: 'Manage multiviewers'
+    manage_multiviewers: 'Manage multiviewers',
+    select_pipeline: 'Select pipeline',
+    select_control_panel: 'Select control panel',
+    control_panel: 'Control panel',
+    to_pipeline: 'To pipeline',
+    from_pipeline: 'From pipeline',
+    sources: 'Sources'
+  },
+  pipeline_card: {
+    audio_format: 'Audio Format',
+    audio_mapping: 'Audio Mapping',
+    audio_sampling_frequency: 'Audio Sampling Frequency',
+    bit_depth: 'Bit Depth',
+    convert_color_range: 'Convert Color Range',
+    encoder: 'Encoder',
+    format: 'Format',
+    frame_rate_d: 'Frame Rate D',
+    frame_rate_n: 'Frame Rate N',
+    gop_length: 'GOP Length',
+    height: 'Height',
+    width: 'Width',
+    video_kilobit_rate: 'Video Kilobit Rate'
+  },
+  output_card: {
+    format: 'Format',
+    bit_depth: 'Bit Depth',
+    video_kilobit_rate: 'Video Kilobit Rate'
   },
   configure_alignment_latency: {
     configure_alignment_latency:
