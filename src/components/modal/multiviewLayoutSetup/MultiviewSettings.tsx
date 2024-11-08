@@ -85,7 +85,6 @@ export default function MultiviewSettingsConfig({
   const handleSetSelectedMultiviewLayout = (name: string) => {
     const selected = multiviewLayouts?.find((m) => m.name === name);
     if (!selected) {
-      toast.error(t('preset.no_multiview_found'));
       return;
     }
     const updatedMultiview = {
