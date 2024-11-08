@@ -698,6 +698,7 @@ export const en = {
     video_kilobit_rate: 'Kilobit rate',
     add_stream: 'Add stream',
     stream_name: 'Stream',
+    no_multiview: 'No multiview can be found',
     multiview_output_settings: 'Multiview output',
     select_multiview_layout: 'Layout',
     configure_layouts: 'Configure layouts',
@@ -723,7 +724,7 @@ export const en = {
     add_another_multiview: 'Add another multiview',
     could_not_delete_layout: 'Could not delete layout',
     could_not_delete_layout_in_use:
-      'Could not delete layout that is saved in production',
+      'The layout is being used and can not be deleted',
     layout_deleted: 'Layout deleted',
     confirm_update_multiviewers:
       'Are you sure you want to update multiviewers for the running production?',

@@ -702,6 +702,7 @@ export const sv = {
     video_kilobit_rate: 'Kilobit rate',
     add_stream: 'Lägg till ström',
     stream_name: 'Ström',
+    no_multiview: 'Ingen multiview hittas',
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
     no_ip_selected: 'Ingen IP-adress vald',
