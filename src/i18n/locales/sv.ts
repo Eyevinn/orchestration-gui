@@ -107,7 +107,7 @@ export const sv = {
     add: 'Lägg till',
     add_other_source_type: 'Lägg till annan källtyp',
     configure_outputs: 'Konfigurera Outputs',
-    manage_multiviewers: 'Uppdatera multiviewers',
+    manage_multiviewers: 'Uppdatera multiviews',
     select_pipeline: 'Välj pipeline',
     select_control_panel: 'Välj kontrollpanel',
     control_panel: 'Kontrollpanel',
@@ -699,7 +699,7 @@ export const sv = {
     optional: 'Valfritt:',
     reset_pipelines: 'Återställa alla pipelines',
     pipeline_output_streams: 'Stänga ner alla pipeline output strömmar',
-    pipeline_multiviewers: 'Stänga ner alla pipeline multiviewers',
+    pipeline_multiviewers: 'Stänga ner alla pipeline multiviews',
     pipeline_streams: 'Stänga ner alla pipeline strömmar',
     pipeline_control_connections:
       'Stänga ner alla pipeline control connections',
@@ -759,7 +759,7 @@ export const sv = {
       'Kompositionen används och kan inte tas bort',
     confirm_update_multiviewers:
       'Är du säker på att du vill uppdatera multiview för pågående produktion?',
-    confirm_update: 'Uppdatera multiviewers'
+    confirm_update: 'Uppdatera multiviews'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

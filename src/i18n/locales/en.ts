@@ -105,7 +105,7 @@ export const en = {
     add: 'Add',
     add_other_source_type: 'Add other source type',
     configure_outputs: 'Configure Outputs',
-    manage_multiviewers: 'Manage multiviewers',
+    manage_multiviewers: 'Manage multiviews',
     select_pipeline: 'Select pipeline',
     select_control_panel: 'Select control panel',
     control_panel: 'Control panel',
@@ -696,7 +696,7 @@ export const en = {
     optional: 'Optional:',
     reset_pipelines: 'Reset all pipelines',
     pipeline_output_streams: 'Delete all pipeline output streams',
-    pipeline_multiviewers: 'Delete all pipeline multiviewer outputs',
+    pipeline_multiviewers: 'Delete all pipeline multiview outputs',
     pipeline_streams: 'Delete all pipeline streams',
     pipeline_control_connections: 'Delete all pipeline control connections',
     ingest_streams: 'Delete all ingest streams',
@@ -754,8 +754,8 @@ export const en = {
       'The layout is being used and can not be deleted',
     layout_deleted: 'Layout deleted',
     confirm_update_multiviewers:
-      'Are you sure you want to update multiviewers for the running production?',
-    confirm_update: 'Update multiviewers'
+      'Are you sure you want to update multiviews for the running production?',
+    confirm_update: 'Update multiviews'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',
