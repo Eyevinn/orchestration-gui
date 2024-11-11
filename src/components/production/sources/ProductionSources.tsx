@@ -573,7 +573,7 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
     (selectedValue !== 'HTML' && selectedValue !== 'Media Player') || locked;
 
   return (
-    <Section title="Sources" startOpen>
+    <Section title={t('production.sources')} startOpen>
       <div className="flex flex-col h-full min-h-[200px] justify-center items-center">
         {sourcesLoading && <LoadingCover />}
         <>

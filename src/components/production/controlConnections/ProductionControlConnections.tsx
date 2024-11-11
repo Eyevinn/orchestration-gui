@@ -6,6 +6,7 @@ import Section from '../../section/Section';
 import { LoadingCover } from '../../loader/LoadingCover';
 import { useContext } from 'react';
 import { GlobalContext } from '../../../contexts/GlobalContext';
+import { useTranslate } from '../../../i18n/useTranslate';
 
 interface ProductionControlConnectionsProps {
   controlConnection?: ProductionControlConnection;
@@ -19,6 +20,7 @@ const ProductionControlConnections: React.FC<
 
   const [controlPanels] = useControlPanels();
   const { locked } = useContext(GlobalContext);
+  const t = useTranslate();
 
   const onControlConnectionChange = (ids: string[]) => {
     if (controlConnection) {
@@ -59,7 +61,7 @@ const ProductionControlConnections: React.FC<
                 </div>
               </div>
               <div className="flex flex-row py-2">
-                <div className="mr-4">{'To Pipeline:'}</div>
+                <div className="mr-4">{t('production.to_pipeline')}:</div>
                 <div className="italic text-gray-300">
                   {controlConnection.control_panel_endpoint.toPipelineIdx}
                 </div>
@@ -78,13 +80,17 @@ const ProductionControlConnections: React.FC<
                         <div className="italic text-gray-300">{pcc.port}</div>
                       </div>
                       <div className="flex flex-row py-2">
-                        <div className="mr-4">{'From Pipeline:'}</div>
+                        <div className="mr-4">
+                          {t('production.from_pipeline')}:
+                        </div>
                         <div className="italic text-gray-300">
                           {pcc.fromPipelineIdx}
                         </div>
                       </div>
                       <div className="flex flex-row py-2">
-                        <div className="mr-4">{'To Pipeline:'}</div>
+                        <div className="mr-4">
+                          {t('production.to_pipeline')}:
+                        </div>
                         <div className="italic text-gray-300">
                           {pcc.toPipelineIdx}
                         </div>

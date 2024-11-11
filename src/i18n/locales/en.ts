@@ -105,7 +105,33 @@ export const en = {
     add: 'Add',
     add_other_source_type: 'Add other source type',
     configure_outputs: 'Configure Outputs',
-    manage_multiviewers: 'Manage multiviewers'
+    manage_multiviewers: 'Manage multiviews',
+    select_pipeline: 'Select pipeline',
+    select_control_panel: 'Select control panel',
+    control_panel: 'Control panel',
+    to_pipeline: 'To pipeline',
+    from_pipeline: 'From pipeline',
+    sources: 'Sources'
+  },
+  pipeline_card: {
+    audio_format: 'Audio Format',
+    audio_mapping: 'Audio Mapping',
+    audio_sampling_frequency: 'Audio Sampling Frequency',
+    bit_depth: 'Bit Depth',
+    convert_color_range: 'Convert Color Range',
+    encoder: 'Encoder',
+    format: 'Format',
+    frame_rate_d: 'Frame Rate D',
+    frame_rate_n: 'Frame Rate N',
+    gop_length: 'GOP Length',
+    height: 'Height',
+    width: 'Width',
+    video_kilobit_rate: 'Video Kilobit Rate'
+  },
+  output_card: {
+    format: 'Format',
+    bit_depth: 'Bit Depth',
+    video_kilobit_rate: 'Video Kilobit Rate'
   },
   configure_alignment_latency: {
     configure_alignment_latency:
@@ -670,7 +696,7 @@ export const en = {
     optional: 'Optional:',
     reset_pipelines: 'Reset all pipelines',
     pipeline_output_streams: 'Delete all pipeline output streams',
-    pipeline_multiviewers: 'Delete all pipeline multiviewer outputs',
+    pipeline_multiviewers: 'Delete all pipeline multiview outputs',
     pipeline_streams: 'Delete all pipeline streams',
     pipeline_control_connections: 'Delete all pipeline control connections',
     ingest_streams: 'Delete all ingest streams',
@@ -698,9 +724,11 @@ export const en = {
     video_kilobit_rate: 'Kilobit rate',
     add_stream: 'Add stream',
     stream_name: 'Stream',
+    no_multiview: 'No multiview can be found',
     multiview_output_settings: 'Multiview output',
     select_multiview_layout: 'Layout',
     configure_layouts: 'Configure layouts',
+    no_avaliable_layouts: 'No available layouts',
     create_layout: 'Create new layout',
     update_layout: 'Update layout',
     no_updated_layout: 'No layout updated',
@@ -722,10 +750,12 @@ export const en = {
     clear_layout: 'Clear layout',
     add_another_multiview: 'Add another multiview',
     could_not_delete_layout: 'Could not delete layout',
+    could_not_delete_layout_in_use:
+      'The layout is being used and can not be deleted',
     layout_deleted: 'Layout deleted',
     confirm_update_multiviewers:
-      'Are you sure you want to update multiviewers for the running production?',
-    confirm_update: 'Update multiviewers'
+      'Are you sure you want to update multiviews for the running production?',
+    confirm_update: 'Update multiviews'
   },
   error: {
     missing_sources_in_db: 'Missing sources, please restart production.',

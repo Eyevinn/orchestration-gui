@@ -95,7 +95,7 @@ export const sv = {
   production_configuration: 'Produktionskonfiguration',
   production: {
     productions: 'Produktioner',
-    add_source: 'Lägg till ingång',
+    add_source: 'Lägg till källa',
     select_preset: 'Välj produktionsmall',
     clear_selection: 'Rensa val',
     started: 'Produktion startad: {{name}}',
@@ -107,7 +107,33 @@ export const sv = {
     add: 'Lägg till',
     add_other_source_type: 'Lägg till annan källtyp',
     configure_outputs: 'Konfigurera Outputs',
-    manage_multiviewers: 'Uppdatera multiviewers'
+    manage_multiviewers: 'Uppdatera multiviews',
+    select_pipeline: 'Välj pipeline',
+    select_control_panel: 'Välj kontrollpanel',
+    control_panel: 'Kontrollpanel',
+    to_pipeline: 'Till pipeline',
+    from_pipeline: 'Från pipeline',
+    sources: 'Källor'
+  },
+  pipeline_card: {
+    audio_format: 'Ljudformat',
+    audio_mapping: 'Ljudmappning',
+    audio_sampling_frequency: 'Samplingsfrekvens',
+    bit_depth: 'Bit Depth',
+    convert_color_range: 'Konvertera Color Range',
+    encoder: 'Encoder',
+    format: 'Format',
+    frame_rate_d: 'Frame Rate D',
+    frame_rate_n: 'Frame Rate N',
+    gop_length: 'GOP Length',
+    height: 'Höjd',
+    width: 'Bredd',
+    video_kilobit_rate: 'Video Kilobit Rate'
+  },
+  output_card: {
+    format: 'Format',
+    bit_depth: 'Bit Depth',
+    video_kilobit_rate: 'Video Kilobit Rate'
   },
   configure_alignment_latency: {
     source_name: 'Källnamn',
@@ -673,7 +699,7 @@ export const sv = {
     optional: 'Valfritt:',
     reset_pipelines: 'Återställa alla pipelines',
     pipeline_output_streams: 'Stänga ner alla pipeline output strömmar',
-    pipeline_multiviewers: 'Stänga ner alla pipeline multiviewers',
+    pipeline_multiviewers: 'Stänga ner alla pipeline multiviews',
     pipeline_streams: 'Stänga ner alla pipeline strömmar',
     pipeline_control_connections:
       'Stänga ner alla pipeline control connections',
@@ -702,6 +728,7 @@ export const sv = {
     video_kilobit_rate: 'Kilobit rate',
     add_stream: 'Lägg till ström',
     stream_name: 'Ström',
+    no_multiview: 'Ingen multiview hittas',
     multiview_output_settings: 'Multiview utgång',
     no_multiview_selected: 'Ingen multiview vald',
     no_ip_selected: 'Ingen IP-adress vald',
@@ -709,6 +736,7 @@ export const sv = {
     no_multiview_found: 'Hittade ingen multiview',
     select_multiview_layout: 'Komposition',
     configure_layouts: 'Justera kompositioner',
+    no_avaliable_layouts: 'Inga kompositioner finns',
     create_layout: 'Skapa komposition',
     update_layout: 'Uppdatera komposition',
     no_updated_layout: 'Ingen uppdaterad komposition',
@@ -727,9 +755,11 @@ export const sv = {
     add_another_multiview: 'Lägg till ny multiview',
     layout_deleted: 'Kompositionen har tagits bort',
     could_not_delete_layout: 'Kunde inte ta bort kompositionen',
+    could_not_delete_layout_in_use:
+      'Kompositionen används och kan inte tas bort',
     confirm_update_multiviewers:
       'Är du säker på att du vill uppdatera multiview för pågående produktion?',
-    confirm_update: 'Uppdatera multiviewers'
+    confirm_update: 'Uppdatera multiviews'
   },
   error: {
     missing_sources_in_db: 'Källor saknas, var god starta om produktionen.',

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MultiviewPreset } from '../../../interfaces/preset';
 import { useTranslate } from '../../../i18n/useTranslate';
 import { useSetupMultiviewLayout } from '../../../hooks/useSetupMultiviewLayout';
@@ -20,7 +20,6 @@ import Decision from '../configureOutputModal/Decision';
 import { Modal } from '../Modal';
 import { useMultiviewDefaultPresets } from '../../../hooks/useMultiviewDefaultPresets';
 import Checkbox from './Checkbox';
-import { useMultiviewPresets } from '../../../hooks/multiviewPreset';
 
 type ChangeLayout = {
   defaultLabel?: string;
@@ -34,7 +33,8 @@ export default function MultiviewLayoutSetup({
   isProductionActive,
   sourceList,
   open,
-  onClose
+  onClose,
+  savedMultiviews
 }: {
   onUpdateLayoutPreset: (newLayout: TMultiviewLayout | null) => void;
   productionId: string;
@@ -42,6 +42,7 @@ export default function MultiviewLayoutSetup({
   sourceList: SourceReference[];
   open: boolean;
   onClose: () => void;
+  savedMultiviews: string[];
 }) {
   const [selectedMultiviewPreset, setSelectedMultiviewPreset] =
     useState<MultiviewPreset | null>(null);
@@ -52,7 +53,6 @@ export default function MultiviewLayoutSetup({
   const [newPresetName, setNewPresetName] = useState<string | null>(null);
   const { inputList } = useCreateInputArray(sourceList);
   const [multiviewLayouts] = useMultiviewLayouts(refresh);
-  const [multiviewPresets] = useMultiviewPresets();
   const { multiviewDefaultPresets } = useMultiviewDefaultPresets({
     sourceList,
     isChecked
@@ -78,16 +78,23 @@ export default function MultiviewLayoutSetup({
     ? multiviewDefaultPresets?.map((preset) => preset.name)
     : [];
 
-  const availableMultiviewLayouts =
-    multiviewLayouts?.filter(
-      (layout) => layout.productionId === productionId
-    ) || [];
+  const availableMultiviewLayouts = useMemo(() => {
+    return (
+      multiviewLayouts?.filter(
+        (layout) => layout.productionId === productionId
+      ) || []
+    );
+  }, [multiviewLayouts, productionId]);
 
   const multiviewLayoutNames =
     availableMultiviewLayouts?.map((layout) => layout.name) || [];
   const layoutNameAlreadyExist = availableMultiviewLayouts?.find(
     (singlePreset) => singlePreset.name === newPresetName
   )?.name;
+
+  useEffect(() => {
+    availableMultiviewLayouts ? setRefresh(false) : setRefresh(true);
+  }, [availableMultiviewLayouts]);
 
   // This useEffect is used to set the drawn layout of the multiviewer on start,
   // if this fails then the modal will be empty
@@ -107,33 +114,31 @@ export default function MultiviewLayoutSetup({
       setPresetName(multiviewDefaultPresets[0].name);
       setSelectedMultiviewPreset(multiviewDefaultPresets[0]);
     }
-  }, [multiviewDefaultPresets, multiviewLayouts]);
+  }, [
+    multiviewDefaultPresets,
+    multiviewLayouts,
+    selectedMultiviewPreset?.name
+  ]);
 
   // Refresh the layout list when a layout is deleted
   useEffect(() => {
     setRefresh(open);
+    setChangedLayout(null);
   }, [open]);
 
   useEffect(() => {
-    if (multiviewLayouts) {
-      setRefresh(false);
-    }
-  }, [multiviewLayouts]);
-
-  const onSave = () => {
     if (multiviewLayout) {
       setSelectedMultiviewPreset(multiviewLayout);
-      onUpdateLayoutPreset({
-        ...multiviewLayout,
-        name:
-          multiviewLayout.name !== presetName && newPresetName !== ''
-            ? multiviewLayout.name
-            : ''
-      });
-    } else {
-      setSelectedMultiviewPreset(null);
-      onUpdateLayoutPreset(null);
+      setRefresh(false);
+      setChangedLayout(null);
     }
+  }, [multiviewLayout]);
+
+  const resetLayoutSetup = () => {
+    setNewPresetName('');
+    setPresetName('');
+    setIsChecked(false);
+    setSelectedMultiviewPreset(null);
   };
 
   const handleLayoutUpdate = (name: string, type: string) => {
@@ -146,6 +151,7 @@ export default function MultiviewLayoutSetup({
 
     switch (type) {
       case 'layout':
+        if (availableMultiviewLayouts.length === 0) return;
         setNewPresetName(name || '');
         if (chosenLayout) {
           setIsChecked(false);
@@ -164,7 +170,7 @@ export default function MultiviewLayoutSetup({
   };
 
   const handleChange = (viewId: string, value: string) => {
-    if (inputList && availableMultiviewLayouts) {
+    if (inputList) {
       const emptyView = {
         id: '',
         input_slot: 0,
@@ -191,6 +197,21 @@ export default function MultiviewLayoutSetup({
       toast.error(t('preset.could_not_delete_layout'));
       return;
     }
+
+    // Check if the layout is in use
+    if (
+      layoutToRemove &&
+      layoutToRemove._id &&
+      savedMultiviews.includes(
+        typeof layoutToRemove._id === 'string'
+          ? layoutToRemove._id
+          : layoutToRemove._id.toString()
+      )
+    ) {
+      toast.error(t('preset.could_not_delete_layout_in_use'));
+      return;
+    }
+
     if (layoutToRemove && layoutToRemove._id) {
       deleteLayout(layoutToRemove._id.toString()).then(() => {
         setRefresh(true);
@@ -203,14 +224,26 @@ export default function MultiviewLayoutSetup({
     }
   };
 
+  const saveNewLayout = () => {
+    if (selectedMultiviewPreset && newPresetName) {
+      onUpdateLayoutPreset({
+        ...selectedMultiviewPreset,
+        name: newPresetName,
+        productionId: productionId
+      });
+      resetLayoutSetup();
+    }
+  };
+
   const closeLayoutModal = () => {
     setRefresh(true);
+    resetLayoutSetup();
     onClose();
   };
 
   return (
     <Modal open={open}>
-      {selectedMultiviewPreset && (
+      {multiviewPresetLayout && (
         <div className="flex flex-col w-full h-full">
           <div className="flex flex-col self-center w-[50%] pt-5">
             <div className="flex flex-row align-middle items-center">
@@ -221,7 +254,7 @@ export default function MultiviewLayoutSetup({
                     ? multiviewLayoutNames.map((singleItem) => ({
                         label: singleItem
                       }))
-                    : [{ label: 'No layouts available' }]
+                    : [{ label: t('preset.no_avaliable_layouts') }]
                 }
                 value={selectedMultiviewPreset?.name || ''}
                 update={(value) => handleLayoutUpdate(value, 'layout')}
@@ -250,14 +283,11 @@ export default function MultiviewLayoutSetup({
               />
             </div>
           </div>
-
-          {multiviewPresetLayout && (
-            <MultiviewLayout
-              multiviewPresetLayout={multiviewPresetLayout}
-              inputList={inputList}
-              handleChange={handleChange}
-            />
-          )}
+          <MultiviewLayout
+            multiviewPresetLayout={multiviewPresetLayout}
+            inputList={inputList}
+            handleChange={handleChange}
+          />
           <div className="flex flex-col w-[50%] h-full pt-3">
             <Input
               label={t('name')}
@@ -274,7 +304,7 @@ export default function MultiviewLayoutSetup({
           <Decision
             className="mt-6"
             onClose={closeLayoutModal}
-            onSave={onSave}
+            onSave={saveNewLayout}
           />
         </div>
       )}

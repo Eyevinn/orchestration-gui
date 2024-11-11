@@ -50,7 +50,7 @@ export function useConfigureMultiviewLayout(
         }
       });
     }
-  }, [defaultLabel, name, source, viewId]);
+  }, [defaultLabel, name, productionId, source, viewId]);
 
   return { multiviewLayout: updatedPreset };
 }

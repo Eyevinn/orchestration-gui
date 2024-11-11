@@ -6,6 +6,7 @@ import PipelineNameDropDown from '../../dropDown/PipelineNameDropDown';
 import cloneDeep from 'lodash.clonedeep';
 import { useContext } from 'react';
 import { GlobalContext } from '../../../contexts/GlobalContext';
+import { useTranslate } from '../../../i18n/useTranslate';
 
 interface PipelineCardInfoProps {
   label: string;
@@ -34,6 +35,7 @@ const ProductionPipelineCard: React.FC<ProductionPipelineCardProps> = (
 ) => {
   const { pipeline, pipelines, onPipelineChange } = props;
   const { locked } = useContext(GlobalContext);
+  const t = useTranslate();
 
   const updatePipelineID = (id: string) => {
     const newPipeline = cloneDeep(pipeline);
@@ -67,37 +69,55 @@ const ProductionPipelineCard: React.FC<ProductionPipelineCardProps> = (
           value={pipeline.alignment_ms}
         />
         <PipelineCardInfo
-          label={'Audio Format'}
+          label={t('pipeline_card.audio_format')}
           value={pipeline.audio_format}
         />
         <PipelineCardInfo
-          label={'Audio Mapping'}
+          label={t('pipeline_card.audio_mapping')}
           value={pipeline.audio_mapping}
         />
         <PipelineCardInfo
-          label={'Audio Sampling Frequency'}
+          label={t('pipeline_card.audio_sampling_frequency')}
           value={pipeline.audio_sampling_frequency}
         />
-        <PipelineCardInfo label={'Bit Depth'} value={pipeline.bit_depth} />
         <PipelineCardInfo
-          label={'Convert Color Range'}
+          label={t('pipeline_card.bit_depth')}
+          value={pipeline.bit_depth}
+        />
+        <PipelineCardInfo
+          label={t('pipeline_card.convert_color_range')}
           value={pipeline.convert_color_range}
         />
-        <PipelineCardInfo label={'Encoder'} value={pipeline.encoder} />
-        <PipelineCardInfo label={'Format'} value={pipeline.format} />
         <PipelineCardInfo
-          label={'Frame Rate D'}
+          label={t('pipeline_card.encoder')}
+          value={pipeline.encoder}
+        />
+        <PipelineCardInfo
+          label={t('pipeline_card.format')}
+          value={pipeline.format}
+        />
+        <PipelineCardInfo
+          label={t('pipeline_card.frame_rate_d')}
           value={pipeline.frame_rate_d}
         />
         <PipelineCardInfo
-          label={'Frame Rate N'}
+          label={t('pipeline_card.frame_rate_n')}
           value={pipeline.frame_rate_n}
         />
-        <PipelineCardInfo label={'GOP Length'} value={pipeline.gop_length} />
-        <PipelineCardInfo label={'Height'} value={pipeline.height} />
-        <PipelineCardInfo label={'Width'} value={pipeline.width} />
         <PipelineCardInfo
-          label={'Video Kilobit Rate'}
+          label={t('pipeline_card.gop_length')}
+          value={pipeline.gop_length}
+        />
+        <PipelineCardInfo
+          label={t('pipeline_card.height')}
+          value={pipeline.height}
+        />
+        <PipelineCardInfo
+          label={t('pipeline_card.width')}
+          value={pipeline.width}
+        />
+        <PipelineCardInfo
+          label={t('pipeline_card.video_kilobit_rate')}
           value={pipeline.video_kilobit_rate}
         />
       </div>

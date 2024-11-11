@@ -6,6 +6,7 @@ interface IDecision {
   onSave: () => void;
   className?: string;
   disabled?: boolean;
+  buttonText?: string;
 }
 
 export default function Decision({
@@ -13,6 +14,7 @@ export default function Decision({
   onSave,
   className,
   disabled
+  buttonText
 }: IDecision) {
   const t = useTranslate();
 
@@ -23,7 +25,7 @@ export default function Decision({
       }`}
     >
       <Button className="hover:bg-red-500" onClick={onClose} state="warning">
-        {t('close')}
+        {buttonText ? buttonText : t('close')}
       </Button>
       <Button
         disabled={disabled}

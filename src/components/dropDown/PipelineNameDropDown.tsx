@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import DropDown from './DropDown';
 import useEffectNotOnMount from '../../hooks/utils/useEffectNotOnMount';
+import { useTranslate } from '../../i18n/useTranslate';
 
 type PipelineNamesDropDownProps = {
   label: string;
@@ -19,6 +20,7 @@ export default function PipelineNamesDropDown({
   const [selectedOption, setSelectedOption] = useState<string | undefined>(
     options.find((o) => o.id === value)?.option
   );
+  const t = useTranslate();
 
   useEffectNotOnMount(() => {
     if (options) {
@@ -33,7 +35,7 @@ export default function PipelineNamesDropDown({
     <div>
       <DropDown
         disabled={disabled}
-        title="Select pipeline"
+        title={t('production.select_pipeline')}
         label={label}
         options={options}
         selected={selectedOption}

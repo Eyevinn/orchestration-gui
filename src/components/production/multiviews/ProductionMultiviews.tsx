@@ -40,17 +40,18 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
   const [streamIdDuplicateIndexes, setStreamIdDuplicateIndexes] = useState<
     number[]
   >([]);
-  const [layoutModalOpen, setLayoutModalOpen] = useState(false);
   const [refresh, setRefresh] = useState(true);
   const [confirmUpdateModalOpen, setConfirmUpdateModalOpen] = useState(false);
   const [newMultiviewLayout, setNewMultiviewLayout] =
     useState<TMultiviewLayout | null>(null);
   const addNewLayout = usePutMultiviewLayout();
   const t = useTranslate();
-  // const getMultiviewLayout = useGetMultiviewLayout();
+
+  const savedMultiviews = multiviewsProp.map((singleMultiview) => {
+    return singleMultiview._id ?? '';
+  });
 
   const clearInputs = () => {
-    setLayoutModalOpen(false);
     setMultiviews(multiviewsProp || []);
   };
 
@@ -101,7 +102,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
     }
 
     await addNewLayout(newLayout);
-    setLayoutModalOpen(false);
+    setNewMultiviewLayout(newLayout);
     setRefresh(true);
   };
 
@@ -206,100 +207,100 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
   return (
     <Section title="Multiviewers">
       <div id="card-wrapper" className="rounded-xl bg-zinc-700 p-4">
-        {!layoutModalOpen && (
-          <div className="flex gap-3">
-            {(multiviews &&
-              multiviews.length > 0 &&
-              multiviews.map((singleItem, index) => {
-                return (
-                  <div className="flex" key={index}>
-                    {index !== 0 && (
-                      <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
-                    )}
-                    <div className="flex flex-col">
-                      <MultiviewSettingsConfig
-                        disabled={locked}
-                        productionId={productionId}
-                        newMultiviewLayout={newMultiviewLayout}
-                        lastItem={multiviews.length === index + 1}
-                        multiview={singleItem}
-                        handleUpdateMultiview={(input) =>
-                          handleUpdateMultiview(input, index)
-                        }
-                        portDuplicateError={
-                          portDuplicateIndexes.length > 0
-                            ? portDuplicateIndexes.includes(index)
-                            : false
-                        }
-                        streamIdDuplicateError={
-                          streamIdDuplicateIndexes.length > 0
-                            ? streamIdDuplicateIndexes.includes(index)
-                            : false
-                        }
-                        refresh={refresh}
-                      />
-                      <div
-                        className={`w-full flex ${
-                          multiviews.length > 1
-                            ? 'justify-between'
-                            : 'justify-end'
-                        }`}
-                      >
-                        {multiviews.length > 1 && (
-                          <button
-                            disabled={locked}
-                            type="button"
-                            title={t('preset.remove_multiview')}
-                            onClick={() => removeNewMultiview(index)}
-                          >
-                            <IconTrash
-                              className={`${
+        <div className="flex gap-3">
+          {(multiviews &&
+            multiviews.length > 0 &&
+            multiviews.map((singleItem, index) => {
+              return (
+                <div className="flex" key={index}>
+                  {index !== 0 && (
+                    <div className="min-h-full border-l border-separate opacity-10 my-12"></div>
+                  )}
+                  <div className="flex flex-col">
+                    <MultiviewSettingsConfig
+                      disabled={locked}
+                      productionId={productionId}
+                      newMultiviewLayout={newMultiviewLayout}
+                      lastItem={multiviews.length === index + 1}
+                      multiview={singleItem}
+                      handleUpdateMultiview={(input) =>
+                        handleUpdateMultiview(input, index)
+                      }
+                      portDuplicateError={
+                        portDuplicateIndexes.length > 0
+                          ? portDuplicateIndexes.includes(index)
+                          : false
+                      }
+                      streamIdDuplicateError={
+                        streamIdDuplicateIndexes.length > 0
+                          ? streamIdDuplicateIndexes.includes(index)
+                          : false
+                      }
+                      refresh={refresh}
+                    />
+                    <div
+                      className={`w-full flex ${
+                        multiviews.length > 1
+                          ? 'justify-between'
+                          : 'justify-end'
+                      }`}
+                    >
+                      {multiviews.length > 1 && (
+                        <button
+                          disabled={locked}
+                          type="button"
+                          title={t('preset.remove_multiview')}
+                          onClick={() => removeNewMultiview(index)}
+                        >
+                          <IconTrash
+                            className={`${
                                 locked
                                   ? 'text-button-delete/50'
                                   : 'text-button-delete hover:text-red-400'
                               } ml-4`}
-                            />
-                          </button>
-                        )}
-                        {multiviews.length === index + 1 && (
-                          <button
-                            disabled={locked}
-                            type="button"
-                            title={t('preset.add_another_multiview')}
-                            onClick={() =>
-                              addNewMultiview({
-                                ...singleItem,
-                                multiview_id: (singleItem.multiview_id ?? 0) + 1
-                              })
-                            }
-                          >
-                            <IconPlus
+                          />
+                        </button>
+                      )}
+                      {multiviews.length === index + 1 && (
+                        <button
+                          type="button"
+                          title={t('preset.add_another_multiview')}
+                          onClick={() =>
+                            addNewMultiview({
+                              ...singleItem,
+                              multiview_id: (singleItem.multiview_id ?? 0) + 1
+                            })
+                          }
+                        >
+                          <IconPlus
                               className={`${
                                 locked
                                   ? 'text-green-400/50'
                                   : 'text-green-400 hover:text-green-200'
                               } mr-2`}
                             />
-                          </button>
-                        )}
-                      </div>
+                        </button>
+                      )}
                     </div>
                   </div>
-                );
-              })) || <div>No Multiviews</div>}
-          </div>
-        )}
+                </div>
+              );
+            })) || <div>{t('preset.no_multiview')}</div>}
+        </div>
         <MultiviewLayoutSetupButton
           disabled={locked}
           productionId={productionId}
           isProductionActive={isProductionActive}
           sourceList={sources}
           onUpdateLayoutPreset={onUpdateLayoutPreset}
+          refreshLayoutList={setRefresh}
+          savedMultiviews={savedMultiviews}
         />
         <div className="flex flex-col">
           <Decision
             disabled={locked}
             className="mt-6"
+            buttonText={t('clear')}
             onClose={() => clearInputs()}
             onSave={() => onSave()}
           />

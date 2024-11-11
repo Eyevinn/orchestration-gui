@@ -57,7 +57,10 @@ export default function SourceCard({
   const { locked } = useContext(GlobalContext);
 
   const pipelinesAreSelected =
-    pipelines.some((pipeline) => pipeline.pipeline_id === undefined) === false;
+    pipelines.some(
+      (pipeline) =>
+        pipeline.pipeline_id === undefined || pipeline.pipeline_id === ''
+    ) === false;
 
   const updateText = (event: ChangeEvent<HTMLInputElement>) => {
     setSourceLabel(event.currentTarget.value);
