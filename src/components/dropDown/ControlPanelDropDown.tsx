@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import DropDown from './DropDown';
 import useEffectNotOnMount from '../../hooks/utils/useEffectNotOnMount';
+import { useTranslate } from '../../i18n/useTranslate';
 
 type ControlPanelDropDown = {
   options: { option: string; available: boolean; id: string }[];
@@ -19,6 +20,7 @@ export default function ControlPanelDropDown({
       (id: string) => options.find((option) => option.id === id)?.option || id
     )
   );
+  const t = useTranslate();
 
   useEffectNotOnMount(() => {
     const mappedIds = selected?.map(
@@ -43,8 +45,8 @@ export default function ControlPanelDropDown({
     <div>
       <DropDown
         disabled={disabled}
-        title="Select control panel"
-        label="Control panel"
+        title={t('production.select_control_panel')}
+        label={t('production.control_panel')}
         options={options}
         multipleSelected={selected}
         setSelected={handleAddSelectedControlPanel}

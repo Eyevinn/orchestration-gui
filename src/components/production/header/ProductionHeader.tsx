@@ -35,7 +35,7 @@ const ProductionHeader: React.FC<ProductionHeaderProps> = (props) => {
         <div className="flex flex-row items-center">
           <Icons name="IconPencil" className="w-8 h-8 mr-2" />
           <input
-            className="text-4xl text-p bg-transparent grow text-start"
+            className="text-4xl text-p bg-transparent grow text-start pointer-events-auto"
             type="text"
             value={name}
             onChange={(e) => {
