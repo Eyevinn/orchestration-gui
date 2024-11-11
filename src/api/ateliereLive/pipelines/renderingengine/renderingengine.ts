@@ -58,6 +58,13 @@ export async function createPipelineHtmlSource(
 
   Log().info('CREATE HTML SOURCE PAYLOAD', payload);
 
+  for (let i = 0; i < production.production_settings.pipelines.length; i++) {
+    Log().info(
+      'Request URL:',
+      `${LIVE_BASE_API_PATH}/pipelines/${production.production_settings.pipelines[i].pipeline_id}/renderingengine/html`
+    );
+  }
+
   try {
     const { production_settings } = production;
 
@@ -65,10 +72,6 @@ export async function createPipelineHtmlSource(
       Log().info(
         'PIPELINE ID TO CREATE HTML SOURCE FOR: ',
         production_settings.pipelines[i].pipeline_id
-      );
-      Log().info(
-        'Request URL:',
-        `${LIVE_BASE_API_PATH}/pipelines/${production_settings.pipelines[i].pipeline_id}/renderingengine/html`
       );
       const response = await fetch(
         new URL(
@@ -305,9 +308,14 @@ export async function deleteHtmlFromPipeline(
       }
     }
   );
+  Log().info('DELETE HTML RESPONSE', response);
   if (response.ok) {
     const text = await response.text();
-    return text ? JSON.parse(text) : {};
+
+    if (text) {
+      return JSON.parse(text);
+    }
+    return;
   }
   throw await response.json();
 }
@@ -346,20 +354,22 @@ export async function createPipelineMediaSource(
     filename: data.filename,
     input_slot: Number(inputSlot)
   };
+  Log().info('PAYLOAD CREATE MEDIA', payload);
+
+  for (let i = 0; i < production.production_settings.pipelines.length; i++) {
+    Log().info(
+      'Request URL:',
+      `${LIVE_BASE_API_PATH}/pipelines/${production.production_settings.pipelines[i].pipeline_id}/renderingengine/media`
+    );
+  }
 
   try {
     const { production_settings } = production;
-
-    Log().info('PAYLOAD CREATE MEDIA', payload);
 
     for (let i = 0; i < production_settings.pipelines.length; i++) {
       Log().info(
         'CREATING MEDIA FOR PIPELINE ID: ',
         production_settings.pipelines[i].pipeline_id
-      );
-      Log().info(
-        'Request URL:',
-        `${LIVE_BASE_API_PATH}/pipelines/${production_settings.pipelines[i].pipeline_id}/renderingengine/media`
       );
       const response = await fetch(
         new URL(
@@ -575,9 +585,14 @@ export async function deleteMediaFromPipeline(
       }
     }
   );
+  Log().info('DELETE MEDIA RESPONSE', response);
   if (response.ok) {
     const text = await response.text();
-    return text ? JSON.parse(text) : {};
+
+    if (text) {
+      return JSON.parse(text);
+    }
+    return;
   }
   throw await response.json();
 }
