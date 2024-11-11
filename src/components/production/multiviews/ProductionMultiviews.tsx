@@ -254,10 +254,10 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                         >
                           <IconTrash
                             className={`${
-                                locked
-                                  ? 'text-button-delete/50'
-                                  : 'text-button-delete hover:text-red-400'
-                              } ml-4`}
+                              locked
+                                ? 'text-button-delete/50'
+                                : 'text-button-delete hover:text-red-400'
+                            } ml-4`}
                           />
                         </button>
                       )}
@@ -273,12 +273,12 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                           }
                         >
                           <IconPlus
-                              className={`${
-                                locked
-                                  ? 'text-green-400/50'
-                                  : 'text-green-400 hover:text-green-200'
-                              } mr-2`}
-                            />
+                            className={`${
+                              locked
+                                ? 'text-green-400/50'
+                                : 'text-green-400 hover:text-green-200'
+                            } mr-2`}
+                          />
                         </button>
                       )}
                     </div>

@@ -13,7 +13,7 @@ export default function Decision({
   onClose,
   onSave,
   className,
-  disabled
+  disabled,
   buttonText
 }: IDecision) {
   const t = useTranslate();

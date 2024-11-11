@@ -23,7 +23,7 @@ export function MultiviewLayoutSetupButton({
   productionId,
   isProductionActive,
   sourceList,
-  disabled
+  disabled,
   refreshLayoutList,
   savedMultiviews
 }: MultiviewLayoutSetupButtonProps) {
