@@ -263,6 +263,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                       )}
                       {multiviews.length === index + 1 && (
                         <button
+                          disabled={locked}
                           type="button"
                           title={t('preset.add_another_multiview')}
                           onClick={() =>
