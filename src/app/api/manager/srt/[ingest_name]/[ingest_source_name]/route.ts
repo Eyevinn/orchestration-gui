@@ -30,7 +30,13 @@ export async function DELETE(
         false
       )
     : 0;
-  return await deleteSrtSource(ingestUuid || '', sourceId || 0)
+  if (!ingestUuid) {
+    return new NextResponse(`Ingest UUID not found in API`, { status: 404 });
+  }
+  if (!sourceId) {
+    return new NextResponse(`Source not found in API`, { status: 404 });
+  }
+  return await deleteSrtSource(ingestUuid, sourceId)
     .then((response) => {
       return new NextResponse(JSON.stringify(response));
     })
@@ -38,7 +44,7 @@ export async function DELETE(
       Log().error(error);
       const errorResponse = {
         ok: false,
-        error: 'unexpected'
+        error: 'Failed to delete SRT source'
       };
       return new NextResponse(JSON.stringify(errorResponse), { status: 500 });
     });
