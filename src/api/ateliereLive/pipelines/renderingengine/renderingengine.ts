@@ -583,7 +583,6 @@ export async function getPipelineRenderingEngine(
     try {
       return await response.json();
     } catch (error) {
-      console.error('Failed to parse successful JSON response:', error);
       throw new Error('Parsing error in successful response.');
     }
   }
@@ -595,7 +594,6 @@ export async function getPipelineRenderingEngine(
     try {
       throw JSON.parse(responseText);
     } catch (error) {
-      console.error('Failed to parse JSON error response:', error);
       throw new Error(`Failed to parse JSON error response: ${responseText}`);
     }
   } else {
@@ -626,7 +624,6 @@ export async function getPipelineRenderingEngineHtml(
     try {
       return await response.json();
     } catch (error) {
-      console.error('Failed to parse successful JSON response:', error);
       throw new Error('Parsing error in successful response.');
     }
   }
@@ -638,7 +635,6 @@ export async function getPipelineRenderingEngineHtml(
     try {
       throw JSON.parse(responseText);
     } catch (error) {
-      console.error('Failed to parse JSON error response:', error);
       throw new Error(`Failed to parse JSON error response: ${responseText}`);
     }
   } else {
@@ -669,7 +665,6 @@ export async function getPipelineRenderingEngineMedia(
     try {
       return await response.json();
     } catch (error) {
-      console.error('Failed to parse successful JSON response:', error);
       throw new Error('Parsing error in successful response.');
     }
   }
@@ -681,7 +676,6 @@ export async function getPipelineRenderingEngineMedia(
     try {
       throw JSON.parse(responseText);
     } catch (error) {
-      console.error('Failed to parse JSON error response:', error);
       throw new Error(`Failed to parse JSON error response: ${responseText}`);
     }
   } else {

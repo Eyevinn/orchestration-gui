@@ -41,15 +41,9 @@ export const CopyItem = ({
     if ('clipboard' in navigator) {
       navigator.clipboard
         .writeText(valueToCopy)
-        .then(() => {
-          handleCopyResult('SUCCESS');
-        })
-        .catch(() => {
-          console.log('Something went wrong copying:', valueToCopy);
-          handleCopyResult('ERROR');
-        });
+        .then(() => handleCopyResult('SUCCESS'))
+        .catch(() => handleCopyResult('ERROR'));
     } else {
-      console.log('Clipboard API not available:', valueToCopy);
       handleCopyResult('ERROR');
     }
   };

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import CopyItem from './CopyItem';
 import { WhepMultiview } from '../../interfaces/whep';
 import { SrtOutput } from '../../interfaces/pipeline';

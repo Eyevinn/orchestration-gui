@@ -235,6 +235,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
       const production = config.isActive
         ? config
         : checkProductionPipelines(config, pipelines);
+
       putProduction(production._id, production);
       setProductionSetup(production);
       setConfigurationName(production.name);
@@ -338,6 +339,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
         );
       }
     }
+
     putProduction(productionSetup?._id.toString(), updatedPreset).then(() => {
       refreshProduction();
     });
@@ -398,6 +400,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             )
           }
         };
+
         setProductionSetup(updatedProduction);
       });
     }
@@ -1115,7 +1118,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
                       );
                       if (!updatedSetup) return;
                       setProductionSetup(updatedSetup);
-
                       putProduction(
                         updatedSetup._id.toString(),
                         updatedSetup

@@ -27,8 +27,7 @@ export function useGetProduction() {
       headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
     });
     if (response.ok) {
-      const res = response.json();
-      return res;
+      return response.json();
     }
     throw await response.text();
   };

@@ -16,7 +16,6 @@ export function useConfigureMultiviewLayout(
 
   useEffect(() => {
     if (productionId && preset && (defaultLabel || source)) {
-      console.log('production ID - layout hook', productionId);
       const arr: MultiviewViews[] = [];
       preset.layout.views.map((item, index) => {
         if (index.toString() === viewId) {

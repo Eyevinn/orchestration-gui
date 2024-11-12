@@ -18,7 +18,6 @@ export function PipelineCard({ pipelineId, isActive }: PipelineCardProps) {
   }, [isActive]);
 
   const SrtInfo = data?.status;
-
   if (SrtInfo === undefined) {
     return null;
   }
