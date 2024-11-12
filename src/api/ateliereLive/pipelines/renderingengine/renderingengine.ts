@@ -56,23 +56,10 @@ export async function createPipelineHtmlSource(
     width: Number(data.width)
   };
 
-  Log().info('CREATE HTML SOURCE PAYLOAD', payload);
-
-  for (let i = 0; i < production.production_settings.pipelines.length; i++) {
-    Log().info(
-      'Request URL:',
-      `${LIVE_BASE_API_PATH}/pipelines/${production.production_settings.pipelines[i].pipeline_id}/renderingengine/html`
-    );
-  }
-
   try {
     const { production_settings } = production;
 
     for (let i = 0; i < production_settings.pipelines.length; i++) {
-      Log().info(
-        'PIPELINE ID TO CREATE HTML SOURCE FOR: ',
-        production_settings.pipelines[i].pipeline_id
-      );
       const response = await fetch(
         new URL(
           LIVE_BASE_API_PATH +
@@ -88,21 +75,16 @@ export async function createPipelineHtmlSource(
         }
       );
       const text = await response.text();
-      Log().info('RESPONSE CREATE HTML: ', response);
-      Log().info('RESPONSE.TEXT CREATE HTML: ', text);
-      Log().info('RESPONSE.STATUS CREATE HTML: ', response.status);
 
       if (response.status === 201) {
         if (text.trim().length > 0) {
           Log().warn('Unexpected content for 201 response:', text);
         }
-        Log().info('SUCCESSFUL CREATION OF HTML SOURCE');
       } else if (
         response.status === 400 ||
         response.status === 404 ||
         response.status === 500
       ) {
-        Log().info('ERROR WHEN CREATING AN HTML SOURCE');
         try {
           const errorResponse = JSON.parse(text);
           Log().error('API error response:', errorResponse);
@@ -308,7 +290,6 @@ export async function deleteHtmlFromPipeline(
       }
     }
   );
-  Log().info('DELETE HTML RESPONSE', response);
   if (response.ok) {
     const text = await response.text();
 
@@ -354,23 +335,11 @@ export async function createPipelineMediaSource(
     filename: data.filename,
     input_slot: Number(inputSlot)
   };
-  Log().info('PAYLOAD CREATE MEDIA', payload);
-
-  for (let i = 0; i < production.production_settings.pipelines.length; i++) {
-    Log().info(
-      'Request URL:',
-      `${LIVE_BASE_API_PATH}/pipelines/${production.production_settings.pipelines[i].pipeline_id}/renderingengine/media`
-    );
-  }
 
   try {
     const { production_settings } = production;
 
     for (let i = 0; i < production_settings.pipelines.length; i++) {
-      Log().info(
-        'CREATING MEDIA FOR PIPELINE ID: ',
-        production_settings.pipelines[i].pipeline_id
-      );
       const response = await fetch(
         new URL(
           LIVE_BASE_API_PATH +
@@ -386,17 +355,12 @@ export async function createPipelineMediaSource(
         }
       );
       const text = await response.text();
-      Log().info('RESPONSE CREATE MEDIA: ', response);
-      Log().info('RESPONSE.TEXT CREATE MEDIA: ', text);
-      Log().info('RESPONSE.STATUS CREATE MEDIA: ', response.status);
 
       if (response.status === 201) {
         if (text.trim().length > 0) {
           Log().warn('Unexpected content for 201 response:', text);
         }
-        Log().info('SUCCESSFULLY CREATED MEDIA SOURCE');
       } else if (response.status === 400 || response.status === 500) {
-        Log().info('ERROR WHEN CREATING A MEDIA SOURCE');
         try {
           const errorResponse = JSON.parse(text);
           Log().error('API error response:', errorResponse);
@@ -585,7 +549,6 @@ export async function deleteMediaFromPipeline(
       }
     }
   );
-  Log().info('DELETE MEDIA RESPONSE', response);
   if (response.ok) {
     const text = await response.text();
 

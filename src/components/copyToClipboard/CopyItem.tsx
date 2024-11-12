@@ -42,7 +42,6 @@ export const CopyItem = ({
       navigator.clipboard
         .writeText(valueToCopy)
         .then(() => {
-          console.log('Copy went great:', valueToCopy);
           handleCopyResult('SUCCESS');
         })
         .catch(() => {

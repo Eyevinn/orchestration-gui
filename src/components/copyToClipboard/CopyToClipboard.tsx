@@ -15,9 +15,6 @@ interface ICopyToClipboard {
 }
 
 export const CopyToClipboard = ({ allSrtUrls }: ICopyToClipboard) => {
-  useEffect(() => {
-    console.log('allSrtUrls', allSrtUrls);
-  }, [allSrtUrls]);
   return (
     <div className="flex flex-col">
       {allSrtUrls.map(({ value, isMulti, viewer }) => (

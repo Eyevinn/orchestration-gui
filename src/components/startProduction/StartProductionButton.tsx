@@ -177,10 +177,6 @@ export function StartProductionButton({
     stopProduction(production)
       .then((status) => {
         if (status.ok) {
-          console.log(
-            'PUT REQUEST:',
-            production.production_settings?.pipelines[0].pipeline_id
-          );
           putProduction(production._id.toString(), {
             ...production,
             isActive: false
@@ -192,10 +188,6 @@ export function StartProductionButton({
           });
         }
         if (!status.ok) {
-          console.log(
-            'PUT REQUEST:',
-            production.production_settings?.pipelines[0].pipeline_id
-          );
           putProduction(production._id.toString(), {
             ...production,
             isActive: false

@@ -346,9 +346,6 @@ export async function stopProduction(
         const htmlSources = await getPipelineRenderingEngineHtml(pipelineId);
         const mediaSources = await getPipelineRenderingEngineMedia(pipelineId);
 
-        Log().info('GET RENDERING ENGINE HTML SOURCES: ', htmlSources);
-        Log().info('GET RENDERING ENGINE MEDIA SOURCES: ', mediaSources);
-
         if (htmlSources.length > 0 && htmlSources) {
           for (const pipeline of production.production_settings.pipelines) {
             for (const htmlSource of htmlSources) {
@@ -804,9 +801,6 @@ export async function startProduction(
   const mediaSources = production.sources.filter(
     (source) => source.type === 'mediaplayer'
   );
-
-  Log().info('HTML SOURCES IN START PRODUCTION: ', htmlSources);
-  Log().info('MEDIA SOURCES IN START PRODUCTION: ', mediaSources);
 
   if (htmlSources.length > 0) {
     for (const htmlSource of htmlSources) {
