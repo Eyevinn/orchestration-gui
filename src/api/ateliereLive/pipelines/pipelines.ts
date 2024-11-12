@@ -293,6 +293,6 @@ function buildOutputStreamSettings(
       srt_stream_id: s.srt_stream_id
     };
   });
-  Log().info(`Creating streams for output ${output.uuid}.'`, outputSettings);
+  Log().info(`Creating streams for output ${output.uuid}.`);
   return outputSettings;
 }
