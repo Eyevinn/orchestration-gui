@@ -11,6 +11,8 @@ import Decision from '../../modal/configureOutputModal/Decision';
 import { UpdateMultiviewersModal } from '../../modal/UpdateMultiviewersModal';
 import { SourceReference } from '../../../interfaces/Source';
 import { MultiviewLayoutSetupButton } from '../../modal/multiviewLayoutSetup/MultiviewLayoutSetupButton';
+import { useContext } from 'react';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 
 type ProductionMultiviewsProps = {
   productionId: string;
@@ -28,6 +30,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
     multiviews: multiviewsProp,
     updateMultiviews
   } = props;
+  const { locked } = useContext(GlobalContext);
 
   const [multiviews, setMultiviews] =
     useState<MultiviewSettings[]>(multiviewsProp);
@@ -215,6 +218,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                   )}
                   <div className="flex flex-col">
                     <MultiviewSettingsConfig
+                      disabled={locked}
                       productionId={productionId}
                       newMultiviewLayout={newMultiviewLayout}
                       lastItem={multiviews.length === index + 1}
@@ -243,17 +247,23 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                     >
                       {multiviews.length > 1 && (
                         <button
+                          disabled={locked}
                           type="button"
                           title={t('preset.remove_multiview')}
                           onClick={() => removeNewMultiview(index)}
                         >
                           <IconTrash
-                            className={`ml-4 text-button-delete hover:text-red-400`}
+                            className={`${
+                              locked
+                                ? 'text-button-delete/50'
+                                : 'text-button-delete hover:text-red-400'
+                            } ml-4`}
                           />
                         </button>
                       )}
                       {multiviews.length === index + 1 && (
                         <button
+                          disabled={locked}
                           type="button"
                           title={t('preset.add_another_multiview')}
                           onClick={() =>
@@ -263,7 +273,13 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
                             })
                           }
                         >
-                          <IconPlus className="mr-2 text-green-400 hover:text-green-200" />
+                          <IconPlus
+                            className={`${
+                              locked
+                                ? 'text-green-400/50'
+                                : 'text-green-400 hover:text-green-200'
+                            } mr-2`}
+                          />
                         </button>
                       )}
                     </div>
@@ -273,6 +289,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
             })) || <div>{t('preset.no_multiview')}</div>}
         </div>
         <MultiviewLayoutSetupButton
+          disabled={locked}
           productionId={productionId}
           isProductionActive={isProductionActive}
           sourceList={sources}
@@ -282,6 +299,7 @@ export default function ProductionMultiviews(props: ProductionMultiviewsProps) {
         />
         <div className="flex flex-col">
           <Decision
+            disabled={locked}
             className="mt-6"
             buttonText={t('clear')}
             onClose={() => clearInputs()}

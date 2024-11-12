@@ -13,6 +13,7 @@ type MultiviewLayoutSetupButtonProps = {
   productionId: string;
   isProductionActive: boolean;
   sourceList: SourceReference[];
+  disabled?: boolean;
   refreshLayoutList: (reload: boolean) => void;
   savedMultiviews: string[];
 };
@@ -22,6 +23,7 @@ export function MultiviewLayoutSetupButton({
   productionId,
   isProductionActive,
   sourceList,
+  disabled,
   refreshLayoutList,
   savedMultiviews
 }: MultiviewLayoutSetupButtonProps) {
@@ -39,9 +41,14 @@ export function MultiviewLayoutSetupButton({
   return (
     <>
       <Button
-        className="flex self-center hover:bg-green-400 min-w-fit max-w-fit mt-10"
+        className={`${
+          disabled
+            ? 'pointer-events-none bg-button-bg/50'
+            : 'hover:bg-green-400'
+        } flex self-center  min-w-fit max-w-fit mt-10`}
         type="button"
         onClick={toggleConfigModal}
+        disabled={disabled}
       >
         {t('preset.configure_layouts')}
         <IconSettings className="text-p inline ml-2" />

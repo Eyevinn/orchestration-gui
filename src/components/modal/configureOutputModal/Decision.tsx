@@ -5,6 +5,7 @@ interface IDecision {
   onClose: () => void;
   onSave: () => void;
   className?: string;
+  disabled?: boolean;
   buttonText?: string;
 }
 
@@ -12,6 +13,7 @@ export default function Decision({
   onClose,
   onSave,
   className,
+  disabled,
   buttonText
 }: IDecision) {
   const t = useTranslate();
@@ -26,7 +28,12 @@ export default function Decision({
         {buttonText ? buttonText : t('close')}
       </Button>
       <Button
-        className="relative flex hover:bg-green-400"
+        disabled={disabled}
+        className={`${
+          disabled
+            ? 'bg-button-bg/50 pointer-events-none'
+            : 'hover-bg-green-400 pointer-events-auto'
+        } relative flex`}
         type="submit"
         onClick={onSave}
       >

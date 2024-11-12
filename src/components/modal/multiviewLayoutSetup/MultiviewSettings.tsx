@@ -16,6 +16,7 @@ type MultiviewSettingsProps = {
   newMultiviewLayout: TMultiviewLayout | null;
   productionId: string | undefined;
   refresh: boolean;
+  disabled?: boolean;
 };
 
 export default function MultiviewSettingsConfig({
@@ -26,7 +27,8 @@ export default function MultiviewSettingsConfig({
   streamIdDuplicateError,
   newMultiviewLayout,
   productionId,
-  refresh
+  refresh,
+  disabled
 }: MultiviewSettingsProps) {
   const t = useTranslate();
   const [selectedMultiviewLayout, setSelectedMultiviewLayout] = useState<
@@ -207,6 +209,7 @@ export default function MultiviewSettingsConfig({
       </div>
       <div>
         <Options
+          disabled={disabled}
           label={t('preset.select_multiview_layout')}
           options={multiviewLayoutNames.map((singleItem) => ({
             label: singleItem
@@ -217,12 +220,14 @@ export default function MultiviewSettingsConfig({
       </div>
       <div className="flex flex-col gap-3">
         <Options
+          disabled={disabled}
           label={t('preset.video_format')}
           options={[{ label: 'AVC' }, { label: 'HEVC' }]}
           value={currentValue?.output.video_format || 'AVC'}
           update={(value) => handleChange('videoFormat', value)}
         />
         <Input
+          disabled={disabled}
           type="number"
           label={t('preset.video_kilobit_rate')}
           inputError={!currentValue?.output.video_kilobit_rate}
@@ -230,18 +235,21 @@ export default function MultiviewSettingsConfig({
           update={(value) => handleChange('videoKiloBit', value)}
         />
         <Options
+          disabled={disabled}
           label={t('preset.mode')}
           options={[{ label: 'listener' }, { label: 'caller' }]}
           value={currentValue?.output.srt_mode || 'listener'}
           update={(value) => handleChange('srtMode', value)}
         />
         <Input
+          disabled={disabled}
           label={t('preset.port')}
           inputError={portDuplicateError || !currentValue?.output.local_port}
           value={currentValue?.output.local_port || ''}
           update={(value) => handleChange('port', value)}
         />
         <Input
+          disabled={disabled}
           label={t('preset.ip')}
           inputError={
             !currentValue?.output.local_ip ||
@@ -251,12 +259,14 @@ export default function MultiviewSettingsConfig({
           update={(value) => handleChange('ip', value)}
         />
         <Input
+          disabled={disabled}
           label={t('preset.srt_stream_id')}
           inputError={streamIdDuplicateError}
           value={currentValue?.output.srt_stream_id || ''}
           update={(value) => handleChange('srtStreamId', value)}
         />
         <Input
+          disabled={disabled}
           label={t('preset.srt_passphrase')}
           value={currentValue?.output.srt_passphrase || ''}
           update={(value) => handleChange('srtPassphrase', value)}

@@ -4,6 +4,8 @@ import { ResourcesCompactPipelineResponse } from '../../../../types/ateliere-liv
 import { PipelineSettings } from '../../../interfaces/pipeline';
 import PipelineNameDropDown from '../../dropDown/PipelineNameDropDown';
 import cloneDeep from 'lodash.clonedeep';
+import { useContext } from 'react';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 import { useTranslate } from '../../../i18n/useTranslate';
 
 interface PipelineCardInfoProps {
@@ -32,6 +34,7 @@ const ProductionPipelineCard: React.FC<ProductionPipelineCardProps> = (
   props
 ) => {
   const { pipeline, pipelines, onPipelineChange } = props;
+  const { locked } = useContext(GlobalContext);
   const t = useTranslate();
 
   const updatePipelineID = (id: string) => {
@@ -44,6 +47,7 @@ const ProductionPipelineCard: React.FC<ProductionPipelineCardProps> = (
     <div id="card-wrapper" className="mb-4">
       <div className="rounded-t-xl bg-zinc-700 p-4">
         <PipelineNameDropDown
+          disabled={locked}
           label={pipeline.pipeline_readable_name}
           options={pipelines.map(
             (pipeline: ResourcesCompactPipelineResponse) => ({

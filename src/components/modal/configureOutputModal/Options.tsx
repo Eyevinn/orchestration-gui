@@ -9,6 +9,7 @@ interface IOptions {
   update: (value: string) => void;
   columnStyle?: boolean;
   emptyFirstOption?: boolean;
+  disabled?: boolean;
 }
 
 export default function Options({
@@ -17,7 +18,8 @@ export default function Options({
   value,
   update,
   columnStyle,
-  emptyFirstOption
+  emptyFirstOption,
+  disabled
 }: IOptions) {
   const t = useTranslate();
   return (
@@ -35,7 +37,12 @@ export default function Options({
           update(e.target.value);
         }}
         value={value}
-        className="cursor-pointer px-2 border justify-center text-sm rounded-lg w-6/12 pt-1 pb-1 bg-gray-500 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none"
+        disabled={disabled}
+        className={`${
+          disabled
+            ? 'bg-gray-500/50 text-white/p pointer-events-none'
+            : 'bg-gray-500 text-white pointer-events-auto'
+        } cursor-pointer px-2 border justify-center text-sm rounded-lg w-6/12 pt-1 pb-1 border-gray-600 placeholder-gray-400 text-white focus:border-gray-400 focus:outline-none`}
       >
         {emptyFirstOption && (
           <option value="">{t('preset.select_option')}</option>

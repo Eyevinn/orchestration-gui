@@ -640,12 +640,12 @@ const ProductionSources: React.FC<ProductionSourcesProps> = (props) => {
               <div className="bg-zinc-700 aspect-video m-2 p-2 text-p border-2 border-zinc-300 rounded flex flex-col gap-2 justify-center items-center">
                 <AddInput
                   onClickSource={() => setInventoryVisible(true)}
-                  disabled={false}
+                  disabled={locked}
                 />
                 <div className="flex flex-row">
                   <Select
                     classNames="w-full"
-                    disabled={false}
+                    disabled={locked}
                     options={[
                       t('production.add_other_source_type'),
                       'HTML',

@@ -13,7 +13,7 @@ export function AddInput({ onClickSource, disabled }: AddInputProps) {
   return (
     <div
       className={`bg-zinc-700 m-2 p-2 text-p rounded gap-2 justify-center items-center ${
-        disabled ? 'opacity-10' : 'opacity-100'
+        disabled ? 'opacity-10 pointer-events-none' : 'opacity-100'
       }`}
     >
       <button

@@ -4,6 +4,8 @@ import { ProductionControlConnection } from '../../../interfaces/production';
 import ControlPanelDropDown from '../../dropDown/ControlPanelDropDown';
 import Section from '../../section/Section';
 import { LoadingCover } from '../../loader/LoadingCover';
+import { useContext } from 'react';
+import { GlobalContext } from '../../../contexts/GlobalContext';
 import { useTranslate } from '../../../i18n/useTranslate';
 
 interface ProductionControlConnectionsProps {
@@ -17,6 +19,7 @@ const ProductionControlConnections: React.FC<
   const { controlConnection, onChange } = props;
 
   const [controlPanels] = useControlPanels();
+  const { locked } = useContext(GlobalContext);
   const t = useTranslate();
 
   const onControlConnectionChange = (ids: string[]) => {
@@ -34,6 +37,7 @@ const ProductionControlConnections: React.FC<
           <div className="rounded-t-xl bg-zinc-700 p-4">
             {!!controlPanels?.length && (
               <ControlPanelDropDown
+                disabled={locked}
                 options={controlPanels.map((controlPanel) => ({
                   option: controlPanel.name,
                   available: controlPanel.outgoing_connections?.length === 0,

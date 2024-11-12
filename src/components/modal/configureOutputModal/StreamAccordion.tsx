@@ -7,6 +7,7 @@ import { OutputStream } from './ConfigureOutputModal';
 type StreamAccordionProps = {
   stream: OutputStream;
   isOnlyStream: boolean;
+  disabled: boolean;
   update: (key: string, value: string) => void;
   onDelete: () => void;
 };
@@ -14,6 +15,7 @@ type StreamAccordionProps = {
 export default function StreamAccordion({
   stream,
   update,
+  disabled,
   onDelete,
   isOnlyStream
 }: StreamAccordionProps) {
@@ -57,7 +59,13 @@ export default function StreamAccordion({
       </button>
 
       <div className={`${active ? 'block' : 'hidden'} w-full`}>
-        <div className="bg-zinc-700 p-2 rounded-b-xl text-p">
+        <div
+          className={`${
+            disabled
+              ? 'pointer-events-none bg-zinc-700/50 text-p/50'
+              : 'pointer-events-auto bg-zinc-700 text-p'
+          } p-2 rounded-b-xl`}
+        >
           <Input
             label={t('preset.srt_stream_id')}
             value={stream.srt_stream_id}
