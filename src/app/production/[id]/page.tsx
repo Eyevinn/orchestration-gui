@@ -927,17 +927,23 @@ export default function ProductionConfiguration({ params }: PageProps) {
           const pipelineId =
             productionSetup.production_settings.pipelines[i].pipeline_id;
           if (pipelineId) {
-            if (selectedSourceRef.type === 'html') {
+            if (
+              selectedSourceRef.type === 'html' &&
+              productionSetup.production_settings.pipelines[0].pipeline_id
+            ) {
               await deleteHtmlSource(
                 pipelineId,
                 selectedSourceRef.input_slot,
-                productionSetup
+                productionSetup.production_settings.pipelines[0].pipeline_id
               );
-            } else if (selectedSourceRef.type === 'mediaplayer') {
+            } else if (
+              selectedSourceRef.type === 'mediaplayer' &&
+              productionSetup.production_settings.pipelines[0].pipeline_id
+            ) {
               await deleteMediaSource(
                 pipelineId,
                 selectedSourceRef.input_slot,
-                productionSetup
+                productionSetup.production_settings.pipelines[0].pipeline_id
               );
             }
           }
@@ -962,7 +968,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
       updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then((result) => {
         if (!result) return;
         setProductionSetup(result);
-        updateMultiview(selectedSourceRef, result);
+        updateMultiview(
+          {
+            ...selectedSourceRef,
+            label: ''
+          },
+          result
+        );
         setRemoveSourceModal(false);
         setSelectedSourceRef(undefined);
         setSelectedSource(undefined);

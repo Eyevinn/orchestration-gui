@@ -6,7 +6,6 @@ import {
 } from '../interfaces/Source';
 import { Production } from '../interfaces/production';
 import { CallbackHook } from './types';
-import { MultiviewSettings } from '../interfaces/multiview';
 import { Result } from '../interfaces/result';
 import { API_SECRET_KEY } from '../utils/constants';
 
@@ -137,26 +136,11 @@ export function useDeleteStream(): CallbackHook<
       };
     }
 
-    const multiviewsWithLabels = [...restWithLabels, ...updatedMultiviews];
-
-    const multiview: MultiviewSettings[] = multiviews.map(
-      (singleMultiview, index) => ({
-        ...singleMultiview,
-        layout: {
-          ...singleMultiview.layout,
-          views: multiviewsWithLabels
-        },
-        for_pipeline_idx: index,
-        multiviewId: index + 1
-      })
-    );
-
     const streamRequests = streamUuids.map((streamUuid) => {
       return fetch(`/api/manager/streams/${streamUuid}`, {
         method: 'DELETE',
         headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
         body: JSON.stringify({
-          multiview: multiview,
           pipelineUUID: pipelineUUID
         })
       });

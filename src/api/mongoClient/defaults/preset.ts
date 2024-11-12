@@ -211,7 +211,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 1'
+          label: ''
         },
         {
           input_slot: 2,
@@ -219,7 +219,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 2'
+          label: ''
         },
         {
           input_slot: 3,
@@ -227,7 +227,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 3'
+          label: ''
         },
         {
           input_slot: 4,
@@ -235,7 +235,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 4'
+          label: ''
         },
         {
           input_slot: 5,
@@ -243,7 +243,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 5'
+          label: ''
         },
         {
           input_slot: 6,
@@ -251,7 +251,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 6'
+          label: ''
         },
         {
           input_slot: 7,
@@ -259,7 +259,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 7'
+          label: ''
         },
         {
           input_slot: 8,
@@ -267,7 +267,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 8'
+          label: ''
         },
         {
           input_slot: 9,
@@ -275,7 +275,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 9'
+          label: ''
         },
         {
           input_slot: 10,
@@ -283,7 +283,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 10'
+          label: ''
         }
       ]
     },
@@ -333,7 +333,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 1'
+          label: ''
         },
         {
           input_slot: 2,
@@ -341,7 +341,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 2'
+          label: ''
         },
         {
           input_slot: 3,
@@ -349,7 +349,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 3'
+          label: ''
         },
         {
           input_slot: 4,
@@ -357,7 +357,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 4'
+          label: ''
         },
         {
           input_slot: 5,
@@ -365,7 +365,7 @@ export const defaultMultiview = [
           y: 540,
           height: 270,
           width: 384,
-          label: 'Input 5'
+          label: ''
         },
         {
           input_slot: 6,
@@ -373,7 +373,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 6'
+          label: ''
         },
         {
           input_slot: 7,
@@ -381,7 +381,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 7'
+          label: ''
         },
         {
           input_slot: 8,
@@ -389,7 +389,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 8'
+          label: ''
         },
         {
           input_slot: 9,
@@ -397,7 +397,7 @@ export const defaultMultiview = [
           y: 810,
           height: 270,
           width: 384,
-          label: 'Input 9'
+          label: ''
         },
         {
           input_slot: 10,
@@ -405,7 +405,7 @@ export const defaultMultiview = [
           y: 810,
           height: 135,
           width: 192,
-          label: 'VS'
+          label: ''
         },
         {
           input_slot: 11,
@@ -413,7 +413,7 @@ export const defaultMultiview = [
           y: 810,
           height: 135,
           width: 192,
-          label: 'UR'
+          label: ''
         },
         {
           input_slot: 12,
@@ -421,7 +421,7 @@ export const defaultMultiview = [
           y: 945,
           height: 135,
           width: 192,
-          label: 'OV'
+          label: ''
         },
         {
           input_slot: 13,
@@ -429,7 +429,7 @@ export const defaultMultiview = [
           y: 945,
           height: 135,
           width: 192,
-          label: 'CG'
+          label: ''
         }
       ]
     },

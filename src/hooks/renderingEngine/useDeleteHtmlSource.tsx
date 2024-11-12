@@ -1,5 +1,3 @@
-import { MultiviewSettings } from '../../interfaces/multiview';
-import { Production } from '../../interfaces/production';
 import { Result } from '../../interfaces/result';
 import { DeleteRenderingEngineSourceStep } from '../../interfaces/Source';
 import { API_SECRET_KEY } from '../../utils/constants';
@@ -10,7 +8,7 @@ export function useDeleteHtmlSource(): CallbackHook<
   (
     pipelineUuid: string,
     inputSlot: number,
-    production: Production
+    ldPipelineId: string
   ) => Promise<Result<DeleteRenderingEngineSourceStep[]>>
 > {
   const [loading, setLoading] = useState<boolean>(false);
@@ -18,97 +16,15 @@ export function useDeleteHtmlSource(): CallbackHook<
   const deleteHtmlSource = async (
     pipelineUuid: string,
     inputSlot: number,
-    production: Production
+    ldPipelineId: string
   ): Promise<Result<DeleteRenderingEngineSourceStep[]>> => {
     setLoading(true);
-
-    const multiviews = production.production_settings.pipelines[0].multiviews;
-    const multiviewViews = multiviews?.flatMap((singleMultiview) => {
-      return singleMultiview.layout.views;
-    });
-    const multiviewsToUpdate = multiviewViews?.filter(
-      (v) => v.input_slot === inputSlot
-    );
-
-    const ldPipelineId =
-      production.production_settings.pipelines[0].pipeline_id;
-
-    if (!multiviewsToUpdate || multiviewsToUpdate.length === 0) {
-      return fetch(
-        `/api/manager/pipelines/${pipelineUuid}/rendering-engine/html/${inputSlot}/${ldPipelineId}`,
-        {
-          method: 'DELETE',
-          headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
-        }
-      )
-        .then(async (response) => {
-          if (response.ok) {
-            const text = await response.text();
-            const data = text ? JSON.parse(text) : null;
-            return data ? data : null;
-          }
-          throw await response.text;
-        })
-        .finally(() => setLoading(false));
-    }
-
-    const updatedMultiviews = multiviewsToUpdate?.map((view) => {
-      return {
-        ...view,
-        label: view.label
-      };
-    });
-
-    const rest = multiviewViews?.filter((v) => v.input_slot !== inputSlot);
-
-    const restWithLabels = rest?.map((v) => {
-      const sourceForView = production.sources.find(
-        (s) => s.input_slot === v.input_slot
-      );
-
-      if (sourceForView) {
-        return { ...v, label: sourceForView.label };
-      }
-
-      return v;
-    });
-
-    if (
-      !restWithLabels ||
-      !updatedMultiviews ||
-      updatedMultiviews.length === 0 ||
-      !multiviews?.some((singleMultiview) => singleMultiview.layout)
-    ) {
-      setLoading(false);
-      return {
-        ok: false,
-        error: 'error'
-      };
-    }
-
-    const multiviewsWithLabels = [...restWithLabels, ...updatedMultiviews];
-
-    const multiview: MultiviewSettings[] = multiviews.map(
-      (singleMultiview, index) => ({
-        ...singleMultiview,
-        layout: {
-          ...singleMultiview.layout,
-          views: multiviewsWithLabels
-        },
-        for_pipeline_idx: index,
-        multiviewId: index + 1
-      })
-    );
 
     return fetch(
       `/api/manager/pipelines/${pipelineUuid}/rendering-engine/html/${inputSlot}/${ldPipelineId}`,
       {
         method: 'DELETE',
-        headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],
-        body: JSON.stringify({
-          pipelineId: pipelineUuid,
-          multiview: multiview
-        })
+        headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
       }
     )
       .then(async (response) => {
