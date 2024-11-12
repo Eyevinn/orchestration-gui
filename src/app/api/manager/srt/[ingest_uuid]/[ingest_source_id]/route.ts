@@ -31,4 +31,3 @@ export async function DELETE(
       return new NextResponse(JSON.stringify(errorResponse), { status: 500 });
     });
 }
-// }
