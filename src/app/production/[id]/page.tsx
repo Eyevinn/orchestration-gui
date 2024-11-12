@@ -929,7 +929,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
           if (pipelineId) {
             if (
               selectedSourceRef.type === 'html' &&
-              productionSetup.production_settings.pipelines[0].pipeline_id
+              productionSetup.production_settings.pipelines[0].pipeline_id &&
+              productionSetup.production_settings.pipelines[0].pipeline_id !==
+                ''
             ) {
               await deleteHtmlSource(
                 pipelineId,
@@ -938,7 +940,9 @@ export default function ProductionConfiguration({ params }: PageProps) {
               );
             } else if (
               selectedSourceRef.type === 'mediaplayer' &&
-              productionSetup.production_settings.pipelines[0].pipeline_id
+              productionSetup.production_settings.pipelines[0].pipeline_id &&
+              productionSetup.production_settings.pipelines[0].pipeline_id !==
+                ''
             ) {
               await deleteMediaSource(
                 pipelineId,
