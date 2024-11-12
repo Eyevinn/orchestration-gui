@@ -24,7 +24,7 @@ export default function PipelineNamesDropDown({
   const [selected, setSelected] = useState<string | undefined>(initial);
   useEffect(() => {
     const id = options?.find((o) => o.option === selected)?.id;
-    if (selected && id) {
+    if (selected && id && id !== '') {
       setSelectedPipelineName(pipelineIndex, selected, id);
     }
   }, [selected]);

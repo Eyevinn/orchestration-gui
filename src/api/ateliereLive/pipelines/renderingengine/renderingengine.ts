@@ -360,7 +360,11 @@ export async function createPipelineMediaSource(
         if (text.trim().length > 0) {
           Log().warn('Unexpected content for 201 response:', text);
         }
-      } else if (response.status === 400 || response.status === 500) {
+      } else if (
+        response.status === 400 ||
+        response.status === 404 ||
+        response.status === 500
+      ) {
         try {
           const errorResponse = JSON.parse(text);
           Log().error('API error response:', errorResponse);
