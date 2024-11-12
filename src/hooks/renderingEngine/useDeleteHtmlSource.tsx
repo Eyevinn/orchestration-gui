@@ -30,9 +30,12 @@ export function useDeleteHtmlSource(): CallbackHook<
       (v) => v.input_slot === inputSlot
     );
 
+    const ldPipelineId =
+      production.production_settings.pipelines[0].pipeline_id;
+
     if (!multiviewsToUpdate || multiviewsToUpdate.length === 0) {
       return fetch(
-        `/api/manager/pipelines/${pipelineUuid}/rendering-engine/html/${inputSlot}`,
+        `/api/manager/pipelines/${pipelineUuid}/rendering-engine/html/${inputSlot}/${ldPipelineId}`,
         {
           method: 'DELETE',
           headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]]
@@ -98,7 +101,7 @@ export function useDeleteHtmlSource(): CallbackHook<
     );
 
     return fetch(
-      `/api/manager/pipelines/${pipelineUuid}/rendering-engine/html/${inputSlot}`,
+      `/api/manager/pipelines/${pipelineUuid}/rendering-engine/html/${inputSlot}/${ldPipelineId}`,
       {
         method: 'DELETE',
         headers: [['x-api-key', `Bearer ${API_SECRET_KEY}`]],

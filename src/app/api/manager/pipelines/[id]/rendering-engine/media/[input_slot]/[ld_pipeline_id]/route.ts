@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAuthenticated } from '../../../../../../../../api/manager/auth';
-import { deleteMediaFromPipeline } from '../../../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
-import { MultiviewSettings } from '../../../../../../../../interfaces/multiview';
-import { updateMultiviewForPipeline } from '../../../../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
-import { DeleteRenderingEngineSourceStep } from '../../../../../../../../interfaces/Source';
-import { Result } from '../../../../../../../../interfaces/result';
-import { Log } from '../../../../../../../../api/logger';
+import { isAuthenticated } from '../../../../../../../../../api/manager/auth';
+import { deleteMediaFromPipeline } from '../../../../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
+import { MultiviewSettings } from '../../../../../../../../../interfaces/multiview';
+import { updateMultiviewForPipeline } from '../../../../../../../../../api/ateliereLive/pipelines/multiviews/multiviews';
+import { DeleteRenderingEngineSourceStep } from '../../../../../../../../../interfaces/Source';
+import { Result } from '../../../../../../../../../interfaces/result';
+import { Log } from '../../../../../../../../../api/logger';
 
 type Params = {
   id: string;
   input_slot: number;
+  ld_pipeline_id: string;
 };
 
 export async function DELETE(
@@ -63,13 +64,15 @@ export async function DELETE(
       if (!singleMultiview.multiview_id) {
         throw `The provided multiview settings did not contain any multiview id`;
       }
-      return updateMultiviewForPipeline(
-        params.id,
-        singleMultiview.multiview_id,
-        singleMultiview.layout.views
-      ).catch((e) => {
-        throw `Error when updating multiview: ${e.message}`;
-      });
+      if (params.id === params.ld_pipeline_id) {
+        return updateMultiviewForPipeline(
+          params.id,
+          singleMultiview.multiview_id,
+          singleMultiview.layout.views
+        ).catch((e) => {
+          throw `Error when updating multiview: ${e.message}`;
+        });
+      }
     });
 
     await Promise.all(multiviewUpdates);
