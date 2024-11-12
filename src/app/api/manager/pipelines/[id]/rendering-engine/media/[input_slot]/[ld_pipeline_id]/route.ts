@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAuthenticated } from '../../../../../../../../api/manager/auth';
-import { deleteMediaFromPipeline } from '../../../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
-import { DeleteRenderingEngineSourceStep } from '../../../../../../../../interfaces/Source';
-import { Result } from '../../../../../../../../interfaces/result';
-import { Log } from '../../../../../../../../api/logger';
+import { isAuthenticated } from '../../../../../../../../../api/manager/auth';
+import { deleteMediaFromPipeline } from '../../../../../../../../../api/ateliereLive/pipelines/renderingengine/renderingengine';
+import { DeleteRenderingEngineSourceStep } from '../../../../../../../../../interfaces/Source';
+import { Result } from '../../../../../../../../../interfaces/result';
+import { Log } from '../../../../../../../../../api/logger';
 
 type Params = {
   id: string;
