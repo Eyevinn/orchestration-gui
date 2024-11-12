@@ -60,7 +60,8 @@ export function useUpdateSourceInputSlotOnMultiviewLayouts(): CallbackHook<
               } else {
                 return {
                   ...view,
-                  input_slot: 0
+                  input_slot: 0,
+                  label: ''
                 };
               }
             }
