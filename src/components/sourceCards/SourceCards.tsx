@@ -36,6 +36,7 @@ export default function SourceCards({
   ) => Promise<void>;
 }) {
   const [items, moveItem] = useDragableItems(productionSetup.sources);
+  let itemsToAdd: SourceReference[] = [];
   const [selectingText, setSelectingText] = useState(false);
   if (!items) return null;
   const isISource = (source: SourceReference | ISource): source is ISource => {
@@ -53,7 +54,24 @@ export default function SourceCards({
   }
   const productionSources = productionSetup.sources;
 
-  for (let i = 0; i < items[items.length - 1].input_slot; i++) {
+  for (const item of items) {
+    if (isISource(item)) {
+      const itemId =
+        typeof item._id === 'string' ? item._id : item._id.toString();
+      const itemAsRef: SourceReference = {
+        _id: itemId,
+        type: 'ingest_source',
+        label: item.label,
+        stream_uuids: item.stream_uuids,
+        input_slot: item.input_slot
+      };
+      itemsToAdd.push(itemAsRef);
+    } else {
+      itemsToAdd.push(item);
+    }
+  }
+
+  for (let i = 0; i < itemsToAdd[itemsToAdd.length - 1].input_slot; i++) {
     tempItems.every((source) => {
       const id = source._id ? source._id : '';
       const isSource = isISource(source);
@@ -66,7 +84,7 @@ export default function SourceCards({
               id={id}
               onMoveItem={moveItem}
               previousOrder={productionSetup.sources}
-              currentOrder={items as SourceReference[]}
+              currentOrder={itemsToAdd}
               productionSetup={productionSetup}
               updateProduction={updateProduction}
               selectingText={selectingText}
