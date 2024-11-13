@@ -20,7 +20,7 @@ import {
   usePutProduction,
   useReplaceProductionSourceStreamIds
 } from '../../../hooks/productions';
-import { Production } from '../../../interfaces/production';
+import { Production, ProductionSettings } from '../../../interfaces/production';
 import { updateSetupItem } from '../../../hooks/items/updateSetupItem';
 import { removeSetupItem } from '../../../hooks/items/removeSetupItem';
 import { addSetupItem } from '../../../hooks/items/addSetupItem';
@@ -697,6 +697,36 @@ export default function ProductionConfiguration({ params }: PageProps) {
     }
   };
 
+  async function fetchWithRetry(
+    updatedSetup: Production,
+    config: {
+      retries: number;
+      retryDelay: number;
+    }
+  ): Promise<Production> {
+    const { retries, retryDelay } = config;
+
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const response = await updateSourceInputSlotOnMultiviewLayouts(
+          updatedSetup
+        );
+
+        if (response) return response;
+
+        throw new Error(`Request failed`);
+      } catch (error) {
+        if (attempt === retries) throw error;
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, retryDelay * 2 ** attempt)
+        );
+      }
+    }
+
+    throw new Error('Max retries reached');
+  }
+
   const handleAddSource = async () => {
     setAddSourceStatus(undefined);
     if (
@@ -783,17 +813,23 @@ export default function ProductionConfiguration({ params }: PageProps) {
           };
           const updatedSetup = addSetupItem(sourceToAdd, productionSetup);
           if (!updatedSetup) return;
-          updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
-            (result) => {
-              if (!result) return;
-              setProductionSetup(result);
-              updateMultiview(sourceToAdd, result);
-              refreshProduction();
-              setAddSourceModal(false);
-              setSelectedSource(undefined);
-            }
-          );
-          setAddSourceStatus(undefined);
+          try {
+            const databaseResult = await fetchWithRetry(updatedSetup, {
+              retries: 10,
+              retryDelay: 1000
+            });
+            setProductionSetup(databaseResult);
+            updateMultiview(sourceToAdd, databaseResult);
+            refreshProduction();
+            setAddSourceModal(false);
+            setSelectedSource(undefined);
+            setAddSourceStatus({ success: true, steps: result.value.steps });
+          } catch (error) {
+            console.error(
+              'Failed to update the database after retries:',
+              error
+            );
+          }
         } else {
           setAddSourceStatus({ success: false, steps: result.value.steps });
         }
@@ -845,14 +881,20 @@ export default function ProductionConfiguration({ params }: PageProps) {
                   productionSetup
                 );
                 if (!updatedSetup) return;
-                updateSourceInputSlotOnMultiviewLayouts(updatedSetup).then(
-                  (result) => {
-                    if (!result) return;
-                    setProductionSetup(updatedSetup);
-                    updateMultiview(selectedSourceRef, result);
-                    setSelectedSourceRef(undefined);
-                  }
-                );
+                try {
+                  const databaseResult = await fetchWithRetry(updatedSetup, {
+                    retries: 10,
+                    retryDelay: 1000
+                  });
+                  setProductionSetup(updatedSetup);
+                  updateMultiview(selectedSourceRef, databaseResult);
+                  setSelectedSourceRef(undefined);
+                } catch (error) {
+                  console.error(
+                    'Failed to update the database after retries:',
+                    error
+                  );
+                }
                 return;
               }
             }
