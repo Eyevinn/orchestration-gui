@@ -1014,7 +1014,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
       const updatedSetup = removeSetupItem(
         selectedSourceRef,
         productionSetup,
-        ingestSourceId
+        ingestSourceId,
+        ingestSource?.ingest_name
       );
 
       if (!updatedSetup) return;
@@ -1193,7 +1194,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
                           input_slot: source.input_slot
                         },
                         productionSetup,
-                        ingestSourceId
+                        ingestSourceId,
+                        ingestSource?.ingest_name
                       );
                       if (!updatedSetup) return;
                       setProductionSetup(updatedSetup);

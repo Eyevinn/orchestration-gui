@@ -4,7 +4,8 @@ import { Production } from '../../interfaces/production';
 export function removeSetupItem(
   source: SourceReference,
   productionSetup: Production,
-  ingestSourceId?: number
+  ingestSourceId?: number,
+  ingestName?: string
 ): Production | null {
   const tempItems = productionSetup.sources.filter(
     (tempItem) => tempItem._id !== source._id
@@ -12,13 +13,15 @@ export function removeSetupItem(
 
   let updatedPipelines = productionSetup.production_settings.pipelines;
 
-  if (ingestSourceId !== undefined) {
+  if (ingestSourceId !== undefined && ingestName !== undefined) {
     updatedPipelines = productionSetup.production_settings.pipelines.map(
       (pipeline) => ({
         ...pipeline,
         sources: pipeline.sources
           ? pipeline.sources.filter(
-              (pipelineSource) => pipelineSource.source_id !== ingestSourceId
+              (pipelineSource) =>
+                pipelineSource.source_id !== ingestSourceId ||
+                pipelineSource.settings.ingest_name !== ingestName
             )
           : []
       })
