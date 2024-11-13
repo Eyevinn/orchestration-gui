@@ -36,7 +36,7 @@ export default function SourceCards({
   ) => Promise<void>;
 }) {
   const [items, moveItem] = useDragableItems(productionSetup.sources);
-  let itemsToAdd: SourceReference[] = [];
+  const itemsToAdd: SourceReference[] = [];
   const [selectingText, setSelectingText] = useState(false);
   if (!items) return null;
   const isISource = (source: SourceReference | ISource): source is ISource => {
