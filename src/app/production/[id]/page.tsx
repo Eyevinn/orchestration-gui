@@ -607,11 +607,11 @@ export default function ProductionConfiguration({ params }: PageProps) {
           }
         };
 
-        const exists =
-          pipeline.sources?.some((s) => s.source_id === newSource.source_id) &&
-          pipeline.sources?.some(
-            (s) => s.settings.ingest_name === newSource.settings.ingest_name
-          );
+        const exists = pipeline.sources?.some(
+          (s) =>
+            s.source_id === newSource.source_id &&
+            s.settings.ingest_name === newSource.settings.ingest_name
+        );
 
         const updatedSources = exists
           ? pipeline.sources
