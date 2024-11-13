@@ -12,6 +12,7 @@ export interface SrtOutput {
 export interface PipelineSource {
   source_id: number;
   settings: {
+    ingest_name: string;
     alignment_ms?: number;
     max_network_latency_ms?: number;
   };

@@ -108,7 +108,9 @@ export async function createStream(
       );
 
       const pipelineSource = pipeline.sources?.find(
-        (source) => source.source_id === sourceId
+        (s) =>
+          s.source_id === sourceId &&
+          s.settings.ingest_name === source.ingest_name
       );
 
       const stream: PipelineStreamSettings = {

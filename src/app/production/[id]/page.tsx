@@ -388,10 +388,13 @@ export default function ProductionConfiguration({ params }: PageProps) {
             pipelines: productionSetup.production_settings.pipelines.map(
               (pipeline) => {
                 if (pipeline.pipeline_id === pipeline_uuid) {
-                  pipeline.sources?.map((source) => {
-                    if (source.source_id === sourceId) {
-                      source.settings.alignment_ms = alignment;
-                      source.settings.max_network_latency_ms = latency;
+                  pipeline.sources?.map((s) => {
+                    if (
+                      s.source_id === sourceId &&
+                      s.settings.ingest_name === source.ingest_name
+                    ) {
+                      s.settings.alignment_ms = alignment;
+                      s.settings.max_network_latency_ms = latency;
                     }
                   });
                 }
@@ -598,14 +601,17 @@ export default function ProductionConfiguration({ params }: PageProps) {
             source.ingest_source_name
           ),
           settings: {
+            ingest_name: source.ingest_name,
             alignment_ms: pipeline.alignment_ms,
             max_network_latency_ms: pipeline.max_network_latency_ms
           }
         };
 
-        const exists = pipeline.sources?.some(
-          (s) => s.source_id === newSource.source_id
-        );
+        const exists =
+          pipeline.sources?.some((s) => s.source_id === newSource.source_id) &&
+          pipeline.sources?.some(
+            (s) => s.settings.ingest_name === newSource.settings.ingest_name
+          );
 
         const updatedSources = exists
           ? pipeline.sources
@@ -730,6 +736,7 @@ export default function ProductionConfiguration({ params }: PageProps) {
             selectedSource.ingest_source_name
           ),
           settings: {
+            ingest_name: selectedSource.ingest_name,
             alignment_ms: pipeline.alignment_ms,
             max_network_latency_ms: pipeline.max_network_latency_ms
           }

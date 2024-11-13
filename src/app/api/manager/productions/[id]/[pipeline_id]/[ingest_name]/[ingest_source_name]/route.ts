@@ -40,7 +40,8 @@ export async function GET(
         ? await getProductionPipelineSourceAlignment(
             params.id,
             params.pipeline_id,
-            sourceId
+            sourceId,
+            params.ingest_name
           )
         : 0;
 
@@ -49,7 +50,8 @@ export async function GET(
         ? await getProductionSourceLatency(
             params.id,
             params.pipeline_id,
-            sourceId
+            sourceId,
+            params.ingest_name
           )
         : 0;
 
@@ -93,12 +95,14 @@ export async function PUT(
         params.id,
         params.pipeline_id,
         sourceId,
+        params.ingest_name,
         alignment
       );
       const latencyResult = await setProductionPipelineSourceLatency(
         params.id,
         params.pipeline_id,
         sourceId,
+        params.ingest_name,
         latency
       );
 
