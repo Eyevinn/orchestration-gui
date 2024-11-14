@@ -60,9 +60,9 @@ export async function teardown(
     };
   };
 
-  // PIPELINES
-  // STEP 1
-  // FETCH PIPELINES
+  // Pipelines
+  // Step 1
+  // Fetch pipelines
   let pipelines: ResourcesCompactPipelineResponse[];
 
   if (pipes) {
@@ -78,9 +78,9 @@ export async function teardown(
     }
   }
 
-  // STEP 2
-  // FETCH PIPELINE OUTPUTS
-  // DELETE PIPELINE OUTPUT STREAMS
+  // Step 2
+  // Fetch pipeline outputs
+  // Delete pipeline output streams
   try {
     for (const pipeline of pipelines) {
       const outputs = await getPipelineOutputs(pipeline.uuid).catch(() => {
@@ -103,9 +103,9 @@ export async function teardown(
     return generateResponse(false);
   }
 
-  // STEP 3
-  // FETCH PIPELINE MULTIVIEWERS
-  // DELETE PIPELINE MULTIVIEWERS
+  // Step 3
+  // Fetch pipeline multiviewers
+  // Delete pipeline multiviewers
   try {
     for (const pipeline of pipelines) {
       const multiviewers = await getMultiviewsForPipeline(pipeline.uuid).catch(
@@ -127,9 +127,9 @@ export async function teardown(
     return generateResponse(false);
   }
 
-  // STEP 4
-  // FETCH PIPELINE STREAMS
-  // DELETE PIPELINE STREAMS
+  // Step 4
+  // Fetch pipeline streams
+  // Delete pipeline streams
   try {
     for (const pipeline of pipelines) {
       await removePipelineStreams(pipeline.uuid).catch(() => {
@@ -142,8 +142,8 @@ export async function teardown(
     return generateResponse(false);
   }
 
-  // STEP 5
-  // DELETE PIPELINE CONNECTIONS
+  // Step 5
+  // Delete pipeline connections
   try {
     const disconnectedReceiverIDs: string[] = [];
     for (const pipeline of pipelines) {
@@ -170,9 +170,9 @@ export async function teardown(
     return generateResponse(false);
   }
 
-  // STEP 6
-  // RESET PIPELINES
-  // ONLY DO THIS STEP IF ENABLED IN OPTIONS
+  // Step 6
+  // Reset pipelines
+  // Only do this step if enabled in options
   if (resetPipelines) {
     try {
       for (const pipeline of pipelines) {
@@ -187,12 +187,12 @@ export async function teardown(
     }
   }
 
-  // INGESTS
-  // DO NOT DO THESE STEPS IF PIPELINES WERE SPECIFIED IN THE OPTIONS
+  // Ingests
+  // Do not do these steps if pipelines were specified in the options
   if (!pipes) {
     let ingests: ResourcesCompactIngestResponse[];
-    // STEP 7
-    // FETCH INGESTS
+    // Step 7
+    // Fetch ingests
     try {
       ingests = await getIngests().catch((e) => {
         throw 'Failed to fetch ingests';
@@ -202,8 +202,8 @@ export async function teardown(
       return generateResponse(false);
     }
 
-    // STEP 8
-    // DELETE INGEST STREAMS
+    // Step 8
+    // Delete ingest streams
     try {
       for (const ingest of ingests) {
         for (const stream of ingest.streams) {
@@ -218,9 +218,9 @@ export async function teardown(
       return generateResponse(false);
     }
 
-    // STEP 9
-    // DELETE INGEST SRC SOURCES
-    // ONLY DO THIS STEP IF ENABLED IN OPTIONS
+    // Step 9
+    // Delete ingest SRT sources
+    // Only do this step if enabled in options
     if (deleteIngestSRTSources) {
       try {
         for (const ingest of ingests) {
@@ -243,15 +243,15 @@ export async function teardown(
     }
   }
 
-  // STEP 10
-  // CHECK THAT EVERYTHING WAS REMOVED/DISCONNECTED/DELETED
+  // Step 10
+  // Check that everything was removed/disconnected/deleted
   try {
     const newPipelines = await getPipelines().catch((e) => {
       throw 'Failed to fetch pipelines';
     });
 
     for (const pipeline of newPipelines) {
-      // CHECK IF ALL OUTPUT STREAMS HAVE BEEN STOPPED
+      // Check if all output streams have been stopped
       const outputs = await getPipelineOutputs(pipeline.uuid).catch((e) => {
         throw `Failed to fetch outputs for pipeline ${pipeline.name}`;
       });
@@ -259,7 +259,7 @@ export async function teardown(
         if (output.active_streams && output.active_streams.length)
           throw `Failed to stop all active streams for output ${output.name} in pipeline ${pipeline.name}`;
       }
-      // CHECK IF ALL MULTIVIEWERS HAVE BEEN DELETED
+      // Check if all multiviewers have been deleted
       const multiviewers = await getMultiviewsForPipeline(pipeline.uuid).catch(
         () => {
           throw `Failed to fetch multiviewers for pipeline ${pipeline.name}`;
@@ -267,10 +267,10 @@ export async function teardown(
       );
       if (multiviewers?.length)
         throw `Failed to delete all multiviewers for pipeline ${pipeline.name}`;
-      // CHECK IF ALL PIPELINE STREAMS HAVE BEEN STOPPED
+      // Check if all pipeline streams have been stopped
       if (pipeline.streams?.length)
         throw `Failed to stop all streams for pipeline ${pipeline.name}`;
-      // CHECK IF ALL PIPELINE CONNECTIONS HAVE BEEN DISCONNECTED
+      // Check if all pipeline connections have been disconnected
       if (pipeline.control_receiver?.incoming_connections?.length)
         throw `Failed to disconnect all incoming connections to the control receiver of pipeline ${pipeline.name}`;
       if (pipeline.control_receiver?.outgoing_connections?.length)
@@ -283,11 +283,11 @@ export async function teardown(
       });
 
       for (const ingest of ingests) {
-        // CHECK IF ALL INGEST STREAMS HAVE BEEN STOPPED
+        // CHeck if all ingest streams have been stopped
         if (ingest.streams?.length)
           throw `Failed to stop ingest streams for ingest ${ingest.name}`;
-        // CHECK IF ALL SRT SOURCES HAVE BEEN DELETED
-        // ONLY IF DELETE INGEST SRT SOURCES IS SET TO TRUE IN OPTIONS (DEFAULT)
+        // Check if all SRT sources have been deleted
+        // Only if delete ingest SRT sources is set to true in options (default)
         if (deleteIngestSRTSources && ingest.sources?.length) {
           const sources = await getIngestSources(ingest.uuid);
           for (const source of sources) {
