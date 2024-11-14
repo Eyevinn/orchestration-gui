@@ -128,8 +128,8 @@ async function connectIngestSources(
 
       const pipelineSource = pipeline.sources?.find(
         (s) =>
-          s.source_id === sourceId &&
-          s.settings.ingest_name === source.ingest_name
+          s.ingest_source_name === source.ingest_source_name &&
+          s.ingest_name === source.ingest_name
       );
 
       const stream: PipelineStreamSettings = {
@@ -877,14 +877,14 @@ export async function startProduction(
 
                 const currentSettings = pipeline.sources?.find(
                   (s) =>
-                    s.source_id === sourceId &&
-                    s.settings.ingest_name === source.ingest_name
+                    s.ingest_source_name === source.ingest_source_name &&
+                    s.ingest_name === source.ingest_name
                 )?.settings;
 
                 return {
-                  source_id: sourceId || 0,
+                  ingest_name: source.ingest_name,
+                  ingest_source_name: source.ingest_source_name,
                   settings: {
-                    ingest_name: source.ingest_name,
                     alignment_ms:
                       currentSettings?.alignment_ms ?? pipeline.alignment_ms,
                     max_network_latency_ms:

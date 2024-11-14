@@ -104,8 +104,8 @@ function deleteMonitoring(db: Db, productionId: string) {
 export async function getProductionPipelineSourceAlignment(
   productionId: string,
   pipelineId: string,
-  sourceId: number,
-  sourceIngestName: string
+  ingestName: string,
+  ingestSourceName: string
 ) {
   const production = await getProduction(productionId);
 
@@ -120,8 +120,8 @@ export async function getProductionPipelineSourceAlignment(
 
   const source = pipeline?.sources?.find(
     (source) =>
-      String(source.source_id) === String(sourceId) &&
-      source.settings.ingest_name === sourceIngestName
+      source.ingest_name === ingestName &&
+      source.ingest_source_name === ingestSourceName
   );
 
   const alignment =
@@ -135,8 +135,8 @@ export async function getProductionPipelineSourceAlignment(
 export async function setProductionPipelineSourceAlignment(
   productionId: string,
   pipelineId: string,
-  sourceId: number,
-  sourceIngestName: string,
+  ingestName: string,
+  ingestSourceName: string,
   alignment_ms: number
 ) {
   const db = await getDatabase();
@@ -146,9 +146,9 @@ export async function setProductionPipelineSourceAlignment(
       {
         _id: new ObjectId(productionId),
         'production_settings.pipelines.pipeline_id': pipelineId,
-        'production_settings.pipelines.sources.source_id': sourceId,
-        'production_settings.pipelines.sources.settings.ingest_name':
-          sourceIngestName
+        'production_settings.pipelines.sources.ingest_name': ingestName,
+        'production_settings.pipelines.sources.ingest_source_name':
+          ingestSourceName
       },
       {
         $set: {
@@ -160,8 +160,8 @@ export async function setProductionPipelineSourceAlignment(
         arrayFilters: [
           { 'p.pipeline_id': pipelineId },
           {
-            's.source_id': sourceId,
-            's.settings.ingest_name': sourceIngestName
+            's.ingest_name': ingestName,
+            's.ingest_source_name': ingestSourceName
           }
         ]
       }
@@ -182,8 +182,8 @@ export async function setProductionPipelineSourceAlignment(
 export async function getProductionSourceLatency(
   productionId: string,
   pipelineId: string,
-  sourceId: number,
-  sourceIngestName: string
+  ingestSourceName: string,
+  ingestName: string
 ) {
   const production = await getProduction(productionId);
 
@@ -198,8 +198,8 @@ export async function getProductionSourceLatency(
 
   const source = pipeline?.sources?.find(
     (source) =>
-      String(source.source_id) === String(sourceId) &&
-      source.settings.ingest_name === sourceIngestName
+      source.ingest_name === ingestName &&
+      source.ingest_source_name === ingestSourceName
   );
 
   const latency =
@@ -212,8 +212,8 @@ export async function getProductionSourceLatency(
 export async function setProductionPipelineSourceLatency(
   productionId: string,
   pipelineId: string,
-  sourceId: number,
-  sourceIngestName: string,
+  ingestName: string,
+  ingestSourceName: string,
   max_network_latency_ms: number
 ) {
   const db = await getDatabase();
@@ -223,9 +223,9 @@ export async function setProductionPipelineSourceLatency(
       {
         _id: new ObjectId(productionId),
         'production_settings.pipelines.pipeline_id': pipelineId,
-        'production_settings.pipelines.sources.source_id': sourceId,
-        'production_settings.pipelines.sources.settings.ingest_name':
-          sourceIngestName
+        'production_settings.pipelines.sources.ingest_name': ingestName,
+        'production_settings.pipelines.sources.ingest_source_name':
+          ingestSourceName
       },
       {
         $set: {
@@ -237,8 +237,8 @@ export async function setProductionPipelineSourceLatency(
         arrayFilters: [
           { 'p.pipeline_id': pipelineId },
           {
-            's.source_id': sourceId,
-            's.settings.ingest_name': sourceIngestName
+            's.ingest_name': ingestName,
+            's.ingest_source_name': ingestSourceName
           }
         ]
       }
