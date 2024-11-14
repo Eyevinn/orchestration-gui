@@ -100,7 +100,9 @@ export default function SourceCard({
     <div
       ref={forwardedRef}
       style={style}
-      className="relative bg-zinc-700 aspect-video m-2 overflow-hidden cursor-pointer"
+      className={`relative bg-zinc-700 aspect-video m-2 overflow-hidden ${
+        productionSetup?.isActive ? 'cursor-auto' : 'cursor-pointer'
+      }`}
     >
       <div className="relative">
         <input
@@ -115,8 +117,26 @@ export default function SourceCard({
           disabled={locked}
         />
       </div>
-      {source && <ImageComponent src={getSourceThumbnail(source)} />}
-      {!source && sourceRef && <ImageComponent type={sourceRef.type} />}
+      {source && (
+        <ImageComponent
+          className={`${
+            productionSetup?.isActive
+              ? 'pointer-events-none'
+              : 'pointer-events-auto'
+          }`}
+          src={getSourceThumbnail(source)}
+        />
+      )}
+      {!source && sourceRef && (
+        <ImageComponent
+          className={`${
+            productionSetup?.isActive
+              ? 'pointer-events-none'
+              : 'pointer-events-auto'
+          }`}
+          type={sourceRef.type}
+        />
+      )}
       {(source || sourceRef) && (
         <h2
           className={`${

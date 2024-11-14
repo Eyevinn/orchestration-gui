@@ -17,10 +17,11 @@ interface ImageComponentProps extends PropsWithChildren {
   src?: string;
   alt?: string;
   type?: Type;
+  className?: string;
 }
 
 const ImageComponent: React.FC<ImageComponentProps> = (props) => {
-  const { src, alt = 'Image', children, type } = props;
+  const { src, alt = 'Image', children, type, className } = props;
   const { imageRefetchKey } = useContext(GlobalContext);
   const [imgSrc, setImgSrc] = useState<string>();
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -52,7 +53,9 @@ const ImageComponent: React.FC<ImageComponentProps> = (props) => {
   return (
     <>
       {(!type || type === 'ingest_source') && src && (
-        <div className="relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700">
+        <div
+          className={`${className} relative z-10 aspect-video min-w-full overflow-hidden border rounded-lg bg-zinc-700`}
+        >
           {((!imgSrc || error) && (
             <IconExclamationCircle className="text-error fill-white w-full h-full" />
           )) || (
