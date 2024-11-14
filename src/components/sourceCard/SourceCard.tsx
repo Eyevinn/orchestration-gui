@@ -101,7 +101,7 @@ export default function SourceCard({
       ref={forwardedRef}
       style={style}
       className={`relative bg-zinc-700 aspect-video m-2 overflow-hidden ${
-        productionSetup?.isActive ? 'cursor-auto' : 'cursor-pointer'
+        productionSetup?.isActive || locked ? 'cursor-auto' : 'cursor-pointer'
       }`}
     >
       <div className="relative">
@@ -120,7 +120,7 @@ export default function SourceCard({
       {source && (
         <ImageComponent
           className={`${
-            productionSetup?.isActive
+            productionSetup?.isActive || locked
               ? 'pointer-events-none'
               : 'pointer-events-auto'
           }`}
@@ -130,7 +130,7 @@ export default function SourceCard({
       {!source && sourceRef && (
         <ImageComponent
           className={`${
-            productionSetup?.isActive
+            productionSetup?.isActive || locked
               ? 'pointer-events-none'
               : 'pointer-events-auto'
           }`}

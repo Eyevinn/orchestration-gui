@@ -220,7 +220,7 @@ export function StartProductionButton({
         <Button
           className={`${
             disabled
-              ? 'bg-button-delete/50'
+              ? 'bg-button-delete/50 pointer-events-none'
               : 'bg-button-delete hover:bg-button-hover-red-bg'
           }`}
           onClick={() => setStopModalOpen(true)}
