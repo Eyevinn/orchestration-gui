@@ -25,7 +25,6 @@ type ConfigureAlignmentModalProps = {
   onAbort: () => void;
   onConfirm: (
     source: ISource,
-    sourceId: number,
     data: {
       pipeline_uuid: string;
       stream_uuid: string;
@@ -67,7 +66,6 @@ export function ConfigureAlignmentLatencyModal({
   const [alignments, setAlignments] = useState<Settings>({});
   const [latencies, setLatencies] = useState<Settings>({});
   const previousLatenciesRef = useRef<Settings>({});
-  const [sourceId, setSourceId] = useState<number>(0);
   const [showRestartStreamModal, setShowRestartStreamModal] =
     useState<boolean>(false);
   const [inputErrors, setInputErrors] = useState<Record<string, boolean>>({});
@@ -97,17 +95,6 @@ export function ConfigureAlignmentLatencyModal({
       }
     }
   }, [pipelinesAreSelected, latencies, alignments]);
-
-  useEffect(() => {
-    const fetchSourceId = async () => {
-      const id = await getIngestSourceId(
-        source.ingest_name,
-        source.ingest_source_name
-      );
-      setSourceId(id);
-    };
-    fetchSourceId();
-  }, [source]);
 
   useEffect(() => {
     const fetchStreams = async () => {
@@ -221,14 +208,13 @@ export function ConfigureAlignmentLatencyModal({
       if (shouldRestart) {
         onConfirm(
           source,
-          sourceId,
           alignmentData,
           true,
           sourceStreams.map((stream) => stream.stream_uuid)
         );
         handleCloseModal();
       } else {
-        onConfirm(source, sourceId, alignmentData);
+        onConfirm(source, alignmentData);
         if (!latenciesChanged) {
           handleCloseModal();
         }
@@ -250,7 +236,7 @@ export function ConfigureAlignmentLatencyModal({
         setInputErrors({});
       });
 
-      onConfirm(source, sourceId, alignmentData);
+      onConfirm(source, alignmentData);
       handleCloseModal();
     }
   };

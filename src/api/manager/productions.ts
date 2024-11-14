@@ -104,8 +104,8 @@ function deleteMonitoring(db: Db, productionId: string) {
 export async function getProductionPipelineSourceAlignment(
   productionId: string,
   pipelineId: string,
-  ingestName: string,
-  ingestSourceName: string
+  ingestSourceName: string,
+  ingestName: string
 ) {
   const production = await getProduction(productionId);
 

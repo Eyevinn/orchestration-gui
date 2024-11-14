@@ -25,7 +25,6 @@ export default function SourceCards({
   onSourceRemoval: (source: SourceReference, ingestSource?: ISource) => void;
   onConfirm: (
     source: ISource,
-    sourceId: number,
     data: {
       pipeline_uuid: string;
       stream_uuid: string;

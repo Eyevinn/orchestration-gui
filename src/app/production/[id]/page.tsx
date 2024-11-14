@@ -134,6 +134,8 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   const [updateStream, loading] = useUpdateStream();
 
+  const [getIngestSourceId] = useIngestSourceId();
+
   const putProductionPipelineSourceAlignmentAndLatency =
     usePutProductionPipelineSourceAlignmentAndLatency();
 
@@ -351,7 +353,6 @@ export default function ProductionConfiguration({ params }: PageProps) {
 
   const handleSetPipelineSourceSettings = async (
     source: ISource,
-    sourceId: number,
     data: {
       pipeline_uuid: string;
       stream_uuid: string;
@@ -410,6 +411,10 @@ export default function ProductionConfiguration({ params }: PageProps) {
     if (shouldRestart && productionSetup && streamUuids) {
       const sourceToDeleteFrom = productionSetup.sources.find((source) =>
         source.stream_uuids?.includes(streamUuids[0])
+      );
+      const sourceId = await getIngestSourceId(
+        source.ingest_name,
+        source.ingest_source_name
       );
       deleteStream(streamUuids, productionSetup, sourceId)
         .then(() => {

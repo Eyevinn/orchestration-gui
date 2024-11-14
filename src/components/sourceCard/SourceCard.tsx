@@ -18,7 +18,6 @@ type SourceCardProps = {
   onSelectingText: (bool: boolean) => void;
   onConfirm: (
     source: ISource,
-    sourceId: number,
     data: {
       pipeline_uuid: string;
       stream_uuid: string;
