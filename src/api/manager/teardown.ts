@@ -283,7 +283,7 @@ export async function teardown(
       });
 
       for (const ingest of ingests) {
-        // CHeck if all ingest streams have been stopped
+        // Check if all ingest streams have been stopped
         if (ingest.streams?.length)
           throw `Failed to stop ingest streams for ingest ${ingest.name}`;
         // Check if all SRT sources have been deleted
