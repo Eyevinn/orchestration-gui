@@ -9,6 +9,8 @@ import { FlowStep, TeardownStepNames } from '../../interfaces/production';
 import { Loader } from '../loader/Loader';
 import FlowSteps from '../flowSteps/FlowSteps';
 import Icons from '../icons/Icons';
+import { useContext } from 'react';
+import { GlobalContext } from '../../contexts/GlobalContext';
 
 const SideNavTeardown: React.FC<SideNavItemBaseProps> = (props) => {
   const { open } = props;
@@ -22,6 +24,7 @@ const SideNavTeardown: React.FC<SideNavItemBaseProps> = (props) => {
   const [success, setSuccess] = useState<boolean>(false);
 
   const [teardown, loading] = useTeardown();
+  const { locked } = useContext(GlobalContext);
 
   const teardownFunc = () => {
     setSteps([]);
@@ -52,12 +55,16 @@ const SideNavTeardown: React.FC<SideNavItemBaseProps> = (props) => {
   return (
     <div className="relative group">
       <div
-        className="flex items-center pl-4 py-4 overflow-hidden rounded-xl hover:bg-light hover:cursor-pointer"
+        className={`${
+          locked ? 'pointer-events-none' : 'pointer-events-auto'
+        } flex items-center pl-4 py-4 overflow-hidden rounded-xl hover:bg-light hover:cursor-pointer`}
         onClick={() => setDisplayModal(true)}
       >
         <Icons
           name="IconAlertOctagon"
-          className="min-w-8 min-h-8 w-8 h-8 mr-4 stroke-yellow-400"
+          className={`${
+            locked ? 'stroke-yellow-400/50' : 'stroke-yellow-400'
+          } min-w-8 min-h-8 w-8 h-8 mr-4 `}
         />
         <div className="whitespace-nowrap">{t('teardown.name')}</div>
       </div>
