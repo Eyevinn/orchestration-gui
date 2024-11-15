@@ -10,6 +10,7 @@ import { useIngests } from '../../../hooks/ingests';
 import Input from '../../input/Input';
 import { ResourcesSourceResponse } from '../../../../types/ateliere-live';
 import { useIngestSources } from '../../../hooks/ingests';
+import toast from 'react-hot-toast';
 
 type AddSrtModalProps = {
   open: boolean;
@@ -20,6 +21,8 @@ type AddSrtModalProps = {
     srtPayload: SrtSource,
     callback: () => void
   ) => void;
+  createSrtError?: string | null;
+  createSrtSuccessful?: boolean;
 };
 
 type SelectOptions = 'Caller' | 'Listener';
@@ -28,7 +31,9 @@ export function AddSrtModal({
   open,
   loading,
   onAbort,
-  onConfirm
+  onConfirm,
+  createSrtError,
+  createSrtSuccessful
 }: AddSrtModalProps) {
   const ingests = useIngests();
   const t = useTranslate();
@@ -42,7 +47,7 @@ export function AddSrtModal({
   const [remotePort, setRemotePort] = useState<number>(1234);
   const [latency, setLatency] = useState<number>(120);
   const [name, setName] = useState<string>('My SRT source');
-  const [passphrase, setPassphrase] = useState<string>();
+  const [passphrase, setPassphrase] = useState<string>('');
   const [isPassphraseError, setIsPassphraseError] = useState<boolean>(false);
   const [isNameError, setIsNameError] = useState<boolean>(false);
   const [isIngestNameError, setIsIngestNameError] = useState<boolean>(false);
@@ -77,6 +82,12 @@ export function AddSrtModal({
       }
     }
   }, [ingestName, ingests]);
+
+  useEffect(() => {
+    if (createSrtError && createSrtError !== '') {
+      toast.error(createSrtError || '');
+    }
+  }, [createSrtError]);
 
   useEffect(() => {
     fetchIngestSources();
@@ -137,10 +148,22 @@ export function AddSrtModal({
   }, [remoteIp]);
 
   useEffect(() => {
+    if (createSrtSuccessful) {
+      handleCancel();
+    }
+  }, [createSrtSuccessful]);
+
+  useEffect(() => {
     if (remotePort) {
       setIsRemotePortError(false);
     }
   }, [remotePort]);
+
+  useEffect(() => {
+    if (passphrase || passphrase === '') {
+      setIsPassphraseError(false);
+    }
+  }, [passphrase]);
 
   const handleCloseModal = () => {
     setIsNameError(false);
@@ -150,6 +173,7 @@ export function AddSrtModal({
     setIsRemoteIpError(false);
     setIsRemotePortError(false);
     setIsPortAlreadyInUseError(false);
+    setIsPassphraseError(false);
     onAbort();
   };
 
@@ -172,6 +196,7 @@ export function AddSrtModal({
     setIsRemoteIpError(false);
     setIsRemotePortError(false);
     setIsPortAlreadyInUseError(false);
+    setIsPassphraseError(false);
 
     onAbort();
   };
@@ -252,11 +277,9 @@ export function AddSrtModal({
         setIsPortAlreadyInUseError(false);
 
         onConfirm(ingestUuid, srtPayload, () => fetchIngestSources());
-        handleCancel();
       }
     } else {
       onConfirm(ingestUuid, srtPayload, () => fetchIngestSources());
-      handleCancel();
     }
   };
 

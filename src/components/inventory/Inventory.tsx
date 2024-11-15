@@ -20,6 +20,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
   >();
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [currentSource, setCurrentSource] = useState<SourceWithId | null>();
+  const [isCreateSuccessful, setIsCreateSuccessful] = useState<boolean>(false);
 
   const [purgeInventorySource, reloadList] = useSetSourceToPurge();
   const [removeInventorySourceItem, reloadInventoryList] =
@@ -31,6 +32,7 @@ export default function Inventory({ locked }: { locked: boolean }) {
     refreshKey
   );
   const [updateSources, updateSourcesLoading] = useUpdateSources();
+  const [createSrtError, setCreateSrtError] = useState<string>('');
   const t = useTranslate();
 
   useEffect(() => {
@@ -54,14 +56,33 @@ export default function Inventory({ locked }: { locked: boolean }) {
     srtPayload: SrtSource,
     callback: () => void
   ) => {
-    createSrtSource(ingestUuid, srtPayload).then(() => {
-      callback();
-    });
+    setCreateSrtError('');
+    createSrtSource(ingestUuid, srtPayload)
+      .then(() => {
+        callback();
+      })
+      .finally(() => {
+        setIsCreateSuccessful(true);
+      })
+      .catch((e) => {
+        const errorMessageString = String(e.message);
+        const isErrorMessageStringUndefined =
+          errorMessageString === 'undefined';
+        setCreateSrtError(
+          'There was an error creating the SRT source ' +
+            (isErrorMessageStringUndefined ? '' : errorMessageString)
+        );
+      });
   };
 
   const handleRefreshInventory = async () => {
     await updateSources();
     setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleCloseModal = () => {
+    setCreateSrtError('');
+    setShowSrtModal(false);
   };
 
   return (
@@ -74,7 +95,10 @@ export default function Inventory({ locked }: { locked: boolean }) {
               ? 'pointer-events-none bg-button-bg/50'
               : 'bg-button-bg hover:bg-button-hover-bg'
           } text-button-text font-bold py-2 px-4 rounded inline-flex items-center ml-2 w-fit`}
-          onClick={() => setShowSrtModal(true)}
+          onClick={() => {
+            setIsCreateSuccessful(false);
+            setShowSrtModal(true);
+          }}
         >
           {t('inventory_list.create_srt')}
         </button>
@@ -115,9 +139,11 @@ export default function Inventory({ locked }: { locked: boolean }) {
         ) : null}
       </div>
       <AddSrtModal
+        createSrtError={createSrtError}
         open={showSrtModal}
         onConfirm={handleCreateSrtSource}
-        onAbort={() => setShowSrtModal(false)}
+        onAbort={handleCloseModal}
+        createSrtSuccessful={isCreateSuccessful}
       />
     </>
   );
