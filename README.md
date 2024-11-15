@@ -70,7 +70,7 @@ https://help.ateliere.com/live/docs/reference/7-0-0/rest_api/
 
 See [CONTRIBUTING](CONTRIBUTING.md)
 
-## Licence
+## License
 
     Copyright (C) 2024 Ateliere Creative Technologies
 
