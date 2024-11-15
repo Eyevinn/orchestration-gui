@@ -167,6 +167,13 @@ export function AddSrtModal({
     }
   }, [passphrase]);
 
+  useEffect(() => {
+    if (ingestName) {
+      setIsIngestNameError(false);
+      setIsDuplicateNameError(false);
+    }
+  }, [ingestName]);
+
   const handleCloseModal = () => {
     setIsNameError(false);
     setIsIngestNameError(false);
