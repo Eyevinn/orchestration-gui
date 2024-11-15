@@ -583,6 +583,7 @@ export const sv = {
     no_remote_port: 'Du behöver fylla i en remote port',
     port_already_in_use_error:
       'Den här porten används redan av en annan SRT källa. Välj en annan port.',
+    passphrase_error: 'Lösenordet måste vara mellan 10 och 79 tecken',
     cancel: 'Avbryt'
   },
   clear: 'Rensa',

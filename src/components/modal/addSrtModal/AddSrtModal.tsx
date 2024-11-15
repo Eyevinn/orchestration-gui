@@ -43,6 +43,7 @@ export function AddSrtModal({
   const [latency, setLatency] = useState<number>(120);
   const [name, setName] = useState<string>('My SRT source');
   const [passphrase, setPassphrase] = useState<string>();
+  const [isPassphraseError, setIsPassphraseError] = useState<boolean>(false);
   const [isNameError, setIsNameError] = useState<boolean>(false);
   const [isIngestNameError, setIsIngestNameError] = useState<boolean>(false);
   const [isLocalPortError, setIsLocalPortError] = useState<boolean>(false);
@@ -218,6 +219,15 @@ export function AddSrtModal({
     }
     if (!remotePort && mode === 'Caller') {
       setIsRemotePortError(true);
+      hasError = true;
+    }
+
+    if (
+      passphrase &&
+      passphrase !== '' &&
+      (passphrase.length < 10 || passphrase.length > 79)
+    ) {
+      setIsPassphraseError(true);
       hasError = true;
     }
 
@@ -455,6 +465,11 @@ export function AddSrtModal({
               value={passphrase}
               onChange={handleInputChange(setPassphrase)}
             />
+            {isPassphraseError && (
+              <p className="text-xs text-button-delete mt-2">
+                {t('inventory_list.passphrase_error')}
+              </p>
+            )}
           </span>
         </span>
       </div>

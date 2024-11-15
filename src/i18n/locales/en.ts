@@ -581,6 +581,7 @@ export const en = {
     no_remote_port: 'You need to enter a remote port',
     port_already_in_use_error:
       'There is already a SRT source with this port. Choose a different port.',
+    passphrase_error: 'The passphrase needs to be between 10 and 79 characters',
     cancel: 'Cancel'
   },
   clear: 'Clear',
