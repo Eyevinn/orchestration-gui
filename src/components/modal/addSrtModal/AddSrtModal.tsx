@@ -123,7 +123,7 @@ export function AddSrtModal({
         setIsNameError(false);
       }
     }
-  }, [isNameError]);
+  }, [isNameError, name]);
 
   useEffect(() => {
     if (mode === 'Caller' && isPortAlreadyInUseError) {
@@ -171,6 +171,7 @@ export function AddSrtModal({
     if (ingestName) {
       setIsIngestNameError(false);
       setIsDuplicateNameError(false);
+      setIsPortAlreadyInUseError(false);
     }
   }, [ingestName]);
 
@@ -384,7 +385,11 @@ export function AddSrtModal({
               className="w-full ml-2"
               type="text"
               value={name}
-              onChange={handleInputChange(setName, setIsNameError)}
+              onChange={handleInputChange(
+                setName,
+                setIsNameError,
+                setIsDuplicateNameError
+              )}
               error={isNameError}
             />
             {isNameError && (
