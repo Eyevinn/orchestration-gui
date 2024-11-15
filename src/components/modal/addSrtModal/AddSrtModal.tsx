@@ -55,6 +55,8 @@ export function AddSrtModal({
   const [isRemotePortError, setIsRemotePortError] = useState<boolean>(false);
   const [isLocalIpError, setIsLocalIpError] = useState<boolean>(false);
   const [isRemoteIpError, setIsRemoteIpError] = useState<boolean>(false);
+  const [isDuplicateNameError, setIsDuplicateNameError] =
+    useState<boolean>(false);
   const [getIngestSources, ingestSourcesLoading] = useIngestSources();
 
   const [isPortAlreadyInUseError, setIsPortAlreadyInUseError] =
@@ -174,6 +176,7 @@ export function AddSrtModal({
     setIsRemotePortError(false);
     setIsPortAlreadyInUseError(false);
     setIsPassphraseError(false);
+    setIsDuplicateNameError(false);
     onAbort();
   };
 
@@ -197,6 +200,7 @@ export function AddSrtModal({
     setIsRemotePortError(false);
     setIsPortAlreadyInUseError(false);
     setIsPassphraseError(false);
+    setIsDuplicateNameError(false);
 
     onAbort();
   };
@@ -256,11 +260,19 @@ export function AddSrtModal({
       hasError = true;
     }
 
+    const srtSources = await fetchIngestSources();
+
+    if (srtSources.length > 0) {
+      const duplicateNames = srtSources.some((srt) => srt.name === name);
+      if (duplicateNames) {
+        setIsDuplicateNameError(true);
+        hasError = true;
+      }
+    }
+
     if (hasError) {
       return;
     }
-
-    const srtSources = await fetchIngestSources();
 
     if (srtSources.length > 0 && mode === 'Listener') {
       const usedPorts: number[] = [];
@@ -371,6 +383,11 @@ export function AddSrtModal({
             {isNameError && (
               <p className="text-xs text-button-delete mt-2">
                 {t('inventory_list.no_name')}
+              </p>
+            )}
+            {isDuplicateNameError && (
+              <p className="text-xs text-button-delete mt-2">
+                {t('inventory_list.duplicate_name_error')}
               </p>
             )}
           </span>

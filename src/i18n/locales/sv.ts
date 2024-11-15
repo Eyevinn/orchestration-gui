@@ -585,6 +585,7 @@ export const sv = {
       'Den här porten används redan av en annan SRT källa. Välj en annan port.',
     passphrase_error: 'Lösenordet måste vara mellan 10 och 79 tecken',
     generic_error: 'Ett fel uppstod vid skapandet av SRT källan',
+    duplicate_name_error: 'Det finns redan en SRT med det här namnet på den här ingesten.',
     cancel: 'Avbryt'
   },
   clear: 'Rensa',
