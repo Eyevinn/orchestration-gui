@@ -69,8 +69,8 @@ export default function Inventory({ locked }: { locked: boolean }) {
         const isErrorMessageStringUndefined =
           errorMessageString === 'undefined';
         setCreateSrtError(
-          'There was an error creating the SRT source ' +
-            (isErrorMessageStringUndefined ? '' : errorMessageString)
+          t('inventory_list.generic_error') +
+            (isErrorMessageStringUndefined ? '' : ': ' + errorMessageString)
         );
       });
   };
