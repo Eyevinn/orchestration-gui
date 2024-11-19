@@ -13,7 +13,7 @@ export default function RemoveLayoutButton({
   title,
   hidden
 }: RemoveLayoutButtonProps) {
-  const handleCheckboxChange = () => {
+  const setIconStyling = () => {
     if (deleteDisabled && !hidden) {
       return 'pointer-events-none text-zinc-400';
     }
@@ -28,15 +28,19 @@ export default function RemoveLayoutButton({
   return (
     <button
       type="button"
-      className="flex items-center flex-row mb-5 pl-2 w-[50%] cursor-default"
-      disabled={deleteDisabled}
+      className={`flex items-center flex-row mb-5 pl-2 w-[50%]  ${
+        deleteDisabled || hidden ? '' : 'hover:cursor-pointer'
+      }`}
+      disabled={hidden || deleteDisabled}
     >
       <div
         title={title}
-        className={`w-6 h-6 ${deleteDisabled ? '' : 'hover:cursor-pointer'}`}
+        className={`w-6 h-6 ${
+          deleteDisabled || hidden ? '' : 'hover:cursor-pointer'
+        }`}
         onClick={() => removeMultiviewLayout()}
       >
-        <IconTrash className={handleCheckboxChange()} />
+        <IconTrash className={setIconStyling()} />
       </div>
     </button>
   );
