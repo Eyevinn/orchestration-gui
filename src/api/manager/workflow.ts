@@ -342,11 +342,31 @@ export async function stopProduction(
   );
 
   if (productionHasRenderingEngineSources) {
+    const ingestPipelineUuids = (await getPipelines()).map(
+      (pipeline) => pipeline.uuid
+    );
+
     for (const pipeline of production.production_settings.pipelines) {
       const pipelineId = pipeline.pipeline_id;
-      if (pipelineId) {
-        const htmlSources = await getPipelineRenderingEngineHtml(pipelineId);
-        const mediaSources = await getPipelineRenderingEngineMedia(pipelineId);
+
+      // Make sure pipeline ID exists before attempting to get rendering engine
+      const pipelineIdExists = pipelineId
+        ? ingestPipelineUuids.includes(pipelineId)
+        : false;
+
+      if (pipelineId && pipelineIdExists) {
+        const htmlSources = await getPipelineRenderingEngineHtml(
+          pipelineId
+        ).catch((error) => {
+          Log().error('Failed to fetch HTML sources from pipeline: ', error);
+          return [];
+        });
+        const mediaSources = await getPipelineRenderingEngineMedia(
+          pipelineId
+        ).catch((error) => {
+          Log().error('Failed to fetch Media sources from pipeline: ', error);
+          return [];
+        });
 
         if (htmlSources.length > 0 && htmlSources) {
           for (const pipeline of production.production_settings.pipelines) {
